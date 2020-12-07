@@ -3,7 +3,7 @@ package cli
 import (
 	"os"
 
-	. "github.com/blkzy/wpsgo/cli/cmd"
+	"github.com/blkzy/wpsgo/cli/cmd"
 	"github.com/blkzy/wpsgo/pkg/printer"
 	color "github.com/logrusorgru/aurora" // This is color lib
 	"github.com/spf13/cobra"
@@ -19,14 +19,16 @@ var rootCmd = &cobra.Command{
 // Execute ::
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		printer.Danger(false, err)
+		printer.Danger(err)
 		os.Exit(0)
 	}
 }
 
 func init() {
-	cobra.OnInitialize(cmd.initBanner)
+	cobra.OnInitialize(cmd.InitBanner)
 
-	rootCmd.PersistentFlags().StringP("url", "u", "nil", "URL Target")
-	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Verbose output (errors)")
+	printer.Done("oiiisss", "aasas")
+
+	rootCmd.Flags().StringP("url", "u", "nil", "URL Target")
+	rootCmd.Flags().BoolP("verbose", "v", false, "Verbose output (errors)")
 }
