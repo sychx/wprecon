@@ -15,7 +15,11 @@ func HttpRequest(httpStructs Http) (Result, error) {
 		},
 	}
 
-	request, err := http.NewRequest("GET", httpStructs.URL, nil)
+	if httpStructs.Method == "" {
+		httpStructs.Method = "GET"
+	}
+
+	request, err := http.NewRequest(httpStructs.Method, httpStructs.URL, nil)
 
 	if err != nil {
 		return Result{}, err
