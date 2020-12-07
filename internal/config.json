@@ -5,7 +5,7 @@
         "email": ""
     },
     "App":{
-        "description": "Goploit is a tool focused on WebHacking, which is still in development! in your initial project phase. Counting from the start with just 5 commands. You can use the -h parameter to see the Goploit help!",
+        "description": "",
         "version": "2.1.0",
         "version-reselase": "2.0"
     }
