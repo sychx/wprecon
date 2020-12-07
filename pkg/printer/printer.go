@@ -2,14 +2,32 @@ package printer
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
+	"strings"
 
 	color "github.com/logrusorgru/aurora" // This is color lib
+	"golang.org/x/net/html/charset"
 )
 
 // Println ::
 func Println(text ...interface{}) {
 	fmt.Fprintln(os.Stdout, text...)
+}
+
+// Decoder :: Convert to UTF-8
+func Decoder(text string) string {
+	r, err := charset.NewReader(strings.NewReader(text), "latin1")
+	if err != nil {
+		log.Fatal(err)
+	}
+	result, err := ioutil.ReadAll(r)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return string(result)
 }
 
 // Danger ::
@@ -70,6 +88,7 @@ func Wait(text ...interface{}) {
 	fmt.Fprintln(os.Stdout, text...)
 }
 
+// Fatal ::
 func Fatal(text ...interface{}) {
 	var prefix = color.Red("[!]").String()
 
@@ -79,6 +98,7 @@ func Fatal(text ...interface{}) {
 	os.Exit(0)
 }
 
+// Required ::
 func Required(text ...interface{}) string {
 	var sufix = color.Red("(Required)").Bold().String()
 
