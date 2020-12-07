@@ -6,7 +6,7 @@ import (
 )
 
 // HttpRequest :: This function will be used for any request that is made.
-func HttpRequest(httpStructs Http) (Result, error) {
+func HttpRequest(httpStructs Http) (Response, error) {
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
@@ -22,13 +22,13 @@ func HttpRequest(httpStructs Http) (Result, error) {
 	request, err := http.NewRequest(httpStructs.Method, httpStructs.URL, nil)
 
 	if err != nil {
-		return Result{}, err
+		return Response{}, err
 	}
 
 	response, err := client.Do(request)
 
 	if err != nil {
-		return Result{}, err
+		return Response{}, err
 	}
 
 	request.Header.Set("User-Agent", "Wordpress Security Go (GoHttp 0.1.0)")
@@ -37,12 +37,12 @@ func HttpRequest(httpStructs Http) (Result, error) {
 		request.Header.Set("User-Agent", userAgent)
 	}
 
-	httpResult := Result{
+	httpResponse := Response{
 		URL:        request.URL.Scheme + "://" + request.URL.Host + request.URL.Path,
 		StatusCode: response.StatusCode,
 		UserAgent:  request.UserAgent(),
 		Body:       response.Body,
 	}
 
-	return httpResult, nil
+	return httpResponse, nil
 }
