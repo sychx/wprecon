@@ -6,6 +6,7 @@ import (
 	"github.com/blkzy/wpsgo/internal"
 	"github.com/blkzy/wpsgo/pkg/gohttp"
 	"github.com/blkzy/wpsgo/pkg/printer" // This is color lib
+	"github.com/blkzy/wpsgo/tools"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +15,11 @@ var rootCmd = &cobra.Command{
 	Short: "Wordpress Scanner Go",
 	Long:  `Wpsgo (Wordpress Scanner Go) is a scanner based on wpscan, only done in golang to get better performance!`,
 	Run: func(cmd *cobra.Command, args []string) {
-		printer.Danger("IALA")
+		target, _ := cmd.Flags().GetString("url")
+
+		response, _ := gohttp.HttpRequest(gohttp.Http{URL: target})
+
+		tools.Wordpress(response)
 	},
 }
 
@@ -29,7 +34,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initBanner)
 
-	rootCmd.PersistentFlags().StringP("url", "u", "", "URL Target "+printer.Required())
+	rootCmd.PersistentFlags().StringP("url", "u", "", "Target URL (Ex: http(s)://google.com/) "+printer.Required())
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Verbose output")
 
 	rootCmd.MarkPersistentFlagRequired("url")
