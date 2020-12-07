@@ -37,14 +37,16 @@ func init() {
 
 func initBanner() {
 	target, _ := rootCmd.Flags().GetString("url")
+	isURL, err := gohttp.IsValidURL(target)
 
-	x, _ := gohttp.IsValidURL(target)
-
-	printer.Println(x)
-
-	if target != "" {
+	switch isURL {
+	case false:
+		internal.Banner()
+		printer.Fatal(err)
+	case true:
 		internal.SBanner(target)
-	} else {
+	default:
 		internal.Banner()
 	}
+
 }

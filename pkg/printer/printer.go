@@ -51,6 +51,15 @@ func Wait(text ...interface{}) {
 	fmt.Fprintln(os.Stdout, text...)
 }
 
+func Fatal(text ...interface{}) {
+	var prefix = color.Red("[!]").String()
+
+	fmt.Fprint(os.Stdout, prefix, " ")
+	fmt.Fprintln(os.Stdout, text...)
+
+	os.Exit(0)
+}
+
 func Required(text ...interface{}) string {
 	var sufix = color.Red("(Required)").Bold().String()
 
