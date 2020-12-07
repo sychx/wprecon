@@ -7,6 +7,7 @@ import (
 	color "github.com/logrusorgru/aurora" // This is color lib
 )
 
+// Println ::
 func Println(text ...interface{}) {
 	fmt.Fprintln(os.Stdout, text...)
 }
@@ -37,8 +38,26 @@ func Warning(text ...interface{}) {
 
 // Loading ::
 func Loading(text ...interface{}) {
-	var prefix = color.Green("[*]").String()
+	var prefix = color.Yellow("[*]").String()
 
+	fmt.Fprint(os.Stdout, prefix, " ")
+	fmt.Fprint(os.Stdout, text...)
+}
+
+// Loading ::
+func LoadingDone(text ...interface{}) {
+	var prefix = color.Green("[+]").String()
+
+	fmt.Print("\033[G\033[K")
+	fmt.Fprint(os.Stdout, prefix, " ")
+	fmt.Fprintln(os.Stdout, text...)
+}
+
+// Loading ::
+func LoadingDanger(text ...interface{}) {
+	var prefix = color.Red("[!]").String()
+
+	fmt.Print("\033[G\033[K")
 	fmt.Fprint(os.Stdout, prefix, " ")
 	fmt.Fprintln(os.Stdout, text...)
 }
