@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"net/http"
 
-	"github.com/blkzy/wpgo/pkg/gohttp"
+	"github.com/blkzy/wpsgo/pkg/gohttp"
 )
 
 // HttpRequest :: This function will be used for any request that is made.
