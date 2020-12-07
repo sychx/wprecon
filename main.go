@@ -1,7 +1,7 @@
 package main
 
-import "github.com/blkzy/wpsgo/cli"
+import . "github.com/blkzy/wpsgo/cli"
 
 func main() {
-	cli.Execute()
+	Execute()
 }

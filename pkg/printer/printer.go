@@ -13,7 +13,7 @@ func Println(text ...interface{}) {
 
 // Danger ::
 func Danger(text ...interface{}) {
-	prefix := color.Red("[!]").String()
+	var prefix = color.Red("[!]").String()
 
 	fmt.Fprint(os.Stdout, prefix, " ")
 	fmt.Fprintln(os.Stdout, text...)
@@ -21,7 +21,7 @@ func Danger(text ...interface{}) {
 
 // Done ::
 func Done(text ...interface{}) {
-	prefix := color.Green("[•]").String()
+	var prefix = color.Green("[•]").String()
 
 	fmt.Fprint(os.Stdout, prefix, " ")
 	fmt.Fprintln(os.Stdout, text...)
@@ -29,7 +29,7 @@ func Done(text ...interface{}) {
 
 // Warning ::
 func Warning(text ...interface{}) {
-	prefix := color.Yellow("[•••]").String()
+	var prefix = color.Yellow("[•••]").String()
 
 	fmt.Fprint(os.Stdout, prefix, " ")
 	fmt.Fprintln(os.Stdout, text...)
@@ -37,7 +37,7 @@ func Warning(text ...interface{}) {
 
 // Loading ::
 func Loading(text ...interface{}) {
-	prefix := color.Green("[*]").String()
+	var prefix = color.Green("[*]").String()
 
 	fmt.Fprint(os.Stdout, prefix, " ")
 	fmt.Fprintln(os.Stdout, text...)
@@ -45,8 +45,14 @@ func Loading(text ...interface{}) {
 
 // Wait ::
 func Wait(text ...interface{}) {
-	prefix := color.Green("[—]").String()
+	var prefix = color.Green("[—]").String()
 
 	fmt.Fprint(os.Stdout, prefix, " ")
 	fmt.Fprintln(os.Stdout, text...)
+}
+
+func Required(text ...interface{}) string {
+	var sufix = color.Red("(Required)").Bold().String()
+
+	return sufix
 }

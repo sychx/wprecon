@@ -21,7 +21,7 @@ type Options struct {
 type Result struct {
 	URL        string
 	Method     string
-	StatusCode int64
+	StatusCode int
 	UserAgent  string
 	Body       io.Reader
 }
