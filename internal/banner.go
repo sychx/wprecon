@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/blkzy/wpsgo/pkg/printer"
+	"github.com/blackcrw/wpsgo/pkg/printer"
 )
 
 // Sbanner :: A banner that will only be executed if the scan is started correctly.

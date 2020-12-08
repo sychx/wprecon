@@ -3,9 +3,10 @@ package cli
 import (
 	"os"
 
-	"github.com/blkzy/wpsgo/internal"
-	"github.com/blkzy/wpsgo/pkg/gohttp"
-	"github.com/blkzy/wpsgo/pkg/printer" // This is color lib
+	"github.com/blackcrw/wpsgo/internal"
+	"github.com/blackcrw/wpsgo/pkg/gohttp"
+	"github.com/blackcrw/wpsgo/pkg/printer" // This is color lib
+	"github.com/blackcrw/wpsgo/tools/wordpress/wpsfinger"
 	"github.com/spf13/cobra"
 )
 
@@ -16,9 +17,9 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		target, _ := cmd.Flags().GetString("url")
 
-		response, _ := gohttp.HttpRequest(gohttp.Http{URL: target})
+		// response, _ := gohttp.HttpRequest(gohttp.Http{URL: target})
 
-		wpsfinger.WAF(target)
+		wpsfinger.HasWordpress(target)
 	},
 }
 

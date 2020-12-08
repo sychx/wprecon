@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/blkzy/wpsgo/pkg/gohttp"
-	"github.com/blkzy/wpsgo/pkg/printer"
-	"github.com/blkzy/wpsgo/tools/wps"
+	"github.com/blackcrw/wpsgo/pkg/gohttp"
+	"github.com/blackcrw/wpsgo/pkg/printer"
+	"github.com/blackcrw/wpsgo/tools/wps"
 )
 
 func HasWordpress(target string) string {

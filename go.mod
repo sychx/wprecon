@@ -1,4 +1,4 @@
-module github.com/blkzy/wpsgo
+module github.com/blackcrw/wpsgo
 
 go 1.15
 

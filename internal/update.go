@@ -3,8 +3,8 @@ package internal
 import (
 	"encoding/json"
 
-	"github.com/blkzy/wpsgo/pkg/gohttp"
-	"github.com/blkzy/wpsgo/pkg/printer"
+	"github.com/blackcrw/wpsgo/pkg/gohttp"
+	"github.com/blackcrw/wpsgo/pkg/printer"
 )
 
 type githubAPIJSON struct {
