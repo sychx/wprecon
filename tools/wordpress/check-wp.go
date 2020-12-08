@@ -19,7 +19,7 @@ func Check(target string) string {
 		`<meta name="generator content="WordPress`,
 		`<a href="http://www.wordpress.com">Powered by WordPress</a>`,
 		`<link rel='https://api.w.org/'`}
-	var paths = [...]string{
+	var directories = [...]string{
 		"wp-content/uploads/",
 		"wp-content/plugins/",
 		"wp-content/themes/",
@@ -50,8 +50,10 @@ func Check(target string) string {
 		wg.Done()
 	}(target, payloads)
 
-	go func(URL string, directories [5]string) {
-		for _, directory := range directories {
+	for _, directory := range directories {
+		wg.Add(1)
+
+		go func(URL string, directory string) {
 			request, err := gohttp.HttpRequest(gohttp.Http{URL: URL + directory})
 
 			if err != nil {
@@ -71,10 +73,10 @@ func Check(target string) string {
 				printer.Done("Listing enable:", URL+directory)
 				exists++
 			}
-		}
 
-		wg.Done()
-	}(target, paths)
+			defer wg.Done()
+		}(target, directory)
+	}
 
 	wg.Wait()
 
