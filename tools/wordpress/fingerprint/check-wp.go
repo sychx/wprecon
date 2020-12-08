@@ -1,7 +1,6 @@
 package wpsfinger
 
 import (
-	. "fmt"
 	"io/ioutil"
 	"strings"
 
@@ -9,9 +8,8 @@ import (
 	"github.com/blackcrw/wpsgo/pkg/printer"
 )
 
-func HasWordpress(target string) string {
-	var calc int
-	var exists int
+func HasWordpress(target string) float32 {
+	var exists float32
 	var err error
 	var response gohttp.Response
 	var content []byte
@@ -26,9 +24,7 @@ func HasWordpress(target string) string {
 		"wp-includes/",
 		"wp-admin/"}
 
-	swg.Add(2)
-
-	go func(URL string, htmlPayloads [3]string) {
+	func(URL string, htmlPayloads [3]string) {
 		response, err = gohttp.HttpRequest(gohttp.Http{URL: URL})
 
 		if err != nil {
@@ -47,13 +43,11 @@ func HasWordpress(target string) string {
 			}
 		}
 
-		swg.Done()
 	}(target, payloads)
 
 	for _, directory := range directories {
-		swg.Add(1)
 
-		go func(URL string, directory string) {
+		func(URL string, directory string) {
 			request, err := gohttp.HttpRequest(gohttp.Http{URL: URL + directory})
 
 			if err != nil {
@@ -69,18 +63,13 @@ func HasWordpress(target string) string {
 			if directory == "wp-admin/" && request.StatusCode == 200 || request.StatusCode == 403 {
 				printer.Warning("Status Code:", request.StatusCode, "in the URL:", URL+directory)
 				exists++
-			} else if !strings.Contains("Index Of", string(body)) {
+			} else if strings.Contains("Index Of", string(body)) {
 				printer.Done("Listing enable:", URL+directory)
 				exists++
 			}
 
-			defer swg.Done()
 		}(target, directory)
 	}
 
-	swg.Wait()
-
-	calc = exists / 8 * 100
-
-	return Sprintf("%v", calc)
+	return exists / 8 * 100
 }
