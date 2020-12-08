@@ -9,8 +9,6 @@ func WAF(target string) (bool, interface{}) {
 	var WAF [6]string
 	var hasWAF bool = false
 
-	swg.Add(6)
-
 	go func(URL string) {
 		response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/wordfence/"})
 
@@ -26,7 +24,6 @@ func WAF(target string) (bool, interface{}) {
 			WAF[0] = "403 — Wordfence Security"
 		}
 
-		swg.Done()
 	}(target)
 
 	go func(URL string) {
@@ -44,7 +41,6 @@ func WAF(target string) (bool, interface{}) {
 			WAF[0] = "403 — BulletProof Security"
 		}
 
-		swg.Done()
 	}(target)
 
 	go func(URL string) {
@@ -62,7 +58,6 @@ func WAF(target string) (bool, interface{}) {
 			WAF[0] = "403 — Better WP Security"
 		}
 
-		swg.Done()
 	}(target)
 
 	go func(URL string) {
@@ -80,7 +75,6 @@ func WAF(target string) (bool, interface{}) {
 			WAF[0] = "403 — Sucuri Security"
 		}
 
-		swg.Done()
 	}(target)
 
 	go func(URL string) {
@@ -98,7 +92,6 @@ func WAF(target string) (bool, interface{}) {
 			WAF[0] = "403 — Acunetix WP Security"
 		}
 
-		swg.Done()
 	}(target)
 
 	go func(URL string) {
@@ -116,7 +109,6 @@ func WAF(target string) (bool, interface{}) {
 			WAF[0] = "403 — All In One WP Security & Firewall"
 		}
 
-		swg.Done()
 	}(target)
 
 	go func(URL string) {
@@ -134,10 +126,7 @@ func WAF(target string) (bool, interface{}) {
 			WAF[0] = "403 — 6Scan Security"
 		}
 
-		swg.Done()
 	}(target)
-
-	swg.Wait()
 
 	return hasWAF, WAF
 }
