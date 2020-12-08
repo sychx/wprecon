@@ -62,7 +62,7 @@ func Loading(text ...interface{}) {
 	fmt.Fprint(os.Stdout, text...)
 }
 
-// Loading ::
+// LoadingDone ::
 func LoadingDone(text ...interface{}) {
 	var prefix = color.Green("[+]").String()
 
@@ -71,9 +71,18 @@ func LoadingDone(text ...interface{}) {
 	fmt.Fprintln(os.Stdout, text...)
 }
 
-// Loading ::
+// LoadingDanger ::
 func LoadingDanger(text ...interface{}) {
 	var prefix = color.Red("[!]").String()
+
+	fmt.Print("\033[G\033[K")
+	fmt.Fprint(os.Stdout, prefix, " ")
+	fmt.Fprintln(os.Stdout, text...)
+}
+
+// LoadingWarning ::
+func LoadingWarning(text ...interface{}) {
+	var prefix = color.Yellow("[•••]").String()
 
 	fmt.Print("\033[G\033[K")
 	fmt.Fprint(os.Stdout, prefix, " ")
