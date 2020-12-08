@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/blackcrw/wpsgo/internal"
@@ -17,9 +18,17 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		target, _ := cmd.Flags().GetString("url")
 
-		// response, _ := gohttp.HttpRequest(gohttp.Http{URL: target})
+		hasWordpressValue := wpsfinger.HasWordpress(target)
+		hasWordpressValueString := fmt.Sprintf("%.2f%%", hasWordpressValue)
 
-		wpsfinger.WAF(target)
+		if hasWordpressValue >= 62.5 {
+			printer.Done("Wordpress confirmed with", hasWordpressValueString, "accuracy!")
+		} else if hasWordpressValue < 62.5 && hasWordpressValue > 40.5 {
+			printer.Warning("I'm not absolutely sure that this target is using wordpress!", hasWordpressValueString, "chance. do you wish to continue ? [Y/n]: ")
+		} else {
+			printer.Fatal("This target is not running wordpress!")
+		}
+
 	},
 }
 
