@@ -5,128 +5,129 @@ import (
 	"github.com/blackcrw/wpsgo/pkg/printer"
 )
 
-func WAF(target string) (bool, interface{}) {
-	var WAF [6]string
-	var hasWAF bool = false
+func WAF(target string) (bool, string) {
 
-	go func(URL string) {
-		response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/wordfence/"})
+	if hasWaf, nameWaf := wordfence(target); hasWaf {
+		return hasWaf, nameWaf
+	} else if hasWaf, nameWaf := bulletproof(target); hasWaf {
+		return hasWaf, nameWaf
+	} else if hasWaf, nameWaf := betterwp(target); hasWaf {
+		return hasWaf, nameWaf
+	} else if hasWaf, nameWaf := sucuri(target); hasWaf {
+		return hasWaf, nameWaf
+	} else if hasWaf, nameWaf := wpsecurity(target); hasWaf {
+		return hasWaf, nameWaf
+	} else if hasWaf, nameWaf := allinonewpsecurity(target); hasWaf {
+		return hasWaf, nameWaf
+	} else if hasWaf, nameWaf := scanprotection(target); hasWaf {
+		return hasWaf, nameWaf
+	}
 
-		if err != nil {
-			printer.Fatal(err)
-		}
+	return false, ""
+}
 
-		switch response.StatusCode {
-		case 200:
-			WAF[0] = "200 — Wordfence Security"
-			hasWAF = true
-		case 403:
-			WAF[0] = "403 — Wordfence Security"
-		}
+func wordfence(target string) (bool, string) {
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/wordfence/"})
 
-	}(target)
+	if err != nil {
+		printer.Fatal(err)
+	}
 
-	go func(URL string) {
-		response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/bulletproof-security/"})
+	switch response.StatusCode {
+	case 200:
+		return true, "200 — Wordfence Security"
+	case 403:
+		return true, "403 — Wordfence Security"
+	}
+}
 
-		if err != nil {
-			printer.Fatal(err)
-		}
+func bulletproof(target string) (bool, string) {
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/bulletproof-security/"})
 
-		switch response.StatusCode {
-		case 200:
-			WAF[0] = "200 — BulletProof Security"
-			hasWAF = true
-		case 403:
-			WAF[0] = "403 — BulletProof Security"
-		}
+	if err != nil {
+		printer.Fatal(err)
+	}
 
-	}(target)
+	switch response.StatusCode {
+	case 200:
+		return true, "200 — BulletProof Security"
+	case 403:
+		return true, "403 — BulletProof Security"
+	}
+}
 
-	go func(URL string) {
-		response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/better-wp-security/"})
+func betterwp(target string) (bool, string) {
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/better-wp-security/"})
 
-		if err != nil {
-			printer.Fatal(err)
-		}
+	if err != nil {
+		printer.Fatal(err)
+	}
 
-		switch response.StatusCode {
-		case 200:
-			WAF[0] = "200 — Better WP Security"
-			hasWAF = true
-		case 403:
-			WAF[0] = "403 — Better WP Security"
-		}
+	switch response.StatusCode {
+	case 200:
+		return true, "200 — Better WP Security"
+	case 403:
+		return true, "403 — Better WP Security"
+	}
+}
 
-	}(target)
+func sucuri(target string) (bool, string) {
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/sucuri-scanner/"})
 
-	go func(URL string) {
-		response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/sucuri-scanner/"})
+	if err != nil {
+		printer.Fatal(err)
+	}
 
-		if err != nil {
-			printer.Fatal(err)
-		}
+	switch response.StatusCode {
+	case 200:
+		return true, "200 — Sucuri Security"
+	case 403:
+		return true, "403 — Sucuri Security"
+	}
+}
 
-		switch response.StatusCode {
-		case 200:
-			WAF[0] = "200 — Sucuri Security"
-			hasWAF = true
-		case 403:
-			WAF[0] = "403 — Sucuri Security"
-		}
+func wpsecurity(target string) (bool, string) {
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/wp-security-scan/"})
 
-	}(target)
+	if err != nil {
+		printer.Fatal(err)
+	}
 
-	go func(URL string) {
-		response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/wp-security-scan/"})
+	switch response.StatusCode {
+	case 200:
+		return true, "200 — Acunetix WP Security"
+	case 403:
+		return true, "403 — Acunetix WP Security"
+	}
+}
 
-		if err != nil {
-			printer.Fatal(err)
-		}
+func allinonewpsecurity(target string) (bool, string) {
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/all-in-one-wp-security-and-firewall/"})
 
-		switch response.StatusCode {
-		case 200:
-			WAF[0] = "200 — Acunetix WP Security"
-			hasWAF = true
-		case 403:
-			WAF[0] = "403 — Acunetix WP Security"
-		}
+	if err != nil {
+		printer.Fatal(err)
+	}
 
-	}(target)
+	switch response.StatusCode {
+	case 200:
+		return true, "200 — All In One WP Security & Firewall"
+	case 403:
+		return true, "403 — All In One WP Security & Firewall"
+	}
+}
 
-	go func(URL string) {
-		response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/all-in-one-wp-security-and-firewall/"})
+func scanprotection(target string) (bool, string) {
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/6scan-protection/"})
 
-		if err != nil {
-			printer.Fatal(err)
-		}
+	if err != nil {
+		printer.Fatal(err)
+	}
 
-		switch response.StatusCode {
-		case 200:
-			WAF[0] = "200 — All In One WP Security & Firewall"
-			hasWAF = true
-		case 403:
-			WAF[0] = "403 — All In One WP Security & Firewall"
-		}
+	switch response.StatusCode {
+	case 200:
+		return true, "200 — 6Scan Security"
+	case 403:
+		return true, "403 — 6Scan Security"
+	}
 
-	}(target)
-
-	go func(URL string) {
-		response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/6scan-protection/"})
-
-		if err != nil {
-			printer.Fatal(err)
-		}
-
-		switch response.StatusCode {
-		case 200:
-			WAF[0] = "200 — 6Scan Security"
-			hasWAF = true
-		case 403:
-			WAF[0] = "403 — 6Scan Security"
-		}
-
-	}(target)
-
-	return hasWAF, WAF
 }
