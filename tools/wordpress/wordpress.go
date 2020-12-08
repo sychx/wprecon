@@ -2,4 +2,4 @@ package wps
 
 import "sync"
 
-var wg *sync.WaitGroup
+var Sync *sync.WaitGroup
