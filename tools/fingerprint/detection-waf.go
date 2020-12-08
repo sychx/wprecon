@@ -3,14 +3,13 @@ package wpsfinger
 import (
 	"github.com/blackcrw/wpsgo/pkg/gohttp"
 	"github.com/blackcrw/wpsgo/pkg/printer"
-	"github.com/blackcrw/wpsgo/tools/wps"
 )
 
 func WAF(target string) (bool, interface{}) {
 	var WAF [6]string
 	var hasWAF bool = false
 
-	wps.Sync.Add(6)
+	swg.Add(6)
 
 	go func(URL string) {
 		response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/wordfence/"})
@@ -27,7 +26,7 @@ func WAF(target string) (bool, interface{}) {
 			WAF[0] = "403 — Wordfence Security"
 		}
 
-		wps.Sync.Done()
+		swg.Done()
 	}(target)
 
 	go func(URL string) {
@@ -45,7 +44,7 @@ func WAF(target string) (bool, interface{}) {
 			WAF[0] = "403 — BulletProof Security"
 		}
 
-		wps.Sync.Done()
+		swg.Done()
 	}(target)
 
 	go func(URL string) {
@@ -63,7 +62,7 @@ func WAF(target string) (bool, interface{}) {
 			WAF[0] = "403 — Better WP Security"
 		}
 
-		wps.Sync.Done()
+		swg.Done()
 	}(target)
 
 	go func(URL string) {
@@ -81,7 +80,7 @@ func WAF(target string) (bool, interface{}) {
 			WAF[0] = "403 — Sucuri Security"
 		}
 
-		wps.Sync.Done()
+		swg.Done()
 	}(target)
 
 	go func(URL string) {
@@ -99,7 +98,7 @@ func WAF(target string) (bool, interface{}) {
 			WAF[0] = "403 — Acunetix WP Security"
 		}
 
-		wps.Sync.Done()
+		swg.Done()
 	}(target)
 
 	go func(URL string) {
@@ -117,7 +116,7 @@ func WAF(target string) (bool, interface{}) {
 			WAF[0] = "403 — All In One WP Security & Firewall"
 		}
 
-		wps.Sync.Done()
+		swg.Done()
 	}(target)
 
 	go func(URL string) {
@@ -135,10 +134,10 @@ func WAF(target string) (bool, interface{}) {
 			WAF[0] = "403 — 6Scan Security"
 		}
 
-		wps.Sync.Done()
+		swg.Done()
 	}(target)
 
-	wps.Sync.Wait()
+	swg.Wait()
 
 	return hasWAF, WAF
 }

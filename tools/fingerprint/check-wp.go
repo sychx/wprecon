@@ -7,7 +7,6 @@ import (
 
 	"github.com/blackcrw/wpsgo/pkg/gohttp"
 	"github.com/blackcrw/wpsgo/pkg/printer"
-	"github.com/blackcrw/wpsgo/tools/wps"
 )
 
 func HasWordpress(target string) string {
@@ -27,7 +26,7 @@ func HasWordpress(target string) string {
 		"wp-includes/",
 		"wp-admin/"}
 
-	wps.Sync.Add(2)
+	swg.Add(2)
 
 	go func(URL string, htmlPayloads [3]string) {
 		response, err = gohttp.HttpRequest(gohttp.Http{URL: URL})
@@ -48,11 +47,11 @@ func HasWordpress(target string) string {
 			}
 		}
 
-		wps.Sync.Done()
+		swg.Done()
 	}(target, payloads)
 
 	for _, directory := range directories {
-		wps.Sync.Add(1)
+		swg.Add(1)
 
 		go func(URL string, directory string) {
 			request, err := gohttp.HttpRequest(gohttp.Http{URL: URL + directory})
@@ -75,11 +74,11 @@ func HasWordpress(target string) string {
 				exists++
 			}
 
-			defer wps.Sync.Done()
+			defer swg.Done()
 		}(target, directory)
 	}
 
-	wps.Sync.Wait()
+	swg.Wait()
 
 	calc = exists / 8 * 100
 
