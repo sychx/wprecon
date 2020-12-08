@@ -6,7 +6,7 @@ import (
 	"github.com/blackcrw/wpsgo/internal"
 	"github.com/blackcrw/wpsgo/pkg/gohttp"
 	"github.com/blackcrw/wpsgo/pkg/printer" // This is color lib
-	"github.com/blackcrw/wpsgo/tools/wpsfinger"
+	wpsfinger "github.com/blackcrw/wpsgo/tools/wordpress/fingerprint"
 	"github.com/spf13/cobra"
 )
 
