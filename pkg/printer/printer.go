@@ -2,53 +2,105 @@ package printer
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
+	"strings"
 
 	color "github.com/logrusorgru/aurora" // This is color lib
+	"golang.org/x/net/html/charset"
 )
 
-/*
-Println :: As I was wanting to make the println more cute with error indicators and etc ...
-I preferred to do this function/this package.
-
-But you must be in doubt as to whether there is a 'Verbose' parameter, the question is simple: As I wanted to do something as simple and with fewer functions as possible, I preferred to pass this 'Verbose' here, because it would be very simple there ... when making the verbose mode, and it would be more organized ... the data and etc ...
-If the print you are going to make will not use verbose mode, you can enter the value 'false' which will have no problem.
-*/
-
+// Println ::
 func Println(text ...interface{}) {
 	fmt.Fprintln(os.Stdout, text...)
 }
 
+// Decoder :: Convert to UTF-8
+func Decoder(text string) string {
+	r, err := charset.NewReader(strings.NewReader(text), "latin1")
+	if err != nil {
+		log.Fatal(err)
+	}
+	result, err := ioutil.ReadAll(r)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return string(result)
+}
+
 // Danger ::
 func Danger(text ...interface{}) {
-	prefix := color.Red("[!]").String()
-	fmt.Fprintln(os.Stdout, prefix, text)
+	var prefix = color.Red("[!]").String()
 
+	fmt.Fprint(os.Stdout, prefix, " ")
+	fmt.Fprintln(os.Stdout, text...)
 }
 
 // Done ::
 func Done(text ...interface{}) {
-	prefix := color.Green("[•]").String()
-	fmt.Fprintln(os.Stdout, prefix, text)
+	var prefix = color.Green("[•]").String()
 
+	fmt.Fprint(os.Stdout, prefix, " ")
+	fmt.Fprintln(os.Stdout, text...)
 }
 
 // Warning ::
 func Warning(text ...interface{}) {
-	prefix := color.Yellow("[•••]").String()
-	fmt.Fprintln(os.Stdout, prefix, text)
+	var prefix = color.Yellow("[•••]").String()
 
+	fmt.Fprint(os.Stdout, prefix, " ")
+	fmt.Fprintln(os.Stdout, text...)
 }
 
 // Loading ::
 func Loading(text ...interface{}) {
-	prefix := color.Green("[*]").String()
-	fmt.Fprintln(os.Stdout, prefix, text)
+	var prefix = color.Yellow("[*]").String()
 
+	fmt.Fprint(os.Stdout, prefix, " ")
+	fmt.Fprint(os.Stdout, text...)
+}
+
+// Loading ::
+func LoadingDone(text ...interface{}) {
+	var prefix = color.Green("[+]").String()
+
+	fmt.Print("\033[G\033[K")
+	fmt.Fprint(os.Stdout, prefix, " ")
+	fmt.Fprintln(os.Stdout, text...)
+}
+
+// Loading ::
+func LoadingDanger(text ...interface{}) {
+	var prefix = color.Red("[!]").String()
+
+	fmt.Print("\033[G\033[K")
+	fmt.Fprint(os.Stdout, prefix, " ")
+	fmt.Fprintln(os.Stdout, text...)
 }
 
 // Wait ::
 func Wait(text ...interface{}) {
-	prefix := color.Green("[—]").String()
-	fmt.Fprintln(os.Stdout, prefix, text)
+	var prefix = color.Green("[—]").String()
+
+	fmt.Fprint(os.Stdout, prefix, " ")
+	fmt.Fprintln(os.Stdout, text...)
+}
+
+// Fatal ::
+func Fatal(text ...interface{}) {
+	var prefix = color.Red("[!]").String()
+
+	fmt.Fprint(os.Stdout, prefix, " ")
+	fmt.Fprintln(os.Stdout, text...)
+
+	os.Exit(0)
+}
+
+// Required ::
+func Required(text ...interface{}) string {
+	var sufix = color.Red("(Required)").Bold().String()
+
+	return sufix
 }

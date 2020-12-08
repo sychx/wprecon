@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/blkzy/wpgo/pkg/wordlist"
+	"github.com/blackcrw/wpsgo/pkg/wordlist"
 )
 
 // RandomUserAgent : this function "generates" user-agents randomly.

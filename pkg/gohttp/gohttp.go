@@ -17,11 +17,11 @@ type Options struct {
 	RandomUserAgent bool
 }
 
-// Result :: This struct will store the request data, and will be used for a return.
-type Result struct {
+// Response :: This struct will store the request data, and will be used for a return.
+type Response struct {
 	URL        string
 	Method     string
-	StatusCode int64
+	StatusCode int
 	UserAgent  string
 	Body       io.Reader
 }
