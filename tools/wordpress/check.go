@@ -1,16 +1,15 @@
-package tools
+package wps
 
 import (
 	. "fmt"
 	"io/ioutil"
-	"log"
 	"strings"
 
 	"github.com/blkzy/wpsgo/pkg/gohttp"
 	"github.com/blkzy/wpsgo/pkg/printer"
 )
 
-func Check(target string) (string, error) {
+func Check(target string) string {
 	var calc int
 	var exists int
 	var err error
@@ -26,6 +25,8 @@ func Check(target string) (string, error) {
 		"wp-content/themes/",
 		"wp-includes/",
 		"wp-admin/"}
+
+	wg.Add(2)
 
 	go func(URL string, htmlPayloads [3]string) {
 		response, err = gohttp.HttpRequest(gohttp.Http{URL: URL})
@@ -45,6 +46,8 @@ func Check(target string) (string, error) {
 				exists++
 			}
 		}
+
+		wg.Done()
 	}(target, payloads)
 
 	go func(URL string, directories [5]string) {
@@ -52,26 +55,30 @@ func Check(target string) (string, error) {
 			request, err := gohttp.HttpRequest(gohttp.Http{URL: URL + directory})
 
 			if err != nil {
-				log.Fatal(err)
+				printer.Fatal(err)
 			}
 
 			body, err := ioutil.ReadAll(request.Body)
 
 			if err != nil {
-				log.Fatal(err)
+				printer.Fatal(err)
 			}
 
-			if directory == "wp-admin/" && request.StatusCode == 200 {
-				printer.Warning("Apparently there is")
+			if directory == "wp-admin/" && request.StatusCode == 200 || request.StatusCode == 403 {
+				printer.Warning("Status Code:", request.StatusCode, "in the URL:", URL+directory)
 				exists++
 			} else if !strings.Contains("Index Of", string(body)) {
-				printer.Done("Index of Exists")
+				printer.Done("Listing enable:", URL+directory)
 				exists++
 			}
 		}
+
+		wg.Done()
 	}(target, paths)
+
+	wg.Wait()
 
 	calc = exists / 8 * 100
 
-	return Sprintf("%v", calc), nil
+	return Sprintf("%v", calc)
 }
