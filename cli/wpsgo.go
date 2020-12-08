@@ -6,7 +6,6 @@ import (
 	"github.com/blkzy/wpsgo/internal"
 	"github.com/blkzy/wpsgo/pkg/gohttp"
 	"github.com/blkzy/wpsgo/pkg/printer" // This is color lib
-	"github.com/blkzy/wpsgo/tools"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +18,7 @@ var rootCmd = &cobra.Command{
 
 		response, _ := gohttp.HttpRequest(gohttp.Http{URL: target})
 
-		tools.Wordpress(response)
+		wpsfinger.WAF(target)
 	},
 }
 
