@@ -6,27 +6,43 @@ import (
 )
 
 func WAF(target string) (bool, string) {
+	printer.Loading("Active WAF detection module")
 
-	if hasWaf, nameWaf := wordfence(target); hasWaf {
-		return hasWaf, nameWaf
-	} else if hasWaf, nameWaf := bulletproof(target); hasWaf {
-		return hasWaf, nameWaf
-	} else if hasWaf, nameWaf := betterwp(target); hasWaf {
-		return hasWaf, nameWaf
-	} else if hasWaf, nameWaf := sucuri(target); hasWaf {
-		return hasWaf, nameWaf
-	} else if hasWaf, nameWaf := wpsecurity(target); hasWaf {
-		return hasWaf, nameWaf
-	} else if hasWaf, nameWaf := allinonewpsecurity(target); hasWaf {
-		return hasWaf, nameWaf
-	} else if hasWaf, nameWaf := scanprotection(target); hasWaf {
-		return hasWaf, nameWaf
+	if has, status, name := wordfence(target); has {
+		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+
+		return has, name
+	} else if has, status, name := bulletproof(target); has {
+		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+
+		return has, name
+	} else if has, status, name := betterwp(target); has {
+		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+
+		return has, name
+	} else if has, status, name := sucuri(target); has {
+		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+
+		return has, name
+	} else if has, status, name := wpsecurity(target); has {
+		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+
+		return has, name
+	} else if has, status, name := allinonewpsecurity(target); has {
+		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+
+		return has, name
+	} else if has, status, name := scanprotection(target); has {
+		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+
+		return has, name
 	}
 
+	printer.LoadingDanger("No WAF was detected! But that doesn't mean it doesn't.")
 	return false, ""
 }
 
-func wordfence(target string) (bool, string) {
+func wordfence(URL string) (bool, int, string) {
 	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/wordfence/"})
 
 	if err != nil {
@@ -35,13 +51,15 @@ func wordfence(target string) (bool, string) {
 
 	switch response.StatusCode {
 	case 200:
-		return true, "200 — Wordfence Security"
+		return true, 200, "Wordfence Security"
 	case 403:
-		return true, "403 — Wordfence Security"
+		return true, 403, "Wordfence Security"
 	}
+
+	return false, 0, ""
 }
 
-func bulletproof(target string) (bool, string) {
+func bulletproof(URL string) (bool, int, string) {
 	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/bulletproof-security/"})
 
 	if err != nil {
@@ -50,13 +68,15 @@ func bulletproof(target string) (bool, string) {
 
 	switch response.StatusCode {
 	case 200:
-		return true, "200 — BulletProof Security"
+		return true, 200, "BulletProof Security"
 	case 403:
-		return true, "403 — BulletProof Security"
+		return true, 403, "BulletProof Security"
 	}
+
+	return false, 0, ""
 }
 
-func betterwp(target string) (bool, string) {
+func betterwp(URL string) (bool, int, string) {
 	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/better-wp-security/"})
 
 	if err != nil {
@@ -65,13 +85,15 @@ func betterwp(target string) (bool, string) {
 
 	switch response.StatusCode {
 	case 200:
-		return true, "200 — Better WP Security"
+		return true, 200, "Better WP Security"
 	case 403:
-		return true, "403 — Better WP Security"
+		return true, 403, "Better WP Security"
 	}
+
+	return false, 0, ""
 }
 
-func sucuri(target string) (bool, string) {
+func sucuri(URL string) (bool, int, string) {
 	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/sucuri-scanner/"})
 
 	if err != nil {
@@ -80,13 +102,15 @@ func sucuri(target string) (bool, string) {
 
 	switch response.StatusCode {
 	case 200:
-		return true, "200 — Sucuri Security"
+		return true, 200, "Sucuri Security"
 	case 403:
-		return true, "403 — Sucuri Security"
+		return true, 403, "Sucuri Security"
 	}
+
+	return false, 0, ""
 }
 
-func wpsecurity(target string) (bool, string) {
+func wpsecurity(URL string) (bool, int, string) {
 	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/wp-security-scan/"})
 
 	if err != nil {
@@ -95,13 +119,15 @@ func wpsecurity(target string) (bool, string) {
 
 	switch response.StatusCode {
 	case 200:
-		return true, "200 — Acunetix WP Security"
+		return true, 200, "Acunetix WP Security"
 	case 403:
-		return true, "403 — Acunetix WP Security"
+		return true, 403, "Acunetix WP Security"
 	}
+
+	return false, 0, ""
 }
 
-func allinonewpsecurity(target string) (bool, string) {
+func allinonewpsecurity(URL string) (bool, int, string) {
 	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/all-in-one-wp-security-and-firewall/"})
 
 	if err != nil {
@@ -110,13 +136,15 @@ func allinonewpsecurity(target string) (bool, string) {
 
 	switch response.StatusCode {
 	case 200:
-		return true, "200 — All In One WP Security & Firewall"
+		return true, 200, "All In One WP Security & Firewall"
 	case 403:
-		return true, "403 — All In One WP Security & Firewall"
+		return true, 403, "All In One WP Security & Firewall"
 	}
+
+	return false, 0, ""
 }
 
-func scanprotection(target string) (bool, string) {
+func scanprotection(URL string) (bool, int, string) {
 	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/6scan-protection/"})
 
 	if err != nil {
@@ -125,9 +153,10 @@ func scanprotection(target string) (bool, string) {
 
 	switch response.StatusCode {
 	case 200:
-		return true, "200 — 6Scan Security"
+		return true, 200, "6Scan Security"
 	case 403:
-		return true, "403 — 6Scan Security"
+		return true, 403, "6Scan Security"
 	}
 
+	return false, 0, ""
 }
