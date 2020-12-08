@@ -2,7 +2,9 @@ package gohttp
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net/http"
+	"strings"
 )
 
 // HttpRequest :: This function will be used for any request that is made.
@@ -15,6 +17,9 @@ func HttpRequest(httpStructs Http) (Response, error) {
 		},
 	}
 
+	if !strings.HasSuffix(httpStructs.URL, "/") {
+		httpStructs.URL = fmt.Sprintf("%s/", httpStructs.URL)
+	}
 	if httpStructs.Method == "" {
 		httpStructs.Method = "GET"
 	}
@@ -31,7 +36,7 @@ func HttpRequest(httpStructs Http) (Response, error) {
 		return Response{}, err
 	}
 
-	request.Header.Set("User-Agent", "Wordpress Security Go (GoHttp 0.1.0)")
+	request.Header.Set("User-Agent", "WPSGo - Wordpress Security Go (GoHttp 0.0.0.1)")
 	if httpStructs.Options.RandomUserAgent == true {
 		userAgent := RandomUserAgent()
 		request.Header.Set("User-Agent", userAgent)
