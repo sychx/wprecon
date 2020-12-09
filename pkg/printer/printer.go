@@ -16,8 +16,8 @@ func Println(text ...interface{}) {
 	fmt.Fprintln(os.Stdout, text...)
 }
 
-// Decoder :: Convert to UTF-8
-func Decoder(text string) string {
+// Decode :: Convert to UTF-8
+func Decode(text string) string {
 	r, err := charset.NewReader(strings.NewReader(text), "latin1")
 	if err != nil {
 		log.Fatal(err)
