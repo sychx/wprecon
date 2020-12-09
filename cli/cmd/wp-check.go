@@ -11,9 +11,10 @@ import (
 
 func Wpcheck(cmd *cobra.Command) {
 	target, _ := cmd.Flags().GetString("url")
+	randomAgent, _ := cmd.Flags().GetBool("random-agent")
 
 	/* Start of wordpress checker */
-	hasWordpressValue := wpfinger.HasWordpress(target)
+	hasWordpressValue := wpfinger.HasWordpress(target, randomAgent)
 	hasWordpressValueString := fmt.Sprintf("%.2f%%", hasWordpressValue)
 
 	if hasWordpressValue >= 62.5 {
