@@ -1,4 +1,4 @@
-module github.com/blackcrw/wpsgo
+module github.com/blackcrw/wprecon
 
 go 1.15
 
