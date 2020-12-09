@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blackcrw/wpsgo/pkg/printer"
-	wpsfinger "github.com/blackcrw/wpsgo/tools/wordpress/fingerprint"
+	"github.com/blackcrw/wprecon/pkg/printer"
+	wpfinger "github.com/blackcrw/wprecon/tools/wordpress/fingerprint"
 	"github.com/spf13/cobra"
 )
 
@@ -13,7 +13,7 @@ func Wpcheck(cmd *cobra.Command) {
 	target, _ := cmd.Flags().GetString("url")
 
 	/* Start of wordpress checker */
-	hasWordpressValue := wpsfinger.HasWordpress(target)
+	hasWordpressValue := wpfinger.HasWordpress(target)
 	hasWordpressValueString := fmt.Sprintf("%.2f%%", hasWordpressValue)
 
 	if hasWordpressValue >= 62.5 {
