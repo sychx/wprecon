@@ -43,7 +43,7 @@ func WAF(target string, randomUserAgent bool) (bool, string) {
 }
 
 func wordfence(URL string, randomUserAgent bool) (bool, int, string) {
-	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/wordfence/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "wp-content/plugins/wordfence/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
 
 	if err != nil {
 		printer.Fatal(err)
@@ -60,7 +60,7 @@ func wordfence(URL string, randomUserAgent bool) (bool, int, string) {
 }
 
 func bulletproof(URL string, randomUserAgent bool) (bool, int, string) {
-	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/bulletproof-security/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "wp-content/plugins/bulletproof-security/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
 
 	if err != nil {
 		printer.Fatal(err)
@@ -77,7 +77,7 @@ func bulletproof(URL string, randomUserAgent bool) (bool, int, string) {
 }
 
 func betterwp(URL string, randomUserAgent bool) (bool, int, string) {
-	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/better-wp-security/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "wp-content/plugins/better-wp-security/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
 
 	if err != nil {
 		printer.Fatal(err)
@@ -94,7 +94,7 @@ func betterwp(URL string, randomUserAgent bool) (bool, int, string) {
 }
 
 func sucuri(URL string, randomUserAgent bool) (bool, int, string) {
-	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/sucuri-scanner/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "wp-content/plugins/sucuri-scanner/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
 
 	if err != nil {
 		printer.Fatal(err)
@@ -111,7 +111,7 @@ func sucuri(URL string, randomUserAgent bool) (bool, int, string) {
 }
 
 func wpsecurity(URL string, randomUserAgent bool) (bool, int, string) {
-	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/wp-security-scan/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "wp-content/plugins/wp-security-scan/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
 
 	if err != nil {
 		printer.Fatal(err)
@@ -128,7 +128,7 @@ func wpsecurity(URL string, randomUserAgent bool) (bool, int, string) {
 }
 
 func allinonewpsecurity(URL string, randomUserAgent bool) (bool, int, string) {
-	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/all-in-one-wp-security-and-firewall/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "wp-content/plugins/all-in-one-wp-security-and-firewall/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
 
 	if err != nil {
 		printer.Fatal(err)
@@ -145,7 +145,7 @@ func allinonewpsecurity(URL string, randomUserAgent bool) (bool, int, string) {
 }
 
 func scanprotection(URL string, randomUserAgent bool) (bool, int, string) {
-	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/6scan-protection/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "wp-content/plugins/6scan-protection/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
 
 	if err != nil {
 		printer.Fatal(err)
