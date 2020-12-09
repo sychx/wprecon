@@ -1,6 +1,6 @@
 package main
 
-import . "github.com/blackcrw/wpsgo/cli"
+import . "github.com/blackcrw/wprecon/cli"
 
 func main() {
 	Execute()

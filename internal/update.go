@@ -3,8 +3,8 @@ package internal
 import (
 	"encoding/json"
 
-	"github.com/blackcrw/wpsgo/pkg/gohttp"
-	"github.com/blackcrw/wpsgo/pkg/printer"
+	"github.com/blackcrw/wprecon/pkg/gohttp"
+	"github.com/blackcrw/wprecon/pkg/printer"
 )
 
 type githubAPIJSON struct {
@@ -26,11 +26,11 @@ func UpdateCheck() {
 
 	go printer.Loading("Checking Version!")
 
-	request, _ := gohttp.HttpRequest(gohttp.Http{Method: "GET", URL: "https://raw.githubusercontent.com/blackcrw/wpsgo/dev/internal/config.json"})
+	request, _ := gohttp.HttpRequest(gohttp.Http{Method: "GET", URL: "https://raw.githubusercontent.com/blackcrw/wprecon/dev/internal/config.json"})
 
 	if err := json.NewDecoder(request.Body).Decode(&githubJSON); err != nil {
 		printer.LoadingDanger("An error occurred while trying to check the version.")
 	} else if githubJSON.App.Version != Version() {
-		printer.LoadingDone("There is a new version!", "New:", githubJSON.App.Version, "Download: https://github.com/blackcrw/wpsgo/releases")
+		printer.LoadingDone("There is a new version!", "New:", githubJSON.App.Version, "Download: https://github.com/blackcrw/wprecon/releases")
 	}
 }

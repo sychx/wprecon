@@ -1,11 +1,11 @@
-package wpsfinger
+package wpfinger
 
 import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/blackcrw/wpsgo/pkg/gohttp"
-	"github.com/blackcrw/wpsgo/pkg/printer"
+	"github.com/blackcrw/wprecon/pkg/gohttp"
+	"github.com/blackcrw/wprecon/pkg/printer"
 )
 
 func HasWordpress(target string) float32 {
