@@ -12,11 +12,12 @@ import (
 func Detectionwaf(cmd *cobra.Command) {
 	target, _ := cmd.Flags().GetString("url")
 	detectionWaf, _ := cmd.Flags().GetBool("detection-waf")
+	randomUserAgent, _ := cmd.Flags().GetBool("random-agent")
 
 	/* Start WAF detection */
 	switch detectionWaf {
 	case true:
-		has, _ := wpfinger.WAF(target)
+		has, _ := wpfinger.WAF(target, randomUserAgent)
 
 		if has {
 			printer.Warning("Do you wish to continue ?! [Y/n] :")
