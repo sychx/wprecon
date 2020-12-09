@@ -9,31 +9,31 @@ func WAF(target string, randomUserAgent bool) (bool, string) {
 	printer.Loading("Active WAF detection module")
 
 	if has, status, name := wordfence(target, randomUserAgent); has {
-		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+		printer.LoadingWarning("Status Code:", status, "—", "WAF:", name)
 
 		return has, name
 	} else if has, status, name := bulletproof(target, randomUserAgent); has {
-		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+		printer.LoadingWarning("Status Code:", status, "—", "WAF:", name)
 
 		return has, name
 	} else if has, status, name := betterwp(target, randomUserAgent); has {
-		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+		printer.LoadingWarning("Status Code:", status, "—", "WAF:", name)
 
 		return has, name
 	} else if has, status, name := sucuri(target, randomUserAgent); has {
-		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+		printer.LoadingWarning("Status Code:", status, "—", "WAF:", name)
 
 		return has, name
 	} else if has, status, name := wpsecurity(target, randomUserAgent); has {
-		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+		printer.LoadingWarning("Status Code:", status, "—", "WAF:", name)
 
 		return has, name
 	} else if has, status, name := allinonewpsecurity(target, randomUserAgent); has {
-		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+		printer.LoadingWarning("Status Code:", status, "—", "WAF:", name)
 
 		return has, name
 	} else if has, status, name := scanprotection(target, randomUserAgent); has {
-		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+		printer.LoadingWarning("Status Code:", status, "—", "WAF:", name)
 
 		return has, name
 	}
