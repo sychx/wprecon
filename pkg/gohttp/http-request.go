@@ -36,7 +36,7 @@ func HttpRequest(httpStructs Http) (Response, error) {
 		return Response{}, err
 	}
 
-	request.Header.Set("User-Agent", "WPSGo - Wordpress Security Go (GoHttp 0.0.0.1)")
+	request.Header.Set("User-Agent", "wprecon - Wordpress Recon (Vulnerability Scanner) (GoHttp 0.0.0.1)")
 	if httpStructs.Options.RandomUserAgent == true {
 		userAgent := RandomUserAgent()
 		request.Header.Set("User-Agent", userAgent)
