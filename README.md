@@ -9,6 +9,7 @@ Hello! Welcome. **Wprecon** (Wordpress Recon), is a vulnerability recognition to
 - Detection WAF
 - Random Agent
 ### In the future:
+- User Enumerator
 - Plugin Scanner
 - Theme Scanner
 -  Vulnerability Scanner
