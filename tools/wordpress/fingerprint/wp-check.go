@@ -60,7 +60,7 @@ func HasWordpress(target string, randomUserAgent bool) float32 {
 			}
 
 			if directory == "wp-admin/" && request.StatusCode == 200 || request.StatusCode == 403 {
-				printer.Warning("Status Code:", request.StatusCode, "in the URL:", URL+directory)
+				printer.Warning("Status Code:", request.StatusCode, "—", "URL:", URL+directory)
 				exists++
 			} else if strings.Contains("Index Of", string(body)) {
 				printer.Done("Listing enable:", URL+directory)
