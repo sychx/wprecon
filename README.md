@@ -19,7 +19,8 @@ Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool i
 |   ❌          | Vulnerability Scanner |
 |   ❌          | Tor Proxy's           |
 
-## Usage
+<h2 align="center">Usage</h2>
+
 | Flag(s)            | Description                                          |
 |--------------------|------------------------------------------------------|
 |-d, --detection-waf | I will try to detect if the target is using any WAF. |
@@ -28,10 +29,9 @@ Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool i
 |-u, --url string    | Target URL (Ex: http(s)://google.com/) `(Required)`  |
 |-v, --verbose       | Verbosity                                            |
 
-## WPrecon running:
+<h2 align="center">WPrecon running</h2>
 
 Command: `wprecon --url "https://www.xxxxxxx.com/" --detection-waf`
-
 ##### Output:
 ```
 —————————————————————————————————————————————————————————————————————
@@ -56,7 +56,8 @@ Version: 0.0.1a
 [•••] Do you wish to continue ?! [Y/n] : Y
 ```
 
-## Install & Compile
+<h2 align="center">Install & Compile</h2>
+
 For you to compile **wprecon** you will need to have the golang compiler installed.
 And for that you will access the official website of golang and will download and install it. [**Here!**](https://golang.org/dl/)
 
