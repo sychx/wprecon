@@ -6,7 +6,7 @@ import (
 	"github.com/blackcrw/wprecon/cli/cmd"
 	"github.com/blackcrw/wprecon/internal"
 	"github.com/blackcrw/wprecon/pkg/gohttp"
-	"github.com/blackcrw/wprecon/pkg/printer" // This is color lib
+	"github.com/blackcrw/wprecon/pkg/printer"
 	"github.com/spf13/cobra"
 )
 

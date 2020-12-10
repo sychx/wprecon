@@ -25,7 +25,7 @@ func HasWordpress(target string, randomUserAgent bool) float32 {
 		"wp-admin/"}
 
 	func(URL string, htmlPayloads [3]string) {
-		response, err = gohttp.HttpRequest(gohttp.Http{URL: URL, Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
+		response, err = gohttp.HttpRequest(gohttp.Http{URL: URL, RandomUserAgent: randomUserAgent})
 
 		if err != nil {
 			printer.Fatal(err)
@@ -47,7 +47,7 @@ func HasWordpress(target string, randomUserAgent bool) float32 {
 
 	for _, directory := range directories {
 		func(URL string, directory string) {
-			request, err := gohttp.HttpRequest(gohttp.Http{URL: URL + directory, Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
+			request, err := gohttp.HttpRequest(gohttp.Http{URL: URL, Dir: directory, RandomUserAgent: randomUserAgent})
 
 			if err != nil {
 				printer.Fatal(err)
@@ -60,10 +60,10 @@ func HasWordpress(target string, randomUserAgent bool) float32 {
 			}
 
 			if directory == "wp-admin/" && request.StatusCode == 200 || request.StatusCode == 403 {
-				printer.Warning("Status Code:", request.StatusCode, "—", "URL:", URL+directory)
+				printer.Warning("Status Code:", request.StatusCode, "—", "URL:", request.URLFULL)
 				exists++
 			} else if strings.Contains("Index Of", string(body)) {
-				printer.Done("Listing enable:", URL+directory)
+				printer.Done("Listing enable:", request.URLFULL)
 				exists++
 			}
 
