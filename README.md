@@ -1,34 +1,43 @@
-# WPrecon (Wordpress Recon)
-Hello! Welcome. **Wprecon** (Wordpress Recon), is a vulnerability recognition tool in CMS Wordpress, 100% developed in Go.
+<h1 align="center">WPrecon (Wordpress Recon)</h1>
+
+<p align="center"> 
+  <a href="https://www.gnu.org/licenses/gpl-3.0">
+    <img alt="License: GPL v3" src="https://img.shields.io/badge/License-GPLv3-blue.svg">
+  </a>
+  <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/blackcrw/wprecon">
+  <img alt="GitHub go.mod Go version (branch)" src="https://img.shields.io/github/go-mod/go-version/blackcrw/wprecon/main?label=Go&logo=go">
+  
+Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool in CMS Wordpress, 100% developed in Go.
+</p> 
+
+### Version: Alfa !
 
 ## Features
 
-### At the time:
-- Detection WAF
-- Random Agent
-- User Enumerator
-### In the future:
-- Plugin Scanner
-- Theme Scanner
--  Vulnerability Scanner
-- Tor Proxy's
+| Status        | Features              |
+|---------------|-----------------------|
+|   ✅          | Random Agent          |
+|   ✅          | Detection WAF         |
+|   ❌          | Plugin Scanner        |
+|   ⚠️           | User Enumerator       |
+|   ❌          | Plugin Scanner        |
+|   ❌          | Theme Scanner         |
+|   ❌          | Vulnerability Scanner |
+|   ❌          | Tor Proxy's           |
 
-## Usage
-| Flag(s)            | Description                                           |
-|--------------------|-------------------------------------------------------|
-|-d, --detection-waf | I will try to detect if the target is using any WAF.  |
-|-h, --help          | help for wprecon                                      |
-|    --no-check-wp   | Will skip wordpress check on target                   |
-|    --random-agent  | Use randomly selected HTTP(S) User-Agent header value |
-|-u, --url string    | Target URL (Ex: http(s)://google.com/) `(Required)`   |
-|-e, --user-enum     | Tries to enumerate users                              |
-|-v, --verbose       | Verbosity                                             |
+<h2 align="center">Usage</h2>
 
+| Flag(s)            | Description                                          |
+|--------------------|------------------------------------------------------|
+|-d, --detection-waf | I will try to detect if the target is using any WAF. |
+|-h, --help          | help for wprecon                                     |
+|--random-agent      | Use randomly selected HTTP(S) User-Agent header value|
+|-u, --url string    | Target URL (Ex: http(s)://google.com/) `(Required)`  |
+|-v, --verbose       | Verbosity                                            |
 
-## WPrecon running:
+<h2 align="center">WPrecon running</h2>
 
 Command: `wprecon --url "https://www.xxxxxxx.com/" --detection-waf`
-
 ##### Output:
 ```
 —————————————————————————————————————————————————————————————————————
@@ -53,7 +62,8 @@ Version: 0.0.1a
 [•••] Do you wish to continue ?! [Y/n] : Y
 ```
 
-## Install & Compile
+<h2 align="center">Install & Compile</h2>
+
 For you to compile **wprecon** you will need to have the golang compiler installed.
 And for that you will access the official website of golang and will download and install it. [**Here!**](https://golang.org/dl/)
 
