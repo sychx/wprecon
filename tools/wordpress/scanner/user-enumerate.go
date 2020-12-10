@@ -41,7 +41,7 @@ func UserEnum(target string, randomUserAgent bool) {
 func userEnumJson(target string, randomUserAgent bool) (bool, usersJson) {
 
 	/* Start of the first scan */
-	switch response, err := gohttp.HttpRequest(gohttp.Http{URL: target + "wp-json/wp/v2/users", Options: gohttp.Options{RandomUserAgent: randomUserAgent}}); true {
+	switch response, err := gohttp.HttpRequest(gohttp.Http{URL: target, Dir: "wp-json/wp/v2/users", RandomUserAgent: randomUserAgent}); true {
 	case response.StatusCode == 200:
 		var jsn usersJson
 		json.NewDecoder(response.Body).Decode(&jsn)
@@ -56,7 +56,7 @@ func userEnumJson(target string, randomUserAgent bool) (bool, usersJson) {
 	/* End of first scan */
 
 	/* Start of the second check */
-	switch response, err := gohttp.HttpRequest(gohttp.Http{URL: target + "?rest_route=/wp/v2/users", Options: gohttp.Options{RandomUserAgent: randomUserAgent}}); true {
+	switch response, err := gohttp.HttpRequest(gohttp.Http{URL: target, Dir: "?rest_route=/wp/v2/users", RandomUserAgent: randomUserAgent}); true {
 	case response.StatusCode == 200:
 		var jsn usersJson
 		json.NewDecoder(response.Body).Decode(&jsn)
@@ -77,7 +77,7 @@ func userEnumJson(target string, randomUserAgent bool) (bool, usersJson) {
 }
 
 func userEnumRss(target string, randomUserAgent bool) (bool, []usersRe) {
-	switch response, err := gohttp.HttpRequest(gohttp.Http{URL: target + "/feed/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}}); true {
+	switch response, err := gohttp.HttpRequest(gohttp.Http{URL: target, Dir: "feed/", RandomUserAgent: randomUserAgent}); true {
 	case response.StatusCode == 200:
 		re := regexp.MustCompile("<dc:creator><!\\[CDATA\\[(.+?)\\]\\]></dc:creator>")
 

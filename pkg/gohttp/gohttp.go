@@ -8,8 +8,10 @@ import (
 type Http struct {
 	Method  string
 	URL     string
+	URLFULL string
+	Dir     string
 	Proxy   string
-	Options Options
+	RandomUserAgent bool
 }
 
 // Options :: This struct will keep the options that can be used, random agent among others.
@@ -20,6 +22,8 @@ type Options struct {
 // Response :: This struct will store the request data, and will be used for a return.
 type Response struct {
 	URL        string
+	URLFULL    string
+	Dir        string
 	Method     string
 	StatusCode int
 	UserAgent  string

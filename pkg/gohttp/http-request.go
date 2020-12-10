@@ -20,11 +20,14 @@ func HttpRequest(httpStructs Http) (Response, error) {
 	if !strings.HasSuffix(httpStructs.URL, "/") {
 		httpStructs.URL = fmt.Sprintf("%s/", httpStructs.URL)
 	}
+
+	httpStructs.URLFULL = httpStructs.URL+httpStructs.Dir
+
 	if httpStructs.Method == "" {
 		httpStructs.Method = "GET"
 	}
 
-	request, err := http.NewRequest(httpStructs.Method, httpStructs.URL, nil)
+	request, err := http.NewRequest(httpStructs.Method, httpStructs.URL + httpStructs.Dir, nil)
 
 	if err != nil {
 		return Response{}, err
@@ -37,13 +40,15 @@ func HttpRequest(httpStructs Http) (Response, error) {
 	}
 
 	request.Header.Set("User-Agent", "wprecon - Wordpress Recon (Vulnerability Scanner) (GoHttp 0.0.0.1)")
-	if httpStructs.Options.RandomUserAgent == true {
+	if httpStructs.RandomUserAgent == true {
 		userAgent := RandomUserAgent()
 		request.Header.Set("User-Agent", userAgent)
 	}
 
 	httpResponse := Response{
-		URL:        request.URL.Scheme + "://" + request.URL.Host + request.URL.Path,
+		URL:        httpStructs.URL,
+		URLFULL:    httpStructs.URLFULL,
+		Dir:		httpStructs.Dir,
 		StatusCode: response.StatusCode,
 		UserAgent:  request.UserAgent(),
 		Body:       response.Body,
