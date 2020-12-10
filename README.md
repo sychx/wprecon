@@ -5,7 +5,7 @@
     <img alt="License: GPL v3" src="https://img.shields.io/badge/License-GPLv3-blue.svg">
   </a>
   <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/blackcrw/wprecon">
-  <img alt="GitHub go.mod Go version (branch)" src="https://img.shields.io/github/go-mod/go-version/blackcrw/wprecon/dev?label=Go&logo=go">
+  <img alt="GitHub go.mod Go version (branch)" src="https://img.shields.io/github/go-mod/go-version/blackcrw/wprecon/master?label=Go&logo=go">
   
 Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool in CMS Wordpress, 100% developed in Go.
 </p> 
