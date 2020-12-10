@@ -84,3 +84,5 @@ After downloading **wprecon** you will compile with the command:
 - `go build ~/Go/src/blackcrw/github.com/blackcrw/wprecon`.
 
 ### 🎉 🎉 🎉 Ready!!! Your **wprecon** is compiled, now just start using it. It was pretty easy, right ?! 
+
+# Yes Baby, Thank You! ✋
