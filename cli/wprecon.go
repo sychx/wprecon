@@ -18,6 +18,7 @@ var rootCmd = &cobra.Command{
 		cmd.Wpcheck(ccmd)
 		cmd.Detectionwaf(ccmd)
 		cmd.UserEnum(ccmd)
+		cmd.PluginEnum(ccmd)
 	},
 }
 
@@ -38,6 +39,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolP("random-agent", "", false, "Use randomly selected HTTP(S) User-Agent header value")
 	rootCmd.PersistentFlags().BoolP("user-enum", "e", false, "Tries to enumerate users")
 	rootCmd.PersistentFlags().BoolP("no-check-wp", "", false, "Will skip wordpress check on target")
+	rootCmd.PersistentFlags().BoolP("plugins-enum", "", false, "Tries to enumerate plugins")
 
 	rootCmd.MarkPersistentFlagRequired("url")
 }
