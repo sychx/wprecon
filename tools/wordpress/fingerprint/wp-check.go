@@ -8,7 +8,7 @@ import (
 	"github.com/blackcrw/wprecon/pkg/printer"
 )
 
-func HasWordpress(target string) float32 {
+func HasWordpress(target string, randomUserAgent bool) float32 {
 	var exists float32
 	var err error
 	var response gohttp.Response
@@ -25,7 +25,7 @@ func HasWordpress(target string) float32 {
 		"wp-admin/"}
 
 	func(URL string, htmlPayloads [3]string) {
-		response, err = gohttp.HttpRequest(gohttp.Http{URL: URL})
+		response, err = gohttp.HttpRequest(gohttp.Http{URL: URL, Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
 
 		if err != nil {
 			printer.Fatal(err)
@@ -46,9 +46,8 @@ func HasWordpress(target string) float32 {
 	}(target, payloads)
 
 	for _, directory := range directories {
-
 		func(URL string, directory string) {
-			request, err := gohttp.HttpRequest(gohttp.Http{URL: URL + directory})
+			request, err := gohttp.HttpRequest(gohttp.Http{URL: URL + directory, Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
 
 			if err != nil {
 				printer.Fatal(err)
@@ -61,7 +60,7 @@ func HasWordpress(target string) float32 {
 			}
 
 			if directory == "wp-admin/" && request.StatusCode == 200 || request.StatusCode == 403 {
-				printer.Warning("Status Code:", request.StatusCode, "in the URL:", URL+directory)
+				printer.Warning("Status Code:", request.StatusCode, "—", "URL:", URL+directory)
 				exists++
 			} else if strings.Contains("Index Of", string(body)) {
 				printer.Done("Listing enable:", URL+directory)

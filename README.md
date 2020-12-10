@@ -37,8 +37,6 @@ Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool i
 | -e, --user-enum     |    Tries to enumerate users                           |
 | -v, --verbose       | Verbosity                                             |
 
-
-
 <h2 align="center">WPrecon running</h2>
 
 Command: `wprecon --url "https://www.xxxxxxx.com/" --detection-waf`

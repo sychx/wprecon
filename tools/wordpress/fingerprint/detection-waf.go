@@ -5,35 +5,35 @@ import (
 	"github.com/blackcrw/wprecon/pkg/printer"
 )
 
-func WAF(target string) (bool, string) {
+func WAF(target string, randomUserAgent bool) (bool, string) {
 	printer.Loading("Active WAF detection module")
 
-	if has, status, name := wordfence(target); has {
-		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+	if has, status, name := wordfence(target, randomUserAgent); has {
+		printer.LoadingWarning("Status Code:", status, "—", "WAF:", name)
 
 		return has, name
-	} else if has, status, name := bulletproof(target); has {
-		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+	} else if has, status, name := bulletproof(target, randomUserAgent); has {
+		printer.LoadingWarning("Status Code:", status, "—", "WAF:", name)
 
 		return has, name
-	} else if has, status, name := betterwp(target); has {
-		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+	} else if has, status, name := betterwp(target, randomUserAgent); has {
+		printer.LoadingWarning("Status Code:", status, "—", "WAF:", name)
 
 		return has, name
-	} else if has, status, name := sucuri(target); has {
-		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+	} else if has, status, name := sucuri(target, randomUserAgent); has {
+		printer.LoadingWarning("Status Code:", status, "—", "WAF:", name)
 
 		return has, name
-	} else if has, status, name := wpsecurity(target); has {
-		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+	} else if has, status, name := wpsecurity(target, randomUserAgent); has {
+		printer.LoadingWarning("Status Code:", status, "—", "WAF:", name)
 
 		return has, name
-	} else if has, status, name := allinonewpsecurity(target); has {
-		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+	} else if has, status, name := allinonewpsecurity(target, randomUserAgent); has {
+		printer.LoadingWarning("Status Code:", status, "—", "WAF:", name)
 
 		return has, name
-	} else if has, status, name := scanprotection(target); has {
-		printer.LoadingWarning("WAF :", name, "Detected", "Status Code :", status)
+	} else if has, status, name := scanprotection(target, randomUserAgent); has {
+		printer.LoadingWarning("Status Code:", status, "—", "WAF:", name)
 
 		return has, name
 	}
@@ -42,8 +42,8 @@ func WAF(target string) (bool, string) {
 	return false, ""
 }
 
-func wordfence(URL string) (bool, int, string) {
-	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/wordfence/"})
+func wordfence(URL string, randomUserAgent bool) (bool, int, string) {
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "wp-content/plugins/wordfence/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
 
 	if err != nil {
 		printer.Fatal(err)
@@ -59,8 +59,8 @@ func wordfence(URL string) (bool, int, string) {
 	return false, 0, ""
 }
 
-func bulletproof(URL string) (bool, int, string) {
-	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/bulletproof-security/"})
+func bulletproof(URL string, randomUserAgent bool) (bool, int, string) {
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "wp-content/plugins/bulletproof-security/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
 
 	if err != nil {
 		printer.Fatal(err)
@@ -76,8 +76,8 @@ func bulletproof(URL string) (bool, int, string) {
 	return false, 0, ""
 }
 
-func betterwp(URL string) (bool, int, string) {
-	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/better-wp-security/"})
+func betterwp(URL string, randomUserAgent bool) (bool, int, string) {
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "wp-content/plugins/better-wp-security/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
 
 	if err != nil {
 		printer.Fatal(err)
@@ -93,8 +93,8 @@ func betterwp(URL string) (bool, int, string) {
 	return false, 0, ""
 }
 
-func sucuri(URL string) (bool, int, string) {
-	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/sucuri-scanner/"})
+func sucuri(URL string, randomUserAgent bool) (bool, int, string) {
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "wp-content/plugins/sucuri-scanner/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
 
 	if err != nil {
 		printer.Fatal(err)
@@ -110,8 +110,8 @@ func sucuri(URL string) (bool, int, string) {
 	return false, 0, ""
 }
 
-func wpsecurity(URL string) (bool, int, string) {
-	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/wp-security-scan/"})
+func wpsecurity(URL string, randomUserAgent bool) (bool, int, string) {
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "wp-content/plugins/wp-security-scan/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
 
 	if err != nil {
 		printer.Fatal(err)
@@ -127,8 +127,8 @@ func wpsecurity(URL string) (bool, int, string) {
 	return false, 0, ""
 }
 
-func allinonewpsecurity(URL string) (bool, int, string) {
-	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/all-in-one-wp-security-and-firewall/"})
+func allinonewpsecurity(URL string, randomUserAgent bool) (bool, int, string) {
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "wp-content/plugins/all-in-one-wp-security-and-firewall/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
 
 	if err != nil {
 		printer.Fatal(err)
@@ -144,8 +144,8 @@ func allinonewpsecurity(URL string) (bool, int, string) {
 	return false, 0, ""
 }
 
-func scanprotection(URL string) (bool, int, string) {
-	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "/wp-content/plugins/6scan-protection/"})
+func scanprotection(URL string, randomUserAgent bool) (bool, int, string) {
+	response, err := gohttp.HttpRequest(gohttp.Http{URL: URL + "wp-content/plugins/6scan-protection/", Options: gohttp.Options{RandomUserAgent: randomUserAgent}})
 
 	if err != nil {
 		printer.Fatal(err)

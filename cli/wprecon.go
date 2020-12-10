@@ -17,6 +17,7 @@ var rootCmd = &cobra.Command{
 	Run: func(ccmd *cobra.Command, args []string) {
 		cmd.Wpcheck(ccmd)
 		cmd.Detectionwaf(ccmd)
+		cmd.UserEnum(ccmd)
 	},
 }
 
@@ -32,9 +33,11 @@ func init() {
 	cobra.OnInitialize(initBanner)
 
 	rootCmd.PersistentFlags().StringP("url", "u", "", "Target URL (Ex: http(s)://google.com/) "+printer.Required())
-	rootCmd.PersistentFlags().BoolP("detection-waf", "d", false, "")
+	rootCmd.PersistentFlags().BoolP("detection-waf", "d", false, "I will try to detect if the target is using any WAF.")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Verbosity")
 	rootCmd.PersistentFlags().BoolP("random-agent", "", false, "Use randomly selected HTTP(S) User-Agent header value")
+	rootCmd.PersistentFlags().BoolP("user-enum", "e", false, "Tries to enumerate users")
+	rootCmd.PersistentFlags().BoolP("no-check-wp", "", false, "Will skip wordpress check on target")
 
 	rootCmd.MarkPersistentFlagRequired("url")
 }
