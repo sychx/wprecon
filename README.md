@@ -1,5 +1,8 @@
-# WPrecon (Wordpress Recon)
-Hello! Welcome. **Wprecon** (Wordpress Recon), is a vulnerability recognition tool in CMS Wordpress, 100% developed in Go.
+<h1 align="center">WPrecon (Wordpress Recon)</h1>
+
+<div align="center"> 
+Hello! Welcome. <b>Wprecon</b> (Wordpress Recon), is a vulnerability recognition tool in CMS Wordpress, 100% developed in Go.
+</div> 
 
 ### Version: Alfa !
 
@@ -18,7 +21,7 @@ Hello! Welcome. **Wprecon** (Wordpress Recon), is a vulnerability recognition to
 ## Usage
 | Flag(s)            | Description                                          |
 |--------------------|------------------------------------------------------|
-|-d, --detection-waf | I will try to detect if the target is using any WAF.                                                  |
+|-d, --detection-waf | I will try to detect if the target is using any WAF. |
 |-h, --help          | help for wprecon                                     |
 |--random-agent      | Use randomly selected HTTP(S) User-Agent header value|
 |-u, --url string    | Target URL (Ex: http(s)://google.com/) `(Required)`  |
