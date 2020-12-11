@@ -15,7 +15,7 @@ func UsersEnum(cmd *cobra.Command) {
 
 	switch userEnum {
 	case true:
-		printer.Loading("Hunting users...")
+		printer.Warning("Hunting users...")
 
 		optionsHttp := Http{
 			URL:                  target,
@@ -24,7 +24,7 @@ func UsersEnum(cmd *cobra.Command) {
 
 		if has, users := wpscan.UserEnumJson(optionsHttp); has {
 			for _, user := range users {
-				printer.Done("User:", user.Name, "—", "Slug:", user.Slug)
+				printer.Done("User:", user.Name)
 			}
 		} else if has, users := wpscan.UserEnumRss(optionsHttp); has {
 			for _, user := range users {
@@ -33,7 +33,7 @@ func UsersEnum(cmd *cobra.Command) {
 				}
 			}
 		} else {
-			printer.LoadingDanger("Unfortunately no user was found. ;-;")
+			printer.Danger("Unfortunately no user was found. ;-;")
 		}
 	}
 

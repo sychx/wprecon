@@ -15,7 +15,7 @@ func PluginsEnum(cmd *cobra.Command) {
 
 	switch pluginEnum {
 	case true:
-		printer.Loading("Hunting plugins...")
+		printer.Warning("Hunting plugins...")
 
 		optionsHttp := Http{
 			URL:                  target,
@@ -29,7 +29,7 @@ func PluginsEnum(cmd *cobra.Command) {
 				}
 			}
 		} else {
-			printer.LoadingDanger("No plugin was found!")
+			printer.Danger("No plugin was found!")
 		}
 
 	}
