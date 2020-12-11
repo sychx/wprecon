@@ -21,9 +21,9 @@ type usersRe struct {
 }
 
 func UserEnumJson(options gohttp.Http) (bool, usersJson) {
+	/* Start of the first scan */
 	options.Dir = "wp-json/wp/v2/users"
 
-	/* Start of the first scan */
 	switch response, err := gohttp.HttpRequest(options); true {
 	case response.StatusCode == 200:
 		var jsn usersJson
@@ -39,7 +39,9 @@ func UserEnumJson(options gohttp.Http) (bool, usersJson) {
 	/* End of first scan */
 
 	/* Start of the second check */
-	switch response, err := gohttp.HttpRequest(gohttp.Http{URL: target, Dir: "?rest_route=/wp/v2/users", RandomUserAgent: randomUserAgent}); true {
+	options.Dir = "?rest_route=/wp/v2/users"
+
+	switch response, err := gohttp.HttpRequest(options); true {
 	case response.StatusCode == 200:
 		var jsn usersJson
 		json.NewDecoder(response.Body).Decode(&jsn)
