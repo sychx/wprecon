@@ -8,7 +8,7 @@ import (
 	"github.com/blackcrw/wprecon/pkg/printer"
 )
 
-func HasWordpress(target string, randomUserAgent bool) float32 {
+func HasWordpress(options gohttp.Http) float32 {
 	var exists float32
 	var err error
 	var response gohttp.Response
@@ -24,8 +24,8 @@ func HasWordpress(target string, randomUserAgent bool) float32 {
 		"wp-includes/",
 		"wp-admin/"}
 
-	func(URL string, htmlPayloads [3]string) {
-		response, err = gohttp.HttpRequest(gohttp.Http{URL: URL, RandomUserAgent: randomUserAgent})
+	func(options gohttp.Http, htmlPayloads [3]string) {
+		response, err = gohttp.HttpRequest(options)
 
 		if err != nil {
 			printer.Fatal(err)
@@ -43,11 +43,13 @@ func HasWordpress(target string, randomUserAgent bool) float32 {
 			}
 		}
 
-	}(target, payloads)
+	}(options, payloads)
 
 	for _, directory := range directories {
-		func(URL string, directory string) {
-			request, err := gohttp.HttpRequest(gohttp.Http{URL: URL, Dir: directory, RandomUserAgent: randomUserAgent})
+		func(options gohttp.Http, directory string) {
+			options.Dir = directory
+
+			request, err := gohttp.HttpRequest(options)
 
 			if err != nil {
 				printer.Fatal(err)
@@ -67,7 +69,7 @@ func HasWordpress(target string, randomUserAgent bool) float32 {
 				exists++
 			}
 
-		}(target, directory)
+		}(options, directory)
 	}
 
 	return exists / 8 * 100

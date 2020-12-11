@@ -2,15 +2,16 @@ package wpscan
 
 import (
 	"fmt"
+	"io/ioutil"
+	"regexp"
+
 	"github.com/blackcrw/wprecon/pkg/gohttp"
 	"github.com/blackcrw/wprecon/pkg/printer"
 	"github.com/blackcrw/wprecon/pkg/text"
-	"io/ioutil"
-	"regexp"
 )
 
-func PluginEnum(target string, randomUserAgent bool) []string {
-	response, err := gohttp.HttpRequest(gohttp.Http{URL: target, RandomUserAgent: randomUserAgent})
+func PluginsFind(options gohttp.Http) (bool, []string) {
+	response, err := gohttp.HttpRequest(options)
 
 	if err != nil {
 		printer.Fatal(err)
@@ -28,7 +29,6 @@ func PluginEnum(target string, randomUserAgent bool) []string {
 
 	plugins := make([]string, len(submatchall))
 	for key, plugin := range submatchall {
-
 		pluginString := fmt.Sprintf("%s", plugin[1])
 
 		if _, has := text.ContainsSliceString(plugins, pluginString); !has {
@@ -36,20 +36,9 @@ func PluginEnum(target string, randomUserAgent bool) []string {
 		}
 	}
 
-	return plugins
-}
-
-/*
-func Changelogs(target string, randomUserAgent bool) {
-	for _, file := range wordlist.WPchangesLogs {
-
-		response, err := gohttp.HttpRequest(gohttp.Http{URL: target, Dir: "/wp-content/plugins/"+file, RandomUserAgent: randomUserAgent})
-
-		if err != nil {
-			printer.Fatal(err)
-		}
-
-		printer.Danger(response)
+	if len(plugins) != 0 {
+		return true, plugins
 	}
+
+	return false, plugins
 }
-*/

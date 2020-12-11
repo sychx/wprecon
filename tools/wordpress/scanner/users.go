@@ -20,28 +20,11 @@ type usersRe struct {
 	Slug string
 }
 
-func UserEnum(target string, randomUserAgent bool) {
-	printer.Loading("Hunting users...")
-
-	if hasEnum, users := userEnumJson(target, randomUserAgent); hasEnum == true {
-		for _, user := range users {
-			printer.LoadingDone("User:", user.Name, "—", "Slug:", user.Slug)
-		}
-	} else if hasEnum, users := userEnumRss(target, randomUserAgent); hasEnum == true {
-		for _, user := range users {
-			if user.Name != "" {
-				printer.LoadingDone("User:", user.Name)
-			}
-		}
-	} else {
-		printer.LoadingDanger("Unfortunately no user was found. ;-;")
-	}
-}
-
-func userEnumJson(target string, randomUserAgent bool) (bool, usersJson) {
+func UserEnumJson(options gohttp.Http) (bool, usersJson) {
+	options.Dir = "wp-json/wp/v2/users"
 
 	/* Start of the first scan */
-	switch response, err := gohttp.HttpRequest(gohttp.Http{URL: target, Dir: "wp-json/wp/v2/users", RandomUserAgent: randomUserAgent}); true {
+	switch response, err := gohttp.HttpRequest(options); true {
 	case response.StatusCode == 200:
 		var jsn usersJson
 		json.NewDecoder(response.Body).Decode(&jsn)
@@ -76,8 +59,10 @@ func userEnumJson(target string, randomUserAgent bool) (bool, usersJson) {
 	return false, nil
 }
 
-func userEnumRss(target string, randomUserAgent bool) (bool, []usersRe) {
-	switch response, err := gohttp.HttpRequest(gohttp.Http{URL: target, Dir: "feed/", RandomUserAgent: randomUserAgent}); true {
+func UserEnumRss(options gohttp.Http) (bool, []usersRe) {
+	options.Dir = "feed/"
+
+	switch response, err := gohttp.HttpRequest(options); true {
 	case response.StatusCode == 200:
 		re := regexp.MustCompile("<dc:creator><!\\[CDATA\\[(.+?)\\]\\]></dc:creator>")
 

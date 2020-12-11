@@ -15,10 +15,10 @@ var rootCmd = &cobra.Command{
 	Short: "Wordpress Recon",
 	Long:  `wprecon (Wordpress Recon) is a scanner based on wpscan, only done in golang to get better performance!`,
 	Run: func(ccmd *cobra.Command, args []string) {
-		cmd.Wpcheck(ccmd)
-		cmd.Detectionwaf(ccmd)
-		cmd.UserEnum(ccmd)
-		cmd.PluginEnum(ccmd)
+		cmd.DetectionWP(ccmd)
+		cmd.DetectionWAF(ccmd)
+		cmd.UsersEnum(ccmd)
+		cmd.PluginsEnum(ccmd)
 	},
 }
 
@@ -35,11 +35,12 @@ func init() {
 
 	rootCmd.PersistentFlags().StringP("url", "u", "", "Target URL (Ex: http(s)://google.com/) "+printer.Required())
 	rootCmd.PersistentFlags().BoolP("detection-waf", "d", false, "I will try to detect if the target is using any WAF.")
-	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Verbosity")
 	rootCmd.PersistentFlags().BoolP("random-agent", "", false, "Use randomly selected HTTP(S) User-Agent header value")
-	rootCmd.PersistentFlags().BoolP("user-enum", "e", false, "Tries to enumerate users")
 	rootCmd.PersistentFlags().BoolP("no-check-wp", "", false, "Will skip wordpress check on target")
-	rootCmd.PersistentFlags().BoolP("plugins-enum", "", false, "Tries to enumerate plugins")
+	rootCmd.PersistentFlags().BoolP("users-enumerate", "e", false, "Use the supplied mode to enumerate Users")
+	rootCmd.PersistentFlags().BoolP("plugins-enumerate", "", false, "Use the supplied mode to enumerate Plugins.")
+	rootCmd.PersistentFlags().BoolP("disable-tls-checks", "", false, "Disables SSL/TLS certificate verification")
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Verbosity mode")
 
 	rootCmd.MarkPersistentFlagRequired("url")
 }
