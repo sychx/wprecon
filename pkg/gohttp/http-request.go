@@ -12,7 +12,7 @@ func HttpRequest(httpStructs Http) (Response, error) {
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
+				InsecureSkipVerify: httpStructs.TLSCertificateVerify,
 			},
 		},
 	}
@@ -21,13 +21,13 @@ func HttpRequest(httpStructs Http) (Response, error) {
 		httpStructs.URL = fmt.Sprintf("%s/", httpStructs.URL)
 	}
 
-	httpStructs.URLFULL = httpStructs.URL+httpStructs.Dir
+	httpStructs.URLFULL = httpStructs.URL + httpStructs.Dir
 
 	if httpStructs.Method == "" {
 		httpStructs.Method = "GET"
 	}
 
-	request, err := http.NewRequest(httpStructs.Method, httpStructs.URL + httpStructs.Dir, nil)
+	request, err := http.NewRequest(httpStructs.Method, httpStructs.URL+httpStructs.Dir, nil)
 
 	if err != nil {
 		return Response{}, err
@@ -48,7 +48,7 @@ func HttpRequest(httpStructs Http) (Response, error) {
 	httpResponse := Response{
 		URL:        httpStructs.URL,
 		URLFULL:    httpStructs.URLFULL,
-		Dir:		httpStructs.Dir,
+		Dir:        httpStructs.Dir,
 		StatusCode: response.StatusCode,
 		UserAgent:  request.UserAgent(),
 		Body:       response.Body,
