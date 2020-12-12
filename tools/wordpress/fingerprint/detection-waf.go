@@ -5,6 +5,8 @@ import (
 	"github.com/blackcrw/wprecon/pkg/printer"
 )
 
+// WAF :: This function will call the WAF's functions until one returns true.
+// Yes, I could use anonymous functions, but I chose not to use it so that the code is not confused if you want to contribute in the future.
 func WAF(options gohttp.Http) (bool, int, string) {
 	printer.Loading("Active WAF detection module")
 
