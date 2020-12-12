@@ -26,15 +26,17 @@ Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool i
 
 <h2 align="center">Usage</h2>
 
-| Flag(s)             | Description                                           |
-|---------------------|-------------------------------------------------------|
-| -d, --detection-waf | I will try to detect if the target is using any WAF.  |
-| -h, --help          | help for wprecon                                      |
-| --no-check-wp       | Will skip wordpress check on target                   |
-| --random-agent      | Use randomly selected HTTP(S) User-Agent header value |
-| -u, --url string    | Target URL (Ex: http(s)://google.com/) `(Required)`   |
-| -e, --user-enum     |    Tries to enumerate users                           |
-| -v, --verbose       | Verbosity                                             |
+| Flag(s)                   | Description                                           |
+|---------------------------|-------------------------------------------------------|
+| -d, --detection-waf       | I will try to detect if the target is using any WAF.  |
+|  --disable-tls-checks     | Disables SSL/TLS certificate verification             |
+| -h, --help                | help for wprecon                                      |
+| --no-check-wp             | Will skip wordpress check on target                   |
+| --random-agent            | Use randomly selected HTTP(S) User-Agent header value |
+| -u, --url string          | Target URL (Ex: http(s)://google.com/) `(Required)`   |
+|     --users-enumerate     | Use the supplied mode to enumerate Users              |
+| --plugins-enumerate       | Use the supplied mode to enumerate Plugins.           |
+| -v, --verbose             | Verbose mode                                          |
 
 <h2 align="center">WPrecon running</h2>
 
