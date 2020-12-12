@@ -10,6 +10,11 @@ import (
 	"github.com/blackcrw/wprecon/pkg/printer"
 )
 
+/*
+Here you may feel somewhat confused. But don't be surprised that I explain it to you!
+As each function returns a different value, I chose to do it that way. But in the future I will improve this.
+*/
+
 type usersJson []struct {
 	Name string `json:"name"`
 	Slug string `json:"slug"`
