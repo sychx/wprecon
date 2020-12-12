@@ -20,6 +20,7 @@ func DetectionWP(cmd *cobra.Command) {
 	case false:
 		var question string
 
+		/* Why did I choose to pass a struct ?! Instead of direct values ​​for and etc. Simple! As each part can have a small change ... so I can have better control! And I avoid building several variables ... */
 		optionsHttp := Http{
 			URL:                  target,
 			RandomUserAgent:      randomUserAgent,
