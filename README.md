@@ -1,5 +1,6 @@
-<h1 align="center">WPrecon (Wordpress Recon)</h1>
+<p align="center" ><img alt="Golpher Ninja by Takuya Ueda" src="https://raw.githubusercontent.com/tenntenn/gopher-stickers/master/png/ninja.png"></p>
 
+<h1 align="center">WPrecon (Wordpress Recon)</h1>
 <p align="center"> 
   <a href="https://www.gnu.org/licenses/gpl-3.0">
     <img alt="License: GPL v3" src="https://img.shields.io/badge/License-GPLv3-blue.svg">
