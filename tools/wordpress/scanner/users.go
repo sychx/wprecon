@@ -25,11 +25,16 @@ type usersRe struct {
 	Slug string
 }
 
-func UserEnumJson(options gohttp.Http) (bool, usersJson) {
-	/* Start of the first scan */
-	options.Dir = "wp-json/wp/v2/users"
+type Users struct {
+	Verbose bool
+	Request gohttp.Http
+}
 
-	switch response, err := gohttp.HttpRequest(options); true {
+func (options *Users) EnumerateJson() (bool, usersJson) {
+	/* Start of the first scan */
+	options.Request.Dir = "wp-json/wp/v2/users"
+
+	switch response, err := gohttp.HttpRequest(options.Request); true {
 	case response.StatusCode == 200:
 		var jsn usersJson
 		json.NewDecoder(response.Body).Decode(&jsn)
@@ -44,9 +49,9 @@ func UserEnumJson(options gohttp.Http) (bool, usersJson) {
 	/* End of first scan */
 
 	/* Start of the second check */
-	options.Dir = "?rest_route=/wp/v2/users"
+	options.Request.Dir = "?rest_route=/wp/v2/users"
 
-	switch response, err := gohttp.HttpRequest(options); true {
+	switch response, err := gohttp.HttpRequest(options.Request); true {
 	case response.StatusCode == 200:
 		var jsn usersJson
 		json.NewDecoder(response.Body).Decode(&jsn)
@@ -60,16 +65,13 @@ func UserEnumJson(options gohttp.Http) (bool, usersJson) {
 	}
 	/* End of second check */
 
-	/* Start of the third check */
-	/* End of third check */
-
 	return false, nil
 }
 
-func UserEnumRss(options gohttp.Http) (bool, []usersRe) {
-	options.Dir = "feed/"
+func (options *Users) EnumerateRss() (bool, []usersRe) {
+	options.Request.Dir = "feed/"
 
-	switch response, err := gohttp.HttpRequest(options); true {
+	switch response, err := gohttp.HttpRequest(options.Request); true {
 	case response.StatusCode == 200:
 		re := regexp.MustCompile("<dc:creator><!\\[CDATA\\[(.+?)\\]\\]></dc:creator>")
 
