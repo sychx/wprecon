@@ -11,7 +11,7 @@
 Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool in CMS Wordpress, 100% developed in Go.
 </p> 
 
-### Version: 0.0.2.1a
+### Version: 0.0.2.2a
 
 ## Features
 
