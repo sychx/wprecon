@@ -27,15 +27,9 @@ func UsersEnum(cmd *cobra.Command) {
 			Request: optionsHttp,
 			Verbose: false}
 
-		if has, usersJson := users.EnumerateJson(); has {
-			for _, user := range usersJson {
-				printer.Done("User:", user.Name)
-			}
-		} else if has, userRss := users.EnumerateRss(); has {
-			for _, user := range userRss {
-				if user.Name != "" {
-					printer.Done("User:", user.Name)
-				}
+		if has, names := users.Enumerate(); has {
+			for _, user := range names {
+				printer.Done("User:", user)
 			}
 		} else {
 			printer.Danger("Unfortunately no user was found. ;-;")
