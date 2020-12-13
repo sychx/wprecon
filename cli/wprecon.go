@@ -33,14 +33,14 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initBanner)
 
-	rootCmd.PersistentFlags().StringP("url", "u", "", "Target URL (Ex: http(s)://google.com/) "+printer.Required())
+	rootCmd.PersistentFlags().StringP("url", "u", "", "Target URL (Ex: http(s)://google.com/). "+printer.Required())
 	rootCmd.PersistentFlags().BoolP("detection-waf", "d", false, "I will try to detect if the target is using any WAF.")
-	rootCmd.PersistentFlags().BoolP("random-agent", "", false, "Use randomly selected HTTP(S) User-Agent header value")
-	rootCmd.PersistentFlags().BoolP("no-check-wp", "", false, "Will skip wordpress check on target")
-	rootCmd.PersistentFlags().BoolP("users-enumerate", "e", false, "Use the supplied mode to enumerate Users")
+	rootCmd.PersistentFlags().BoolP("random-agent", "", false, "Use randomly selected HTTP(S) User-Agent header value.")
+	rootCmd.PersistentFlags().BoolP("no-check-wp", "", false, "Will skip wordpress check on target.")
+	rootCmd.PersistentFlags().BoolP("users-enumerate", "e", false, "Use the supplied mode to enumerate Users.")
 	rootCmd.PersistentFlags().BoolP("plugins-enumerate", "", false, "Use the supplied mode to enumerate Plugins.")
-	rootCmd.PersistentFlags().BoolP("disable-tls-checks", "", false, "Disables SSL/TLS certificate verification")
-	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Verbosity mode")
+	rootCmd.PersistentFlags().BoolP("disable-tls-checks", "", false, "Disables SSL/TLS certificate verification.")
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Verbosity mode.")
 
 	rootCmd.MarkPersistentFlagRequired("url")
 }
