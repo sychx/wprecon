@@ -23,12 +23,16 @@ func UsersEnum(cmd *cobra.Command) {
 			RandomUserAgent:      randomUserAgent,
 			TLSCertificateVerify: tlsCertificateVerify}
 
-		if has, users := wpscan.UserEnumJson(optionsHttp); has {
-			for _, user := range users {
+		users := wpscan.Users{
+			Request: optionsHttp,
+			Verbose: false}
+
+		if has, usersJson := users.EnumerateJson(); has {
+			for _, user := range usersJson {
 				printer.Done("User:", user.Name)
 			}
-		} else if has, users := wpscan.UserEnumRss(optionsHttp); has {
-			for _, user := range users {
+		} else if has, userRss := users.EnumerateRss(); has {
+			for _, user := range userRss {
 				if user.Name != "" {
 					printer.Done("User:", user.Name)
 				}
