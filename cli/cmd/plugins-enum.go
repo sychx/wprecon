@@ -33,7 +33,7 @@ func PluginsEnum(cmd *cobra.Command) {
 					printer.Done("Plugin:", name)
 
 					if changelog, response := plugins.Changelog(name); changelog {
-						printer.Done("Changelog:", response.URLFULL)
+						printer.Warning("Changelog:", response.URLFULL)
 					}
 				}
 			}
