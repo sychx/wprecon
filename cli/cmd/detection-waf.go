@@ -28,8 +28,12 @@ func DetectionWAF(cmd *cobra.Command) {
 			RandomUserAgent:      randomUserAgent,
 			TLSCertificateVerify: tlsCertificateVerify}
 
-		if has, status, name := wpfinger.WAF(optionsHttp); has {
-			printer.LoadingWarning("Status Code:", status, "—", "WAF:", name)
+		waf := wpfinger.WAF{
+			Request: optionsHttp,
+			Verbose: false}
+
+		if has, status, name := waf.Detection(); has {
+			printer.LoadingWarning(status, "—", "WAF :", name)
 
 			printer.Warning("Do you wish to continue ?! [Y/n] :")
 			if fmt.Scan(&question); strings.ToLower(question) != "y" {
