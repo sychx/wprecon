@@ -16,32 +16,6 @@ type Plugins struct {
 	Request gohttp.Http
 }
 
-func (options *Plugins) Changelog(plugin string) (bool, gohttp.Response) {
-	for _, value := range wordlist.WPchangesLogs {
-		options.Request.Dir = fmt.Sprintf("/wp-content/plugins/%s/%s", plugin, value)
-
-		printer.Danger(options.Request.Dir)
-
-		response, err := gohttp.HttpRequest(options.Request)
-
-		if err != nil {
-			printer.Fatal(err)
-		}
-
-		bodyBytes, err := ioutil.ReadAll(response.Body)
-
-		if err != nil {
-			printer.Fatal(err)
-		}
-
-		if response.StatusCode == 200 && string(bodyBytes) != "" {
-			return true, response
-		}
-	}
-
-	return false, gohttp.Response{}
-}
-
 func (options *Plugins) Enumerate() (bool, []string) {
 	response, err := gohttp.HttpRequest(options.Request)
 
@@ -73,4 +47,28 @@ func (options *Plugins) Enumerate() (bool, []string) {
 	}
 
 	return false, plugins
+}
+
+func (options *Plugins) Changelog(plugin string) (bool, gohttp.Response) {
+	for _, value := range wordlist.WPchangesLogs {
+		options.Request.Dir = fmt.Sprintf("/wp-content/plugins/%s/%s", plugin, value)
+
+		response, err := gohttp.HttpRequest(options.Request)
+
+		if err != nil {
+			printer.Fatal(err)
+		}
+
+		bodyBytes, err := ioutil.ReadAll(response.Body)
+
+		if err != nil {
+			printer.Fatal(err)
+		}
+
+		if response.StatusCode == 200 && string(bodyBytes) != "" {
+			return true, response
+		}
+	}
+
+	return false, gohttp.Response{}
 }
