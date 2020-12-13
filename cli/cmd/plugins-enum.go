@@ -23,10 +23,18 @@ func PluginsEnum(cmd *cobra.Command) {
 			RandomUserAgent:      randomUserAgent,
 			TLSCertificateVerify: tlsCertificateVerify}
 
-		if has, lista := wpscan.PluginsFind(optionsHttp); has {
-			for _, name := range lista {
+		plugins := wpscan.Plugins{
+			Request: optionsHttp,
+			Verbose: false}
+
+		if has, names := plugins.Enumerate(); has {
+			for _, name := range names {
 				if name != "" {
 					printer.Done("Plugin:", name)
+
+					if changelog, response := plugins.Changelog(name); changelog {
+						printer.Done("Changelog:", response.URLFULL)
+					}
 				}
 			}
 		} else {
