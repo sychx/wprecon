@@ -24,7 +24,7 @@ type githubAPIJSON struct {
 func UpdateCheck() {
 	var githubJSON githubAPIJSON
 
-	go printer.Loading("Checking Version!")
+	printer.Loading("Checking Version!")
 
 	request, _ := gohttp.HttpRequest(gohttp.Http{Method: "GET", URL: "https://raw.githubusercontent.com/blackcrw/wprecon/dev/internal/config.json"})
 
