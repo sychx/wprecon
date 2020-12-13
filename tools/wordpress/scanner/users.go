@@ -8,6 +8,7 @@ import (
 
 	"github.com/blackcrw/wprecon/pkg/gohttp"
 	"github.com/blackcrw/wprecon/pkg/printer"
+	"github.com/blackcrw/wprecon/pkg/text"
 )
 
 /*
@@ -15,64 +16,99 @@ Here you may feel somewhat confused. But don't be surprised that I explain it to
 As each function returns a different value, I chose to do it that way. But in the future I will improve this.
 */
 
-type usersJson []struct {
-	Name string `json:"name"`
-	Slug string `json:"slug"`
-}
-
-type usersRe struct {
-	Name string
-	Slug string
-}
-
 type Users struct {
 	Verbose bool
 	Request gohttp.Http
 }
 
-func (options *Users) EnumerateJson() (bool, usersJson) {
-	/* Start of the first scan */
-	options.Request.Dir = "wp-json/wp/v2/users"
+type uJson []struct {
+	Name string `json:"name"`
+}
 
-	switch response, err := gohttp.HttpRequest(options.Request); true {
-	case response.StatusCode == 200:
-		var jsn usersJson
-		json.NewDecoder(response.Body).Decode(&jsn)
+func (options *Users) Enumerate() (bool, []string) {
 
-		if len(jsn) > 0 {
-			return true, jsn
+	if has, json := options.json(); has {
+		names := make([]string, len(json))
+
+		for key, value := range json {
+
+			names[key] = fmt.Sprintf("%s", value.Name)
 		}
 
-	case err != nil:
-		printer.Fatal(err)
-	}
-	/* End of first scan */
+		return true, names
 
-	/* Start of the second check */
-	options.Request.Dir = "?rest_route=/wp/v2/users"
+	} else if has, route := options.route(); has {
+		names := make([]string, len(route))
 
-	switch response, err := gohttp.HttpRequest(options.Request); true {
-	case response.StatusCode == 200:
-		var jsn usersJson
-		json.NewDecoder(response.Body).Decode(&jsn)
+		for key, value := range route {
 
-		if len(jsn) > 0 {
-			return true, jsn
+			names[key] = fmt.Sprintf("%s", value.Name)
 		}
 
-	case err != nil:
-		printer.Fatal(err)
+		return true, names
+
+	} else if has, rss := options.rss(); has {
+		var names []string
+
+		for _, value := range rss {
+
+			valueString := fmt.Sprintf("%s", value[1])
+
+			if _, has := text.ContainsSliceString(names, valueString); !has && valueString != "" {
+				names = append(names, valueString)
+			}
+		}
+
+		return true, names
 	}
-	/* End of second check */
 
 	return false, nil
 }
 
-func (options *Users) EnumerateRss() (bool, []usersRe) {
+func (options *Users) json() (bool, uJson) {
+	options.Request.Dir = "wp-json/wp/v2/users"
+
+	var jsn uJson
+
+	if response, err := gohttp.HttpRequest(options.Request); response.StatusCode == 200 {
+
+		json.NewDecoder(response.Body).Decode(&jsn)
+
+		if len(jsn) > 0 {
+			return true, jsn
+		}
+
+	} else if err != nil {
+		printer.Fatal(err)
+	}
+
+	return false, nil
+}
+
+func (options *Users) route() (bool, uJson) {
+	options.Request.Dir = "?rest_route=/wp/v2/users"
+
+	var jsn uJson
+
+	if response, err := gohttp.HttpRequest(options.Request); response.StatusCode == 200 {
+
+		json.NewDecoder(response.Body).Decode(&jsn)
+
+		if len(jsn) > 0 {
+			return true, jsn
+		}
+
+	} else if err != nil {
+		printer.Fatal(err)
+	}
+
+	return false, nil
+}
+
+func (options *Users) rss() (bool, [][][]byte) {
 	options.Request.Dir = "feed/"
 
-	switch response, err := gohttp.HttpRequest(options.Request); true {
-	case response.StatusCode == 200:
+	if response, err := gohttp.HttpRequest(options.Request); response.StatusCode == 200 {
 		re := regexp.MustCompile("<dc:creator><!\\[CDATA\\[(.+?)\\]\\]></dc:creator>")
 
 		bodyBytes, err := ioutil.ReadAll(response.Body)
@@ -83,15 +119,9 @@ func (options *Users) EnumerateRss() (bool, []usersRe) {
 
 		submatchall := re.FindAllSubmatch([]byte(bodyBytes), -1)
 
-		for key, name := range submatchall {
-			dir := make([]usersRe, len(submatchall))
+		return true, submatchall
 
-			dir[key].Name = fmt.Sprintf("%s", name[1])
-
-			return true, dir
-		}
-
-	case err != nil:
+	} else if err != nil {
 		printer.Fatal(err)
 	}
 
