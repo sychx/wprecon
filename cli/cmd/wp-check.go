@@ -26,7 +26,11 @@ func DetectionWP(cmd *cobra.Command) {
 			RandomUserAgent:      randomUserAgent,
 			TLSCertificateVerify: tlsCertificateVerify}
 
-		wordpressAccuracy := wpfinger.HasWordpress(optionsHttp)
+		wordpress := wpfinger.Wordpress{
+			Request: optionsHttp,
+			Verbose: false}
+
+		wordpressAccuracy := wordpress.Check()
 		wordpressAccuracyString := fmt.Sprintf("%.2f%%", wordpressAccuracy)
 
 		if wordpressAccuracy >= 62.5 {
