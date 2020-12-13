@@ -28,21 +28,19 @@ type uJson []struct {
 func (options *Users) Enumerate() (bool, []string) {
 
 	if has, json := options.json(); has {
-		names := make([]string, len(json))
+		var names []string
 
-		for key, value := range json {
-
-			names[key] = fmt.Sprintf("%s", value.Name)
+		for _, value := range json {
+			names = append(names, fmt.Sprintf("%s", value.Name))
 		}
 
 		return true, names
 
 	} else if has, route := options.route(); has {
-		names := make([]string, len(route))
+		var names []string
 
-		for key, value := range route {
-
-			names[key] = fmt.Sprintf("%s", value.Name)
+		for _, value := range route {
+			names = append(names, fmt.Sprintf("%s", value.Name))
 		}
 
 		return true, names
