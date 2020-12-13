@@ -12,8 +12,9 @@ import (
 )
 
 type Plugins struct {
-	Verbose bool
-	Request gohttp.Http
+	Verbose  bool
+	Request  gohttp.Http
+	response map[string]interface{}
 }
 
 func (options *Plugins) Enumerate() (bool, []string) {
@@ -33,12 +34,12 @@ func (options *Plugins) Enumerate() (bool, []string) {
 
 	submatchall := re.FindAllSubmatch([]byte(bodyBytes), -1)
 
-	plugins := make([]string, len(submatchall))
-	for key, plugin := range submatchall {
+	var plugins []string
+	for _, plugin := range submatchall {
 		pluginString := fmt.Sprintf("%s", plugin[1])
 
 		if _, has := text.ContainsSliceString(plugins, pluginString); !has {
-			plugins[key] = pluginString
+			plugins = append(plugins, pluginString)
 		}
 	}
 
