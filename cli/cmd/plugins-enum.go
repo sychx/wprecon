@@ -27,20 +27,7 @@ func PluginsEnum(cmd *cobra.Command) {
 			Request: optionsHttp,
 			Verbose: false}
 
-		if has, names := plugins.Enumerate(); has {
-			for _, name := range names {
-				if name != "" {
-					printer.Done("Plugin:", name)
-
-					if changelog, response := plugins.Changelog(name); changelog {
-						printer.Warning("Changelog:", response.URLFULL)
-					}
-				}
-			}
-		} else {
-			printer.Danger("No plugin was found!")
-		}
-
+		plugins.Enumerate()
 	}
 
 }
