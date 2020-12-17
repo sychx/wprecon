@@ -34,6 +34,7 @@ Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool i
 | -h, --help                | help for wprecon                                      |
 | --no-check-wp             | Will skip wordpress check on target                   |
 | --random-agent            | Use randomly selected HTTP(S) User-Agent header value |
+| --tor                     | Use Tor anonymity network                             |
 | -u, --url string          | Target URL (Ex: http(s)://google.com/) `(Required)`   |
 |     --users-enumerate     | Use the supplied mode to enumerate Users              |
 | --plugins-enumerate       | Use the supplied mode to enumerate Plugins.           |
