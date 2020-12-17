@@ -11,6 +11,7 @@ type Http struct {
 	URLFULL              string
 	Dir                  string
 	Proxy                string
+	Tor                  bool
 	RandomUserAgent      bool
 	TLSCertificateVerify bool
 }
