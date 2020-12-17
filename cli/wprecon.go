@@ -38,7 +38,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolP("plugins-enumerate", "", false, "Use the supplied mode to enumerate Plugins.")
 	rootCmd.PersistentFlags().BoolP("detection-waf", "d", false, "I will try to detect if the target is using any WAF.")
 	rootCmd.PersistentFlags().BoolP("random-agent", "", false, "Use randomly selected HTTP(S) User-Agent header value.")
-	rootCmd.PersistentFlags().BoolP("tor", "", false, "Active Tor Proxy's")
+	rootCmd.PersistentFlags().BoolP("tor", "", false, "Use Tor anonymity network")
 	rootCmd.PersistentFlags().BoolP("no-check-wp", "", false, "Will skip wordpress check on target.")
 	rootCmd.PersistentFlags().BoolP("disable-tls-checks", "", false, "Disables SSL/TLS certificate verification.")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Verbosity mode.")
