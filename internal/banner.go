@@ -8,10 +8,15 @@ import (
 )
 
 // Sbanner :: A banner that will only be executed if the scan is started correctly.
-func SBanner(target string) {
+func SBanner(target string, tor bool) {
 	Banner()
 	printer.Done("Target:", target)
-	printer.Done("Starting:", time.Now().Format(("02/jan/2006 15:04:05")), "\n")
+
+	if tor {
+		printer.Done("Proxy: TOR")
+	}
+
+	printer.Done("Starting:", time.Now().Format(("02/Jan/2006 15:04:05")), "\n")
 }
 
 // Banner :: A simple banner.
