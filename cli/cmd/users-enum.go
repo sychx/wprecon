@@ -12,6 +12,7 @@ func UsersEnum(cmd *cobra.Command) {
 	userEnum, _ := cmd.Flags().GetBool("users-enumerate")
 	randomUserAgent, _ := cmd.Flags().GetBool("random-agent")
 	tlsCertificateVerify, _ := cmd.Flags().GetBool("disable-tls-verify")
+	torProxy, _ := cmd.Flags().GetBool("tor")
 
 	switch userEnum {
 	case true:
@@ -21,6 +22,7 @@ func UsersEnum(cmd *cobra.Command) {
 		optionsHttp := Http{
 			URL:                  target,
 			RandomUserAgent:      randomUserAgent,
+			Tor:                  torProxy,
 			TLSCertificateVerify: tlsCertificateVerify}
 
 		users := wpscan.Users{
