@@ -12,6 +12,7 @@ func PluginsEnum(cmd *cobra.Command) {
 	pluginEnum, _ := cmd.Flags().GetBool("plugins-enumerate")
 	randomUserAgent, _ := cmd.Flags().GetBool("random-agent")
 	tlsCertificateVerify, _ := cmd.Flags().GetBool("disable-tls-verify")
+	torProxy, _ := cmd.Flags().GetBool("tor")
 
 	switch pluginEnum {
 	case true:
@@ -21,6 +22,7 @@ func PluginsEnum(cmd *cobra.Command) {
 		optionsHttp := Http{
 			URL:                  target,
 			RandomUserAgent:      randomUserAgent,
+			Tor:                  torProxy,
 			TLSCertificateVerify: tlsCertificateVerify}
 
 		plugins := wpscan.Plugins{
