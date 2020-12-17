@@ -9,8 +9,21 @@ import (
 
 // HttpRequest :: This function will be used for any request that is made.
 func HttpRequest(httpStructs Http) (Response, error) {
+	proxy := http.ProxyFromEnvironment
+
+	if httpStructs.Tor {
+		tor, err := TorCheck()
+
+		if err != nil {
+			return Response{}, fmt.Errorf("%w", err)
+		}
+
+		proxy = tor
+	}
+
 	client := &http.Client{
 		Transport: &http.Transport{
+			Proxy: proxy,
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: httpStructs.TLSCertificateVerify,
 			},
@@ -27,7 +40,7 @@ func HttpRequest(httpStructs Http) (Response, error) {
 		httpStructs.Method = "GET"
 	}
 
-	request, err := http.NewRequest(httpStructs.Method, httpStructs.URL+httpStructs.Dir, nil)
+	request, err := http.NewRequest(httpStructs.Method, httpStructs.URLFULL, nil)
 
 	if err != nil {
 		return Response{}, err
