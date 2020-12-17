@@ -34,11 +34,12 @@ func init() {
 	cobra.OnInitialize(initBanner)
 
 	rootCmd.PersistentFlags().StringP("url", "u", "", "Target URL (Ex: http(s)://google.com/). "+printer.Required())
-	rootCmd.PersistentFlags().BoolP("detection-waf", "d", false, "I will try to detect if the target is using any WAF.")
-	rootCmd.PersistentFlags().BoolP("random-agent", "", false, "Use randomly selected HTTP(S) User-Agent header value.")
-	rootCmd.PersistentFlags().BoolP("no-check-wp", "", false, "Will skip wordpress check on target.")
 	rootCmd.PersistentFlags().BoolP("users-enumerate", "e", false, "Use the supplied mode to enumerate Users.")
 	rootCmd.PersistentFlags().BoolP("plugins-enumerate", "", false, "Use the supplied mode to enumerate Plugins.")
+	rootCmd.PersistentFlags().BoolP("detection-waf", "d", false, "I will try to detect if the target is using any WAF.")
+	rootCmd.PersistentFlags().BoolP("random-agent", "", false, "Use randomly selected HTTP(S) User-Agent header value.")
+	rootCmd.PersistentFlags().BoolP("tor", "", false, "Active Tor Proxy's")
+	rootCmd.PersistentFlags().BoolP("no-check-wp", "", false, "Will skip wordpress check on target.")
 	rootCmd.PersistentFlags().BoolP("disable-tls-checks", "", false, "Disables SSL/TLS certificate verification.")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Verbosity mode.")
 
@@ -47,14 +48,14 @@ func init() {
 
 func initBanner() {
 	target, _ := rootCmd.Flags().GetString("url")
-	isURL, err := gohttp.IsValidURL(target)
+	tor, _ := rootCmd.Flags().GetBool("tor")
 
-	switch isURL {
+	switch isURL, err := gohttp.IsValidURL(target); isURL {
 	case false:
 		internal.Banner()
 		printer.Fatal(err)
 	case true:
-		internal.SBanner(target)
+		internal.SBanner(target, tor)
 	default:
 		internal.Banner()
 	}
