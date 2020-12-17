@@ -15,6 +15,7 @@ func DetectionWAF(cmd *cobra.Command) {
 	detectionWaf, _ := cmd.Flags().GetBool("detection-waf")
 	randomUserAgent, _ := cmd.Flags().GetBool("random-agent")
 	tlsCertificateVerify, _ := cmd.Flags().GetBool("disable-tls-verify")
+	torProxy, _ := cmd.Flags().GetBool("tor")
 
 	switch detectionWaf {
 	case true:
@@ -26,6 +27,7 @@ func DetectionWAF(cmd *cobra.Command) {
 		optionsHttp := Http{
 			URL:                  target,
 			RandomUserAgent:      randomUserAgent,
+			Tor:                  torProxy,
 			TLSCertificateVerify: tlsCertificateVerify}
 
 		waf := wpfinger.WAF{
