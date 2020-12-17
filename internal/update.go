@@ -30,7 +30,7 @@ func UpdateCheck() {
 
 	if err := json.NewDecoder(request.Body).Decode(&githubJSON); err != nil {
 		printer.LoadingDanger("An error occurred while trying to check the version.")
-	} else if githubJSON.App.Version != Version() {
+	} else if githubJSON.App.Version != Version {
 		printer.LoadingDone("There is a new version!", "New:", githubJSON.App.Version, "Download: https://github.com/blackcrw/wprecon/releases")
 	}
 }
