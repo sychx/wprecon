@@ -31,6 +31,6 @@ ____/|__/  /_/     /_/ |_| /_____/  \____/  \____/ /_/ |_/
 
 `)
 	fmt.Print("Github: ", "https://github.com/blackcrw/wprecon\n")
-	fmt.Print("Version: ", "0.0.2.1a\n")
+	fmt.Print("Version: ", Version)
 	fmt.Print("—————————————————————————————————————————————————————————————————————\n")
 }
