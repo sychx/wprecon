@@ -12,9 +12,7 @@ Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool i
 </p> 
 
 ### Version: 0.0.2.0a
-##### Hmm because these last days are not updated ?!
-##### I'm making more commits on the dev branch, so keep an eye out there hehe.
-##### As soon as possible a major complete remodel will come out.
+##### Hmm because these last days are not updated ?! I'm making more commits on the dev branch, so keep an eye out there hehe. As soon as possible a major complete remodel will come out.
 
 ## Features
 
