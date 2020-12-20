@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// ContainsSliceString :: This function will be used to check if there is a certain string within a slice/array.
 func ContainsSliceString(slice []string, val string) (int, bool) {
 	for i, item := range slice {
 		if fmt.Sprintf("%s", item) == val {
@@ -13,5 +14,4 @@ func ContainsSliceString(slice []string, val string) (int, bool) {
 	}
 
 	return -1, false
-
 }

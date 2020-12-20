@@ -11,8 +11,13 @@ import (
 	:: https://stackoverflow.com/questions/51069484/url-validation-seems-broken
 */
 
-// IsValidURL :: This function will be used for URL validation
-func IsValidURL(URL string) (bool, error) {
+// URL ::
+type URL interface {
+	IsURL() (bool, error)
+}
+
+// IsURL :: This function will be used for URL validation
+func IsURL(URL string) (bool, error) {
 	// Check it's an Absolute URL or absolute path
 	uri, err := url.ParseRequestURI(URL)
 	if err != nil {

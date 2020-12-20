@@ -1,4 +1,4 @@
-package wpscan
+package scanner
 
 import (
 	"encoding/json"
@@ -11,64 +11,53 @@ import (
 	"github.com/blackcrw/wprecon/pkg/text"
 )
 
-/*
-Here you may feel somewhat confused. But don't be surprised that I explain it to you!
-As each function returns a different value, I chose to do it that way. But in the future I will improve this.
-*/
-
+// Users ::
 type Users struct {
+	HTTP    *gohttp.HTTPOptions
 	Verbose bool
-	Request gohttp.Http
 }
 
-type uJson []struct {
+type uJSON []struct {
 	Name string `json:"name"`
 }
 
-func (options *Users) Enumerate() (bool, []string) {
-
+// Enumerate ::
+func (options *Users) Enumerate() {
 	if has, json := options.json(); has {
-		var names []string
+		printer.Done("⎡ User(s) :")
 
 		for _, value := range json {
-			names = append(names, fmt.Sprintf("%s", value.Name))
+			printer.Done("⎢", value.Name)
 		}
-
-		return true, names
-
 	} else if has, route := options.route(); has {
-		var names []string
+		printer.Done("⎡ User(s) :")
 
 		for _, value := range route {
-			names = append(names, fmt.Sprintf("%s", value.Name))
+			printer.Done("⎢", value.Name)
 		}
-
-		return true, names
-
 	} else if has, rss := options.rss(); has {
 		var names []string
 
-		for _, value := range rss {
+		printer.Done("⎡ User(s) :")
 
+		for _, value := range rss {
 			valueString := fmt.Sprintf("%s", value[1])
 
 			if _, has := text.ContainsSliceString(names, valueString); !has && valueString != "" {
-				names = append(names, valueString)
+				printer.Done("⎢", valueString)
 			}
 		}
-
-		return true, names
+	} else {
+		printer.Danger("Unfortunately no user was found. ;-;")
 	}
-
-	return false, nil
 }
 
-func (options *Users) json() (bool, uJson) {
-	options.Request.Dir = "wp-json/wp/v2/users"
+func (options *Users) json() (bool, uJSON) {
+	options.HTTP.URL.Directory = "wp-json/wp/v2/users"
 
-	var jsn uJson
+	var jsn uJSON
 
-	if response, err := gohttp.HttpRequest(options.Request); response.StatusCode == 200 {
+	if response, err := gohttp.HTTPRequest(options.HTTP); response.StatusCode == 200 {
 
 		json.NewDecoder(response.Body).Decode(&jsn)
 
@@ -83,12 +72,12 @@ func (options *Users) json() (bool, uJson) {
 	return false, nil
 }
 
-func (options *Users) route() (bool, uJson) {
-	options.Request.Dir = "?rest_route=/wp/v2/users"
+func (options *Users) route() (bool, uJSON) {
+	options.HTTP.URL.Directory = "?rest_route=/wp/v2/users"
 
-	var jsn uJson
+	var jsn uJSON
 
-	if response, err := gohttp.HttpRequest(options.Request); response.StatusCode == 200 {
+	if response, err := gohttp.HTTPRequest(options.HTTP); response.StatusCode == 200 {
 
 		json.NewDecoder(response.Body).Decode(&jsn)
 
@@ -104,9 +93,9 @@ func (options *Users) route() (bool, uJson) {
 }
 
 func (options *Users) rss() (bool, [][][]byte) {
-	options.Request.Dir = "feed/"
+	options.HTTP.URL.Directory = "feed/"
 
-	if response, err := gohttp.HttpRequest(options.Request); response.StatusCode == 200 {
+	if response, err := gohttp.HTTPRequest(options.HTTP); response.StatusCode == 200 {
 		re := regexp.MustCompile("<dc:creator><!\\[CDATA\\[(.+?)\\]\\]></dc:creator>")
 
 		bodyBytes, err := ioutil.ReadAll(response.Body)

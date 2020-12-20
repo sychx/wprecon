@@ -1,63 +1,135 @@
 package cli
 
 import (
+	"fmt"
 	"os"
 
-	"github.com/blackcrw/wprecon/cli/cmd"
-	"github.com/blackcrw/wprecon/internal"
+	"github.com/blackcrw/wprecon/internal/pkg/banner"
 	"github.com/blackcrw/wprecon/pkg/gohttp"
 	"github.com/blackcrw/wprecon/pkg/printer"
+	"github.com/blackcrw/wprecon/tools/wordpress/fingerprint"
+	"github.com/blackcrw/wprecon/tools/wordpress/scanner"
 	"github.com/spf13/cobra"
 )
 
-var rootCmd = &cobra.Command{
+var root = &cobra.Command{
 	Use:   "wprecon",
 	Short: "Wordpress Recon",
 	Long:  `wprecon (Wordpress Recon) is a scanner based on wpscan, only done in golang to get better performance!`,
-	Run: func(ccmd *cobra.Command, args []string) {
-		cmd.DetectionWP(ccmd)
-		cmd.DetectionWAF(ccmd)
-		cmd.UsersEnum(ccmd)
-		cmd.PluginsEnum(ccmd)
+	Run: func(cmd *cobra.Command, args []string) {
+		tor, _ := cmd.Flags().GetBool("tor")
+		target, _ := cmd.Flags().GetString("url")
+		verbose, _ := cmd.Flags().GetBool("verbose")
+		nocheckwp, _ := cmd.Flags().GetBool("no-check-wp")
+		detectionwaf, _ := cmd.Flags().GetBool("detection-waf")
+		randomuseragent, _ := cmd.Flags().GetBool("random-agent")
+		userenumerate, _ := cmd.Flags().GetBool("users-enumerate")
+		pluginenumerate, _ := cmd.Flags().GetBool("plugins-enumerate")
+		tlscertificateverify, _ := cmd.Flags().GetBool("disable-tls-verify")
+
+		options := &gohttp.HTTPOptions{
+			URL: gohttp.URLOptions{
+				Simple: target,
+			},
+			Options: gohttp.Options{
+				Tor:                  tor,
+				RandomUserAgent:      randomuseragent,
+				TLSCertificateVerify: tlscertificateverify,
+			},
+		}
+
+		// ———————————————Wordpress Block——————————————— //
+
+		if !nocheckwp {
+			/* WP :: Wordpress */
+			WP := fingerprint.Wordpress{
+				HTTP:    options,
+				Verbose: verbose,
+			}
+
+			WP.Detection()
+		}
+
+		// ————————WebApplicationFirewall Block———————— //
+
+		if detectionwaf {
+			/* WAF :: Web Application Firewall */
+			WAF := fingerprint.WebApplicationFirewall{
+				HTTP:    options,
+				Verbose: verbose,
+			}
+
+			WAF.Detection()
+		}
+
+		// ————————————————Space Block———————————————— //
+		if detectionwaf && pluginenumerate {
+			fmt.Println("")
+		}
+
+		// ———————————————Plugins Block——————————————— //
+
+		if pluginenumerate {
+			/* EP :: Enumeration Plugin(s) */
+			EP := scanner.Plugins{
+				HTTP:    options,
+				Verbose: verbose,
+			}
+
+			EP.Enumerate()
+		}
+
+		// ————————————————Space Block———————————————— //
+		if pluginenumerate && userenumerate {
+			fmt.Println("")
+		}
+
+		// ————————————————Users Block———————————————— //
+
+		if userenumerate {
+			/* EU :: Enumeration User(s) */
+			EU := scanner.Users{
+				HTTP:    options,
+				Verbose: verbose,
+			}
+
+			EU.Enumerate()
+		}
 	},
+}
+
+func init() {
+	cobra.OnInitialize(ibanner)
+
+	root.PersistentFlags().StringP("url", "u", "", "Target URL (Ex: http(s)://example.com/). "+printer.Required)
+	root.PersistentFlags().BoolP("users-enumerate", "e", false, "Use the supplied mode to enumerate Users.")
+	root.PersistentFlags().BoolP("plugins-enumerate", "", false, "Use the supplied mode to enumerate Plugins.")
+	root.PersistentFlags().BoolP("detection-waf", "d", false, "I will try to detect if the target is using any WAF.")
+	root.PersistentFlags().BoolP("random-agent", "", false, "Use randomly selected HTTP(S) User-Agent header value.")
+	root.PersistentFlags().BoolP("tor", "", false, "Use Tor anonymity network")
+	root.PersistentFlags().BoolP("no-check-wp", "", false, "Will skip wordpress check on target.")
+	root.PersistentFlags().BoolP("disable-tls-checks", "", false, "Disables SSL/TLS certificate verification.")
+	root.PersistentFlags().BoolP("verbose", "v", false, "Verbosity mode.")
+
+	root.MarkPersistentFlagRequired("url")
+}
+
+func ibanner() {
+	verbose, _ := root.Flags().GetBool("verbose")
+	target, _ := root.Flags().GetString("url")
+	tor, _ := root.Flags().GetBool("tor")
+
+	if isURL, err := gohttp.IsURL(target); isURL {
+		banner.SBanner(target, tor, verbose)
+	} else {
+		banner.Banner()
+		printer.Fatal(err)
+	}
 }
 
 // Execute ::
 func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		// printer.Danger(err)
+	if err := root.Execute(); err != nil {
 		os.Exit(0)
 	}
-}
-
-func init() {
-	cobra.OnInitialize(initBanner)
-
-	rootCmd.PersistentFlags().StringP("url", "u", "", "Target URL (Ex: http(s)://google.com/). "+printer.Required())
-	rootCmd.PersistentFlags().BoolP("users-enumerate", "e", false, "Use the supplied mode to enumerate Users.")
-	rootCmd.PersistentFlags().BoolP("plugins-enumerate", "", false, "Use the supplied mode to enumerate Plugins.")
-	rootCmd.PersistentFlags().BoolP("detection-waf", "d", false, "I will try to detect if the target is using any WAF.")
-	rootCmd.PersistentFlags().BoolP("random-agent", "", false, "Use randomly selected HTTP(S) User-Agent header value.")
-	rootCmd.PersistentFlags().BoolP("tor", "", false, "Use Tor anonymity network")
-	rootCmd.PersistentFlags().BoolP("no-check-wp", "", false, "Will skip wordpress check on target.")
-	rootCmd.PersistentFlags().BoolP("disable-tls-checks", "", false, "Disables SSL/TLS certificate verification.")
-	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Verbosity mode.")
-
-	rootCmd.MarkPersistentFlagRequired("url")
-}
-
-func initBanner() {
-	target, _ := rootCmd.Flags().GetString("url")
-	tor, _ := rootCmd.Flags().GetBool("tor")
-
-	switch isURL, err := gohttp.IsValidURL(target); isURL {
-	case false:
-		internal.Banner()
-		printer.Fatal(err)
-	case true:
-		internal.SBanner(target, tor)
-	default:
-		internal.Banner()
-	}
-
 }

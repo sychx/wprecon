@@ -7,8 +7,8 @@ import (
 	"github.com/blackcrw/wprecon/pkg/wordlist"
 )
 
-// RandomUserAgent : this function "generates" user-agents randomly.
-func RandomUserAgent() string {
+// randomuseragent : this function "generates" user-agents randomly.
+func randomuseragent() string {
 	timeUnix := time.Now().Unix()
 
 	rand.Seed(timeUnix)
