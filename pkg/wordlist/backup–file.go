@@ -1,5 +1,6 @@
 package wordlist
 
+// BackupFiles ::
 var BackupFiles = [...]string{
 	"wordpress.7z",
 	"wordpress.rar",

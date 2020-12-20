@@ -1,4 +1,4 @@
-package wpscan
+package scanner
 
 import (
 	"encoding/json"
@@ -8,64 +8,94 @@ import (
 
 	"github.com/blackcrw/wprecon/pkg/gohttp"
 	"github.com/blackcrw/wprecon/pkg/printer"
+	"github.com/blackcrw/wprecon/pkg/text"
 )
 
-type usersJson []struct {
+// Users ::
+type Users struct {
+	HTTP    *gohttp.HTTPOptions
+	Verbose bool
+}
+
+type uJSON []struct {
 	Name string `json:"name"`
-	Slug string `json:"slug"`
 }
 
-type usersRe struct {
-	Name string
-	Slug string
+// Enumerate ::
+func (options *Users) Enumerate() {
+	if has, json := options.json(); has {
+		printer.Done("⎡ User(s) :")
+
+		for _, value := range json {
+			printer.Done("⎢", value.Name)
+		}
+	} else if has, route := options.route(); has {
+		printer.Done("⎡ User(s) :")
+
+		for _, value := range route {
+			printer.Done("⎢", value.Name)
+		}
+	} else if has, rss := options.rss(); has {
+		var names []string
+
+		printer.Done("⎡ User(s) :")
+
+		for _, value := range rss {
+			valueString := fmt.Sprintf("%s", value[1])
+
+			if _, has := text.ContainsSliceString(names, valueString); !has && valueString != "" {
+				printer.Done("⎢", valueString)
+			}
+		}
+	} else {
+		printer.Danger("Unfortunately no user was found. ;-;")
+	}
 }
 
-func UserEnumJson(options gohttp.Http) (bool, usersJson) {
-	/* Start of the first scan */
-	options.Dir = "wp-json/wp/v2/users"
+func (options *Users) json() (bool, uJSON) {
+	options.HTTP.URL.Directory = "wp-json/wp/v2/users"
 
-	switch response, err := gohttp.HttpRequest(options); true {
-	case response.StatusCode == 200:
-		var jsn usersJson
+	var jsn uJSON
+
+	if response, err := gohttp.HTTPRequest(options.HTTP); response.StatusCode == 200 {
+
 		json.NewDecoder(response.Body).Decode(&jsn)
 
 		if len(jsn) > 0 {
 			return true, jsn
 		}
 
-	case err != nil:
+	} else if err != nil {
 		printer.Fatal(err)
 	}
-	/* End of first scan */
-
-	/* Start of the second check */
-	options.Dir = "?rest_route=/wp/v2/users"
-
-	switch response, err := gohttp.HttpRequest(options); true {
-	case response.StatusCode == 200:
-		var jsn usersJson
-		json.NewDecoder(response.Body).Decode(&jsn)
-
-		if len(jsn) > 0 {
-			return true, jsn
-		}
-
-	case err != nil:
-		printer.Fatal(err)
-	}
-	/* End of second check */
-
-	/* Start of the third check */
-	/* End of third check */
 
 	return false, nil
 }
 
-func UserEnumRss(options gohttp.Http) (bool, []usersRe) {
-	options.Dir = "feed/"
+func (options *Users) route() (bool, uJSON) {
+	options.HTTP.URL.Directory = "?rest_route=/wp/v2/users"
 
-	switch response, err := gohttp.HttpRequest(options); true {
-	case response.StatusCode == 200:
+	var jsn uJSON
+
+	if response, err := gohttp.HTTPRequest(options.HTTP); response.StatusCode == 200 {
+
+		json.NewDecoder(response.Body).Decode(&jsn)
+
+		if len(jsn) > 0 {
+			return true, jsn
+		}
+
+	} else if err != nil {
+		printer.Fatal(err)
+	}
+
+	return false, nil
+}
+
+func (options *Users) rss() (bool, [][][]byte) {
+	options.HTTP.URL.Directory = "feed/"
+
+	if response, err := gohttp.HTTPRequest(options.HTTP); response.StatusCode == 200 {
 		re := regexp.MustCompile("<dc:creator><!\\[CDATA\\[(.+?)\\]\\]></dc:creator>")
 
 		bodyBytes, err := ioutil.ReadAll(response.Body)
@@ -76,15 +106,9 @@ func UserEnumRss(options gohttp.Http) (bool, []usersRe) {
 
 		submatchall := re.FindAllSubmatch([]byte(bodyBytes), -1)
 
-		for key, name := range submatchall {
-			dir := make([]usersRe, len(submatchall))
+		return true, submatchall
 
-			dir[key].Name = fmt.Sprintf("%s", name[1])
-
-			return true, dir
-		}
-
-	case err != nil:
+	} else if err != nil {
 		printer.Fatal(err)
 	}
 

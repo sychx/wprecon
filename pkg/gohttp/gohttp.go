@@ -1,32 +1,70 @@
 package gohttp
 
 import (
-	"io"
+	"crypto/tls"
+	"fmt"
+	"net/http"
+	"strings"
 )
 
-// Http :: This is Struct Http, it will inherit the struct Options and client.
-type Http struct {
-	Method               string
-	URL                  string
-	URLFULL              string
-	Dir                  string
-	Proxy                string
-	RandomUserAgent      bool
-	TLSCertificateVerify bool
-}
+// HTTPRequest :: This function will be used for any request that is made.
+func HTTPRequest(options *HTTPOptions) (Response, error) {
+	if !strings.HasSuffix(options.URL.Simple, "/") {
+		options.URL.Simple = fmt.Sprintf("%s/", options.URL.Simple)
+	}
 
-// Options :: This struct will keep the options that can be used, random agent among others.
-type Options struct {
-	RandomUserAgent bool
-}
+	options.URL.Full = options.URL.Simple + options.URL.Directory
 
-// Response :: This struct will store the request data, and will be used for a return.
-type Response struct {
-	URL        string
-	URLFULL    string
-	Dir        string
-	Method     string
-	StatusCode int
-	UserAgent  string
-	Body       io.Reader
+	if options.Method == "" {
+		options.Method = "GET"
+	}
+
+	if options.Options.Tor {
+		t, err := Tor()
+
+		if err != nil {
+			return Response{}, err
+		}
+
+		options.Proxy = t
+	} else {
+		options.Proxy = http.ProxyFromEnvironment
+	}
+
+	client := &http.Client{
+		Transport: &http.Transport{
+			Proxy: options.Proxy,
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: options.Options.TLSCertificateVerify,
+			},
+		},
+	}
+
+	request, err := http.NewRequest(options.Method, options.URL.Full, nil)
+
+	if err != nil {
+		return Response{}, err
+	}
+
+	if options.Options.RandomUserAgent {
+		request.Header.Set("User-Agent", randomuseragent())
+	} else {
+		request.Header.Set("User-Agent", "WPrecon - Wordpress Recon (Vulnerability Scanner) (GoHttp 1.0)")
+	}
+
+	resp, err := client.Do(request)
+
+	if err != nil {
+		return Response{}, err
+	}
+
+	httpResponse := Response{
+		Method:     options.Method,
+		URL:        options.URL,
+		StatusCode: resp.StatusCode,
+		UserAgent:  request.UserAgent(),
+		Body:       resp.Body,
+	}
+
+	return httpResponse, nil
 }

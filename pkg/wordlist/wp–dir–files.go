@@ -1,16 +1,13 @@
 package wordlist
 
-var WPchangesLogs = [...]string {
+// WPchangesLogs ::
+var WPchangesLogs = [...]string{
 	"changelog.txt",
 	"changelog.md",
-	"CHANGELOG.txt",
 	"changelog",
-	"CHANGELOG.md",
-	"ChangeLog.txt",
-	"ChangeLog.md",
-	"CHANGELOG",
 }
 
+// WPfpd :: These are the files that can contain a "full path disclosure".
 var WPfpd = [...]string{
 	"404.php",
 	"archive.php",
@@ -26,15 +23,15 @@ var WPfpd = [...]string{
 	"archive.php",
 }
 
+// WPlicense ::
 var WPlicense = [...]string{
 	"license.txt",
 	"license.md",
-	"LICENSE.md",
-	"LICENSE.txt",
-	"LICENSE",
+	"license",
 }
 
-var WPdirs = [...]string{
+// WPdirectorys ::
+var WPdirectorys = [...]string{
 	"js",
 	"css",
 	"images",
@@ -50,11 +47,9 @@ var WPdirs = [...]string{
 	"core",
 }
 
+// WPreadme ::
 var WPreadme = [...]string{
 	"readme.txt",
 	"readme.md",
-	"README.md",
-	"README.txt",
-	"README",
 	"readme",
 }

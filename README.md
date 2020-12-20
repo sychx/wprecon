@@ -11,8 +11,7 @@
 Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool in CMS Wordpress, 100% developed in Go.
 </p> 
 
-### Version: 0.0.2.0a
-##### Hmm because these last days are not updated ?! I'm making more commits on the dev branch, so keep an eye out there hehe. As soon as possible a major complete remodel will come out.
+#### Version: 0.1.0.0a — Complete refactoring of the code.
 
 ## Features
 
@@ -24,7 +23,7 @@ Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool i
 |   ✅          | Plugin Scanner        |
 |   ❌          | Theme Scanner         |
 |   ❌          | Vulnerability Scanner |
-|   ❌          | Tor Proxy's           |
+|   ✅          | Tor Proxy's           |
 
 <h2 align="center">Usage</h2>
 
@@ -35,6 +34,7 @@ Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool i
 | -h, --help                | help for wprecon                                      |
 | --no-check-wp             | Will skip wordpress check on target                   |
 | --random-agent            | Use randomly selected HTTP(S) User-Agent header value |
+| --tor                     | Use Tor anonymity network                             |
 | -u, --url string          | Target URL (Ex: http(s)://google.com/) `(Required)`   |
 |     --users-enumerate     | Use the supplied mode to enumerate Users              |
 | --plugins-enumerate       | Use the supplied mode to enumerate Plugins.           |

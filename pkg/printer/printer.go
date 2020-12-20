@@ -11,12 +11,15 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
+// Required :: Constant with the word "required" in red.
+var Required string = color.Red("(Required)").Bold().String()
+
 // Println ::
 func Println(text ...interface{}) {
 	fmt.Fprintln(os.Stdout, text...)
 }
 
-// Decode :: Convert to UTF-8
+// Decode :: This function will convert any string to UTF-8.
 func Decode(text string) string {
 	r, err := charset.NewReader(strings.NewReader(text), "latin1")
 	if err != nil {
@@ -32,7 +35,7 @@ func Decode(text string) string {
 
 // Danger ::
 func Danger(text ...interface{}) {
-	var prefix = color.Red("[!]").String()
+	var prefix = color.Red("[✗]").String()
 
 	fmt.Fprint(os.Stdout, prefix, " ")
 	fmt.Fprintln(os.Stdout, text...)
@@ -40,7 +43,7 @@ func Danger(text ...interface{}) {
 
 // Done ::
 func Done(text ...interface{}) {
-	var prefix = color.Green("[•]").String()
+	var prefix = color.Green("[✔]").String()
 
 	fmt.Fprint(os.Stdout, prefix, " ")
 	fmt.Fprintln(os.Stdout, text...)
@@ -48,7 +51,7 @@ func Done(text ...interface{}) {
 
 // Warning ::
 func Warning(text ...interface{}) {
-	var prefix = color.Yellow("[•••]").String()
+	var prefix = color.Yellow("[!]").String()
 
 	fmt.Fprint(os.Stdout, prefix, " ")
 	fmt.Fprintln(os.Stdout, text...)
@@ -56,7 +59,7 @@ func Warning(text ...interface{}) {
 
 // Loading ::
 func Loading(text ...interface{}) {
-	var prefix = color.Yellow("[*]").String()
+	var prefix = color.Yellow("[✲]").String()
 
 	fmt.Fprint(os.Stdout, prefix, " ")
 	fmt.Fprint(os.Stdout, text...)
@@ -64,7 +67,7 @@ func Loading(text ...interface{}) {
 
 // LoadingDone ::
 func LoadingDone(text ...interface{}) {
-	var prefix = color.Green("[+]").String()
+	var prefix = color.Green("[✔]").String()
 
 	fmt.Print("\033[G\033[K")
 	fmt.Fprint(os.Stdout, prefix, " ")
@@ -73,7 +76,7 @@ func LoadingDone(text ...interface{}) {
 
 // LoadingDanger ::
 func LoadingDanger(text ...interface{}) {
-	var prefix = color.Red("[!]").String()
+	var prefix = color.Red("[✗]").String()
 
 	fmt.Print("\033[G\033[K")
 	fmt.Fprint(os.Stdout, prefix, " ")
@@ -82,7 +85,7 @@ func LoadingDanger(text ...interface{}) {
 
 // LoadingWarning ::
 func LoadingWarning(text ...interface{}) {
-	var prefix = color.Yellow("[•••]").String()
+	var prefix = color.Yellow("[!]").String()
 
 	fmt.Print("\033[G\033[K")
 	fmt.Fprint(os.Stdout, prefix, " ")
@@ -105,11 +108,4 @@ func Fatal(text ...interface{}) {
 	fmt.Fprintln(os.Stdout, text...)
 
 	os.Exit(0)
-}
-
-// Required ::
-func Required(text ...interface{}) string {
-	var sufix = color.Red("(Required)").Bold().String()
-
-	return sufix
 }
