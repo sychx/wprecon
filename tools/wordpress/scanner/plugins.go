@@ -57,9 +57,10 @@ func (options *Plugins) Enumerate() {
 		}
 
 		for plugin, _ := range plugins {
-			printer.Done("⎢", plugin, "—", options.HTTP.URL.Simple+"wp-content/plugins/"+plugin)
+			printer.Done("⎢", plugin)
 
 			if options.Verbose {
+				printer.Warning("—", "URL Path:", options.HTTP.URL.Simple+"wp-content/plugins"+plugin)
 				options.readme(plugin)
 				options.changelog(plugin)
 				// options.license(plugin)
