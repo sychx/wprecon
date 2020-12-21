@@ -2,6 +2,7 @@ package printer
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -25,6 +26,7 @@ func Decode(text string) string {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	result, err := ioutil.ReadAll(r)
 	if err != nil {
 		log.Fatal(err)
@@ -34,70 +36,102 @@ func Decode(text string) string {
 }
 
 // Danger ::
-func Danger(text ...interface{}) {
+func Danger(text ...string) {
 	var prefix = color.Red("[✗]").String()
+	var textString = strings.Join(text, " ")
 
-	fmt.Fprint(os.Stdout, prefix, " ")
-	fmt.Fprintln(os.Stdout, text...)
+	_, err := io.WriteString(os.Stdout, prefix+" "+textString+"\n")
+
+	if err != nil {
+		panic(err)
+	}
 }
 
 // Done ::
-func Done(text ...interface{}) {
+func Done(text ...string) {
 	var prefix = color.Green("[✔]").String()
+	var textString = strings.Join(text, " ")
 
-	fmt.Fprint(os.Stdout, prefix, " ")
-	fmt.Fprintln(os.Stdout, text...)
+	_, err := io.WriteString(os.Stdout, prefix+" "+textString+"\n")
+
+	if err != nil {
+		panic(err)
+	}
 }
 
 // Warning ::
-func Warning(text ...interface{}) {
+func Warning(text ...string) {
 	var prefix = color.Yellow("[!]").String()
+	var textString = strings.Join(text, " ")
 
-	fmt.Fprint(os.Stdout, prefix, " ")
-	fmt.Fprintln(os.Stdout, text...)
+	_, err := io.WriteString(os.Stdout, prefix+" "+textString+"\n")
+
+	if err != nil {
+		panic(err)
+	}
 }
 
 // Loading ::
-func Loading(text ...interface{}) {
+func Loading(text ...string) {
 	var prefix = color.Yellow("[✲]").String()
+	var textString = strings.Join(text, " ")
 
-	fmt.Fprint(os.Stdout, prefix, " ")
-	fmt.Fprint(os.Stdout, text...)
+	_, err := io.WriteString(os.Stdout, prefix+" "+textString+"\n")
+
+	if err != nil {
+		panic(err)
+	}
 }
 
 // LoadingDone ::
-func LoadingDone(text ...interface{}) {
+func LoadingDone(text ...string) {
 	var prefix = color.Green("[✔]").String()
+	var textString = strings.Join(text, " ")
 
 	fmt.Print("\033[G\033[K")
-	fmt.Fprint(os.Stdout, prefix, " ")
-	fmt.Fprintln(os.Stdout, text...)
+	_, err := io.WriteString(os.Stdout, prefix+" "+textString+"\n")
+
+	if err != nil {
+		panic(err)
+	}
 }
 
 // LoadingDanger ::
-func LoadingDanger(text ...interface{}) {
+func LoadingDanger(text ...string) {
 	var prefix = color.Red("[✗]").String()
+	var textString = strings.Join(text, " ")
 
 	fmt.Print("\033[G\033[K")
-	fmt.Fprint(os.Stdout, prefix, " ")
-	fmt.Fprintln(os.Stdout, text...)
+	_, err := io.WriteString(os.Stdout, prefix+" "+textString+"\n")
+
+	if err != nil {
+		panic(err)
+	}
 }
 
 // LoadingWarning ::
-func LoadingWarning(text ...interface{}) {
+func LoadingWarning(text ...string) {
 	var prefix = color.Yellow("[!]").String()
+	var textString = strings.Join(text, " ")
 
 	fmt.Print("\033[G\033[K")
-	fmt.Fprint(os.Stdout, prefix, " ")
-	fmt.Fprintln(os.Stdout, text...)
+	_, err := io.WriteString(os.Stdout, prefix+" "+textString+"\n")
+
+	if err != nil {
+		panic(err)
+	}
 }
 
 // Wait ::
-func Wait(text ...interface{}) {
+func Wait(text ...string) {
 	var prefix = color.Green("[—]").String()
+	var textString = strings.Join(text, " ")
 
-	fmt.Fprint(os.Stdout, prefix, " ")
-	fmt.Fprintln(os.Stdout, text...)
+	_, err := io.WriteString(os.Stdout, prefix+" "+textString+"\n")
+
+	if err != nil {
+		panic(err)
+	}
 }
 
 // Fatal ::
