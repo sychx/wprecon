@@ -111,7 +111,7 @@ func (options *Wordpress) directory() {
 		}
 
 		if directory == "wp-admin/" && request.StatusCode == 200 || request.StatusCode == 403 {
-			printer.Warning("Status Code:", request.StatusCode, "—", "URL:", request.URL.Full)
+			printer.Warning("Status Code:", fmt.Sprint(request.StatusCode), "—", "URL:", request.URL.Full)
 			options.accuracy++
 		} else if strings.Contains("Index Of", string(body)) {
 			printer.Done("Listing enable:", request.URL.Full)
