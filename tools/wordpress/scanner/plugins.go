@@ -4,12 +4,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"regexp"
-	"sync"
-	"time"
 
 	"github.com/blackcrw/wprecon/pkg/gohttp"
 	"github.com/blackcrw/wprecon/pkg/printer"
-	"github.com/blackcrw/wprecon/pkg/wordlist"
 )
 
 // Plugins ::
@@ -18,156 +15,43 @@ type Plugins struct {
 	Verbose bool
 }
 
-var wg sync.WaitGroup
-
 // Enumerate ::
 func (options *Plugins) Enumerate() {
-	plugins := func() map[string]bool {
-		request, err := gohttp.HTTPRequest(options.HTTP)
+	var pluginsMapper = make(map[string]bool)
 
-		if err != nil {
-			printer.Fatal(err)
-		}
+	request, err := gohttp.HTTPRequest(options.HTTP)
 
-		bodyBytes, err := ioutil.ReadAll(request.Body)
+	if err != nil {
+		printer.Fatal(err)
+	}
 
-		if err != nil {
-			printer.Fatal(err)
-		}
+	bodyBytes, err := ioutil.ReadAll(request.Body)
 
-		re := regexp.MustCompile("/wp-content/plugins/(.+?)/")
+	if err != nil {
+		printer.Fatal(err)
+	}
 
-		submatchall := re.FindAllSubmatch([]byte(bodyBytes), -1)
+	re := regexp.MustCompile("/wp-content/plugins/(.+?)/")
 
-		pluginsMapper := make(map[string]bool)
+	submatchall := re.FindAllSubmatch([]byte(bodyBytes), -1)
 
-		for _, plugin := range submatchall {
-			plugin := fmt.Sprintf("%s", plugin[1])
+	for _, plugin := range submatchall {
+		plugin := fmt.Sprintf("%s", plugin[1])
 
-			pluginsMapper[plugin] = true
-		}
+		pluginsMapper[plugin] = true
+	}
 
-		return pluginsMapper
-	}()
+	if len(pluginsMapper) > 0 {
+		printer.Done("⎡ Plugin(s) :")
+	}
 
-	wg.Add(1)
-	go func() {
-		if len(plugins) > 0 {
-			printer.Done("⎡ Plugin(s) :")
-		}
+	for plugin, _ := range pluginsMapper {
+		printer.Done("⎢", plugin)
 
-		for plugin, _ := range plugins {
-			printer.Done("⎢", plugin, "—", options.HTTP.URL.Simple+"wp-content/plugins/"+plugin)
-
-			if options.Verbose {
-				options.readme(plugin)
-				options.changelog(plugin)
-				// options.license(plugin)
-				// options.fullpathdisclosure(plugin)
-			}
-
-			time.Sleep(time.Millisecond)
-		}
-
-		defer wg.Done()
-	}()
-
-	wg.Wait()
-}
-
-func (options *Plugins) fullpathdisclosure(plugin string) {
-	for _, value := range wordlist.WPfpd {
-		options.HTTP.URL.Directory = fmt.Sprintf("wp-content/plugins/%s/%s", plugin, value)
-
-		response, err := gohttp.HTTPRequest(options.HTTP)
-
-		if err != nil {
-			printer.Fatal(err)
-		}
-
-		bodyBytes, err := ioutil.ReadAll(response.Body)
-
-		if err != nil {
-			printer.Fatal(err)
-		}
-
-		if response.StatusCode == 200 || response.StatusCode == 406 && string(bodyBytes) != "" {
-			printer.Warning("— Full Path Disclosure:", response.URL.Full)
-
-			break
+		if options.Verbose {
+			printer.Warning("—", "URL Path:", options.HTTP.URL.Simple+"wp-content/plugins/"+plugin)
 		}
 	}
-}
 
-func (options *Plugins) readme(plugin string) {
-
-	for _, value := range wordlist.WPreadme {
-		options.HTTP.URL.Directory = fmt.Sprintf("wp-content/plugins/%s/%s", plugin, value)
-
-		response, err := gohttp.HTTPRequest(options.HTTP)
-
-		if err != nil {
-			printer.Fatal(err)
-		}
-
-		bodyBytes, err := ioutil.ReadAll(response.Body)
-
-		if err != nil {
-			printer.Fatal(err)
-		}
-
-		if response.StatusCode == 200 || response.StatusCode == 406 && string(bodyBytes) != "" {
-			printer.Warning("— Readme:", response.URL.Full)
-
-			break
-		}
-	}
-}
-
-func (options *Plugins) license(plugin string) {
-	for _, value := range wordlist.WPlicense {
-		options.HTTP.URL.Directory = fmt.Sprintf("wp-content/plugins/%s/%s", plugin, value)
-
-		response, err := gohttp.HTTPRequest(options.HTTP)
-
-		if err != nil {
-			printer.Fatal(err)
-		}
-
-		bodyBytes, err := ioutil.ReadAll(response.Body)
-
-		if err != nil {
-			printer.Fatal(err)
-		}
-
-		if response.StatusCode == 200 || response.StatusCode == 406 && string(bodyBytes) != "" {
-			printer.Warning("— License:", response.URL.Full)
-
-			break
-		}
-	}
-}
-
-func (options *Plugins) changelog(plugin string) {
-	for _, value := range wordlist.WPchangesLogs {
-		options.HTTP.URL.Directory = fmt.Sprintf("wp-content/plugins/%s/%s", plugin, value)
-
-		response, err := gohttp.HTTPRequest(options.HTTP)
-
-		if err != nil {
-			printer.Fatal(err)
-		}
-
-		bodyBytes, err := ioutil.ReadAll(response.Body)
-
-		if err != nil {
-			printer.Fatal(err)
-		}
-
-		if response.StatusCode == 200 || response.StatusCode == 406 && string(bodyBytes) != "" {
-			printer.Warning("— Changelog:", response.URL.Full)
-
-			break
-		}
-	}
+	printer.Println("")
 }

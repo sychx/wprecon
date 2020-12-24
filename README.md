@@ -11,7 +11,7 @@
 Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool in CMS Wordpress, 100% developed in Go.
 </p> 
 
-#### Version: 0.1.0.0a — Complete refactoring of the code.
+#### Version: 0.1.3.0a
 
 ## Features
 
@@ -21,24 +21,28 @@ Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool i
 |   ✅          | Detection WAF         |
 |   ✅          | User Enumerator       |
 |   ✅          | Plugin Scanner        |
-|   ❌          | Theme Scanner         |
-|   ❌          | Vulnerability Scanner |
+|   ✅          | Theme Scanner         |
 |   ✅          | Tor Proxy's           |
+|   ✅          | Detection Honeypot    |
+|   ❌          | Vulnerability Scanner |
+|   ❌          | Admin Finder          |
 
 <h2 align="center">Usage</h2>
 
-| Flag(s)                   | Description                                           |
-|---------------------------|-------------------------------------------------------|
-| -d, --detection-waf       | I will try to detect if the target is using any WAF.  |
-|  --disable-tls-checks     | Disables SSL/TLS certificate verification             |
-| -h, --help                | help for wprecon                                      |
-| --no-check-wp             | Will skip wordpress check on target                   |
-| --random-agent            | Use randomly selected HTTP(S) User-Agent header value |
-| --tor                     | Use Tor anonymity network                             |
-| -u, --url string          | Target URL (Ex: http(s)://google.com/) `(Required)`   |
-|     --users-enumerate     | Use the supplied mode to enumerate Users              |
-| --plugins-enumerate       | Use the supplied mode to enumerate Plugins.           |
-| -v, --verbose             | Verbose mode                                          |
+| Flag(s)                    | Description                                                            |
+|----------------------------|------------------------------------------------------------------------|
+|  -u, --url string          | Target URL (Ex: http(s)://example.com/). (Required)                    |
+|      --users-enumerate     | Use the supplied mode to enumerate Users.                              |
+|      --themes-enumerate    | Use the supplied mode to enumerate Themes.                             |
+|      --plugins-enumerate   | Use the supplied mode to enumerate Plugins.                            |
+|      --detection-waf       | I will try to detect if the target is using any WAF.                   |
+|      --detection-honeypot  | I will try to detect if the target is a honeypot, based on the shodan. |
+|      --no-check-wp         | Will skip wordpress check on target.                                   |
+|      --random-agent        | Use randomly selected HTTP(S) User-Agent header value.                 |
+|      --tor                 | Use Tor anonymity network.                                             |
+|      --disable-tls-checks  | Disables SSL/TLS certificate verification.                             |
+|  -h, --help                | help for wprecon.                                                      |
+|  -v, --verbose             | Verbosity mode.                                                        |
 
 <h2 align="center">WPrecon running</h2>
 

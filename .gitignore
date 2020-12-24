@@ -17,3 +17,4 @@
 *.xml
 *.iml
 wprecon
+.vscode/launch.json

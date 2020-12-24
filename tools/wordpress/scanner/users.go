@@ -50,6 +50,8 @@ func (options *Users) Enumerate() {
 	} else {
 		printer.Danger("Unfortunately no user was found. ;-;")
 	}
+
+	printer.Println("")
 }
 
 func (options *Users) json() (bool, uJSON) {

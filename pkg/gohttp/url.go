@@ -11,15 +11,11 @@ import (
 	:: https://stackoverflow.com/questions/51069484/url-validation-seems-broken
 */
 
-// URL ::
-type URL interface {
-	IsURL() (bool, error)
-}
-
 // IsURL :: This function will be used for URL validation
 func IsURL(URL string) (bool, error) {
 	// Check it's an Absolute URL or absolute path
 	uri, err := url.ParseRequestURI(URL)
+
 	if err != nil {
 		return false, err
 	}
@@ -34,9 +30,27 @@ func IsURL(URL string) (bool, error) {
 
 	// Check it's a valid domain name
 	_, err = net.LookupHost(uri.Host)
+
 	if err != nil {
 		return false, err
 	}
 
 	return true, nil
+}
+
+// GetHost ::
+func GetHost(URL string) (string, error) {
+	uri, err := url.ParseRequestURI(URL)
+
+	if err != nil {
+		return "", err
+	}
+
+	_, err = net.LookupHost(uri.Host)
+
+	if err != nil {
+		return "", err
+	}
+
+	return uri.Host, nil
 }

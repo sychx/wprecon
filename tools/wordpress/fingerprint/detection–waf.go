@@ -55,9 +55,9 @@ func (options *WebApplicationFirewall) Detection() {
 	printer.Loading("Active WAF detection module")
 
 	if has, status, name := detection(); has {
-		printer.LoadingWarning(status, "—", "WAF :", name)
+		printer.LoadingWarning(fmt.Sprint(status), "—", "WAF :", name)
 
-		printer.Warning("Do you wish to continue ?! [Y/n] :")
+		printer.Warning("Do you wish to continue ?! [Y/n] :\r")
 		fmt.Scan(&question)
 
 		if strings.ToLower(question) != "y" {
@@ -66,6 +66,8 @@ func (options *WebApplicationFirewall) Detection() {
 	} else {
 		printer.LoadingDanger("No WAF was detected! But that doesn't mean it doesn't.")
 	}
+
+	printer.Println("")
 }
 
 func (options *WebApplicationFirewall) wordfence() (bool, int, string) {
