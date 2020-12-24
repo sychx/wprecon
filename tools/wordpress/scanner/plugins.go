@@ -16,9 +16,8 @@ import (
 type Plugins struct {
 	HTTP    *gohttp.HTTPOptions
 	Verbose bool
+	wg      sync.WaitGroup
 }
-
-var wg sync.WaitGroup
 
 // Enumerate ::
 func (options *Plugins) Enumerate() {
@@ -50,7 +49,7 @@ func (options *Plugins) Enumerate() {
 		return pluginsMapper
 	}()
 
-	wg.Add(1)
+	options.wg.Add(1)
 	go func() {
 		if len(plugins) > 0 {
 			printer.Done("⎡ Plugin(s) :")
@@ -60,20 +59,27 @@ func (options *Plugins) Enumerate() {
 			printer.Done("⎢", plugin)
 
 			if options.Verbose {
+<<<<<<< Updated upstream
 				printer.Warning("—", "URL Path:", options.HTTP.URL.Simple+"wp-content/plugins"+plugin)
+=======
+				printer.Warning("—", "URL Path:", options.HTTP.URL.Simple+"wp-content/plugins/"+plugin)
+>>>>>>> Stashed changes
 				options.readme(plugin)
 				options.changelog(plugin)
 				// options.license(plugin)
 				// options.fullpathdisclosure(plugin)
+
 			}
 
 			time.Sleep(time.Millisecond)
 		}
 
-		defer wg.Done()
+		defer options.wg.Done()
 	}()
 
-	wg.Wait()
+	options.wg.Wait()
+
+	printer.Println("")
 }
 
 func (options *Plugins) fullpathdisclosure(plugin string) {
