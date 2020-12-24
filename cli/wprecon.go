@@ -21,6 +21,7 @@ var root = &cobra.Command{
 		verbose, _ := cmd.Flags().GetBool("verbose")
 		nocheckwp, _ := cmd.Flags().GetBool("no-check-wp")
 		detectionwaf, _ := cmd.Flags().GetBool("detection-waf")
+		detectionhoneypot, _ := cmd.Flags().GetBool("detection-honeypot")
 		randomuseragent, _ := cmd.Flags().GetBool("random-agent")
 		userenumerate, _ := cmd.Flags().GetBool("users-enumerate")
 		pluginenumerate, _ := cmd.Flags().GetBool("plugins-enumerate")
@@ -36,6 +37,15 @@ var root = &cobra.Command{
 				RandomUserAgent:      randomuseragent,
 				TLSCertificateVerify: tlscertificateverify,
 			},
+		}
+
+		if detectionhoneypot {
+			/* WP :: Wordpress */
+			WP := fingerprint.Honeypot{
+				HTTP:    options,
+				Verbose: verbose,
+			}
+			WP.Detection()
 		}
 
 		// ———————————————Wordpress Block——————————————— //
@@ -102,7 +112,8 @@ func init() {
 	root.PersistentFlags().BoolP("users-enumerate", "", false, "Use the supplied mode to enumerate Users.")
 	root.PersistentFlags().BoolP("plugins-enumerate", "", false, "Use the supplied mode to enumerate Plugins.")
 	root.PersistentFlags().BoolP("themes-enumerate", "", false, "Use the supplied mode to enumerate themes.")
-	root.PersistentFlags().BoolP("detection-waf", "d", false, "I will try to detect if the target is using any WAF.")
+	root.PersistentFlags().BoolP("detection-waf", "", false, "I will try to detect if the target is using any WAF Wordpress.")
+	root.PersistentFlags().BoolP("detection-honeypot", "", false, "I will try to detect if the target is a honeypot, based on the shodan.")
 	root.PersistentFlags().BoolP("random-agent", "", false, "Use randomly selected HTTP(S) User-Agent header value.")
 	root.PersistentFlags().BoolP("tor", "", false, "Use Tor anonymity network")
 	root.PersistentFlags().BoolP("no-check-wp", "", false, "Will skip wordpress check on target.")
