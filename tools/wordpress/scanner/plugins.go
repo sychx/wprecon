@@ -25,7 +25,7 @@ func (options *Plugins) Enumerate() {
 		printer.Fatal(err)
 	}
 
-	bodyBytes, err := ioutil.ReadAll(request.Body)
+	bodyBytes, err := ioutil.ReadAll(request.Raw)
 
 	if err != nil {
 		printer.Fatal(err)
