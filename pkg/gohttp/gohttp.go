@@ -63,8 +63,10 @@ func HTTPRequest(options *HTTPOptions) (Response, error) {
 		URL:        options.URL,
 		StatusCode: resp.StatusCode,
 		UserAgent:  request.UserAgent(),
-		Body:       resp.Body,
+		Raw:        resp.Body,
 	}
+
+	options.TotalRequests++
 
 	return httpResponse, nil
 }
