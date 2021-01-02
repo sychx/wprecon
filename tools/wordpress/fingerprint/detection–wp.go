@@ -74,7 +74,7 @@ func (options *Wordpress) htmlcode() {
 		printer.Fatal(err)
 	}
 
-	content, err := ioutil.ReadAll(response.Body)
+	content, err := ioutil.ReadAll(response.Raw)
 
 	if err != nil {
 		printer.Fatal(err)
@@ -106,7 +106,7 @@ func (options *Wordpress) directory() {
 			printer.Fatal(err)
 		}
 
-		body, err := ioutil.ReadAll(request.Body)
+		body, err := ioutil.ReadAll(request.Raw)
 
 		if err != nil {
 			printer.Fatal(err)
