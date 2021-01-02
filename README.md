@@ -16,7 +16,7 @@ Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool i
 ### Notice:
 #### Why is the project out of updates these days ?! What happens is that I am doing the vulnerability scanner.
 
-[Compile and Install](https://github.com/blackcrw/wprecon/doc/compile&install.md)
+### [Compile and Install](https://github.com/blackcrw/wprecon/doc/compile&install.md)
 
 ## Features
 
@@ -76,4 +76,4 @@ Version: 0.0.1a
 [•••] Do you wish to continue ?! [Y/n] : Y
 ```
 
-# Yes Baby, Thank You! ✋
+### Yes Baby, Thank You! ✋
