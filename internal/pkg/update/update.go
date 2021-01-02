@@ -39,7 +39,7 @@ func CheckUpdate() {
 		printer.Fatal("Error checking for an update (", err, ")")
 	}
 
-	err = json.NewDecoder(request.Body).Decode(&githubJSON)
+	err = json.NewDecoder(request.Raw).Decode(&githubJSON)
 
 	if err != nil {
 		printer.LoadingDanger("An error occurred while trying to check the version.")
