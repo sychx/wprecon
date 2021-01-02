@@ -50,7 +50,7 @@ func (options *Honeypot) Detection() {
 		printer.Fatal(err)
 	}
 
-	body, err := ioutil.ReadAll(request.Body)
+	body, err := ioutil.ReadAll(request.Raw)
 
 	if err != nil {
 		printer.Fatal(err)
