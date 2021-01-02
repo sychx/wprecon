@@ -61,7 +61,7 @@ func (options *Users) json() (bool, uJSON) {
 
 	if response, err := gohttp.HTTPRequest(options.HTTP); response.StatusCode == 200 {
 
-		json.NewDecoder(response.Body).Decode(&jsn)
+		json.NewDecoder(response.Raw).Decode(&jsn)
 
 		if len(jsn) > 0 {
 			return true, jsn
@@ -81,7 +81,7 @@ func (options *Users) route() (bool, uJSON) {
 
 	if response, err := gohttp.HTTPRequest(options.HTTP); response.StatusCode == 200 {
 
-		json.NewDecoder(response.Body).Decode(&jsn)
+		json.NewDecoder(response.Raw).Decode(&jsn)
 
 		if len(jsn) > 0 {
 			return true, jsn
@@ -100,7 +100,7 @@ func (options *Users) rss() (bool, [][][]byte) {
 	if response, err := gohttp.HTTPRequest(options.HTTP); response.StatusCode == 200 {
 		re := regexp.MustCompile("<dc:creator><!\\[CDATA\\[(.+?)\\]\\]></dc:creator>")
 
-		bodyBytes, err := ioutil.ReadAll(response.Body)
+		bodyBytes, err := ioutil.ReadAll(response.Raw)
 
 		if err != nil {
 			printer.Fatal(err)
