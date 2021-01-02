@@ -27,7 +27,7 @@ func (options *Themes) Enumerate() {
 		printer.Fatal(err)
 	}
 
-	bodyBytes, err := ioutil.ReadAll(request.Body)
+	rawBytes, err := ioutil.ReadAll(request.Raw)
 
 	if err != nil {
 		printer.Fatal(err)
@@ -35,7 +35,7 @@ func (options *Themes) Enumerate() {
 
 	re := regexp.MustCompile("/wp-content/themes/(.+?)/")
 
-	submatchall := re.FindAllSubmatch([]byte(bodyBytes), -1)
+	submatchall := re.FindAllSubmatch([]byte(rawBytes), -1)
 
 	for _, theme := range submatchall {
 		theme := fmt.Sprintf("%s", theme[1])
