@@ -45,6 +45,8 @@ var WPdirectorys = [...]string{
 	"logs",
 	"vendor",
 	"core",
+	"wp-admin",
+	"wp-content",
 }
 
 // WPreadme ::
