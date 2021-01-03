@@ -98,27 +98,29 @@ func (options *Wordpress) directory() {
 		"wp-admin/"}
 
 	for _, directory := range directories {
-		options.HTTP.URL.Directory = directory
+		go func(directory string) {
+			options.HTTP.URL.Directory = directory
 
-		request, err := gohttp.HTTPRequest(options.HTTP)
+			request, err := gohttp.HTTPRequest(options.HTTP)
 
-		if err != nil {
-			printer.Fatal(err)
-		}
+			if err != nil {
+				printer.Fatal(err)
+			}
 
-		body, err := ioutil.ReadAll(request.Raw)
+			body, err := ioutil.ReadAll(request.Raw)
 
-		if err != nil {
-			printer.Fatal(err)
-		}
+			if err != nil {
+				printer.Fatal(err)
+			}
 
-		if directory == "wp-admin/" && request.StatusCode == 200 || request.StatusCode == 403 {
-			printer.Warning("Status Code:", fmt.Sprint(request.StatusCode), "—", "URL:", request.URL.Full)
-			options.accuracy++
-		} else if strings.Contains("Index Of", string(body)) {
-			printer.Done("Listing enable:", request.URL.Full)
-			options.accuracy++
-		}
+			if directory == "wp-admin/" && request.StatusCode == 200 || request.StatusCode == 403 {
+				printer.Warning("Status Code:", fmt.Sprint(request.StatusCode), "—", "URL:", request.URL.Full)
+				options.accuracy++
+			} else if strings.Contains("Index Of", string(body)) {
+				printer.Done("Listing enable:", request.URL.Full)
+				options.accuracy++
+			}
+		}(directory)
 
 		time.Sleep(time.Millisecond * time.Duration(rand.Intn(2000)))
 	}
