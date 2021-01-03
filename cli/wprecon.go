@@ -1,12 +1,14 @@
 package cli
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/blackcrw/wprecon/internal/pkg/banner"
 	"github.com/blackcrw/wprecon/pkg/gohttp"
 	"github.com/blackcrw/wprecon/pkg/printer"
 	"github.com/blackcrw/wprecon/tools/wordpress/fingerprint"
+	"github.com/blackcrw/wprecon/tools/wordpress/fuzzer"
 	"github.com/blackcrw/wprecon/tools/wordpress/scanner"
 	"github.com/spf13/cobra"
 )
@@ -27,6 +29,7 @@ var root = &cobra.Command{
 		pluginenumerate, _ := cmd.Flags().GetBool("plugins-enumerate")
 		themeenumerate, _ := cmd.Flags().GetBool("themes-enumerate")
 		tlscertificateverify, _ := cmd.Flags().GetBool("disable-tls-verify")
+		fuzzerbackup, _ := cmd.Flags().GetBool("fuzzer-backup")
 
 		options := &gohttp.HTTPOptions{
 			URL: gohttp.URLOptions{
@@ -40,12 +43,12 @@ var root = &cobra.Command{
 		}
 
 		if detectionhoneypot {
-			/* WP :: Wordpress */
-			WP := fingerprint.Honeypot{
+			/* HP :: Honeypot */
+			HP := fingerprint.Honeypot{
 				HTTP:    options,
 				Verbose: verbose,
 			}
-			WP.Detection()
+			HP.Detection()
 		}
 
 		// ———————————————Wordpress Block——————————————— //
@@ -102,6 +105,17 @@ var root = &cobra.Command{
 
 			EU.Enumerate()
 		}
+
+		if fuzzerbackup {
+			FB := fuzzer.Backup{
+				HTTP:    options,
+				Verbose: verbose,
+			}
+
+			FB.Run()
+		}
+
+		printer.Done("Total requests:", fmt.Sprint(options.TotalRequests))
 	},
 }
 
@@ -109,11 +123,12 @@ func init() {
 	cobra.OnInitialize(ibanner)
 
 	root.PersistentFlags().StringP("url", "u", "", "Target URL (Ex: http(s)://example.com/). "+printer.Required)
+	root.PersistentFlags().BoolP("detection-waf", "", false, "I will try to detect if the target is using any WAF Wordpress.")
+	root.PersistentFlags().BoolP("detection-honeypot", "", false, "I will try to detect if the target is a honeypot, based on the shodan.")
 	root.PersistentFlags().BoolP("users-enumerate", "", false, "Use the supplied mode to enumerate Users.")
 	root.PersistentFlags().BoolP("plugins-enumerate", "", false, "Use the supplied mode to enumerate Plugins.")
 	root.PersistentFlags().BoolP("themes-enumerate", "", false, "Use the supplied mode to enumerate themes.")
-	root.PersistentFlags().BoolP("detection-waf", "", false, "I will try to detect if the target is using any WAF Wordpress.")
-	root.PersistentFlags().BoolP("detection-honeypot", "", false, "I will try to detect if the target is a honeypot, based on the shodan.")
+	root.PersistentFlags().BoolP("fuzzer-backup", "", false, "Performs a fuzzing to try to find the backup file if it exists.")
 	root.PersistentFlags().BoolP("random-agent", "", false, "Use randomly selected HTTP(S) User-Agent header value.")
 	root.PersistentFlags().BoolP("tor", "", false, "Use Tor anonymity network")
 	root.PersistentFlags().BoolP("no-check-wp", "", false, "Will skip wordpress check on target.")
