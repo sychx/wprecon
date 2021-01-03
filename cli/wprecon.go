@@ -1,15 +1,12 @@
-package cli
+package cmd
 
 import (
-	"fmt"
 	"os"
 
+	"github.com/blackcrw/wprecon/cli/cmd"
 	"github.com/blackcrw/wprecon/internal/pkg/banner"
 	"github.com/blackcrw/wprecon/pkg/gohttp"
 	"github.com/blackcrw/wprecon/pkg/printer"
-	"github.com/blackcrw/wprecon/tools/wordpress/fingerprint"
-	"github.com/blackcrw/wprecon/tools/wordpress/fuzzer"
-	"github.com/blackcrw/wprecon/tools/wordpress/scanner"
 	"github.com/spf13/cobra"
 )
 
@@ -17,127 +14,14 @@ var root = &cobra.Command{
 	Use:   "wprecon",
 	Short: "Wordpress Recon",
 	Long:  `wprecon (Wordpress Recon) is a scanner based on wpscan, only done in golang to get better performance!`,
-	Run: func(cmd *cobra.Command, args []string) {
-		tor, _ := cmd.Flags().GetBool("tor")
-		target, _ := cmd.Flags().GetString("url")
-		verbose, _ := cmd.Flags().GetBool("verbose")
-		nocheckwp, _ := cmd.Flags().GetBool("no-check-wp")
-		detectionwaf, _ := cmd.Flags().GetBool("detection-waf")
-		detectionhoneypot, _ := cmd.Flags().GetBool("detection-honeypot")
-		randomuseragent, _ := cmd.Flags().GetBool("random-agent")
-		userenumerate, _ := cmd.Flags().GetBool("users-enumerate")
-		pluginenumerate, _ := cmd.Flags().GetBool("plugins-enumerate")
-		themeenumerate, _ := cmd.Flags().GetBool("themes-enumerate")
-		tlscertificateverify, _ := cmd.Flags().GetBool("disable-tls-verify")
-		fuzzerbackup, _ := cmd.Flags().GetBool("fuzzer-backup")
-
-		options := &gohttp.HTTPOptions{
-			URL: gohttp.URLOptions{
-				Simple: target,
-			},
-			Options: gohttp.Options{
-				Tor:                  tor,
-				RandomUserAgent:      randomuseragent,
-				TLSCertificateVerify: tlscertificateverify,
-			},
-		}
-
-		if detectionhoneypot {
-			/* HP :: Honeypot */
-			HP := fingerprint.Honeypot{
-				HTTP:    options,
-				Verbose: verbose,
-			}
-			HP.Detection()
-		}
-
-		// ———————————————Wordpress Block——————————————— //
-		if !nocheckwp {
-			/* WP :: Wordpress */
-			WP := fingerprint.Wordpress{
-				HTTP:    options,
-				Verbose: verbose,
-			}
-
-			WP.Detection()
-		}
-
-		// ————————WebApplicationFirewall Block———————— //
-		if detectionwaf {
-			/* WAF :: Web Application Firewall */
-			WAF := fingerprint.WebApplicationFirewall{
-				HTTP:    options,
-				Verbose: verbose,
-			}
-
-			WAF.Detection()
-		}
-
-		// ———————————————Plugins Block—————————————— //
-		if pluginenumerate {
-			/* EP :: Enumeration Plugin(s) */
-			EP := scanner.Plugins{
-				HTTP:    options,
-				Verbose: verbose,
-			}
-
-			EP.Enumerate()
-		}
-
-		// ———————————————Themes Block——————————————— //
-		if themeenumerate {
-			/* ET :: Enumeration Theme(s) */
-			ET := scanner.Themes{
-				HTTP:    options,
-				Verbose: verbose,
-			}
-
-			ET.Enumerate()
-		}
-
-		// ————————————————Users Block———————————————— //
-		if userenumerate {
-			/* EU :: Enumeration User(s) */
-			EU := scanner.Users{
-				HTTP:    options,
-				Verbose: verbose,
-			}
-
-			EU.Enumerate()
-		}
-
-		if fuzzerbackup {
-			FB := fuzzer.Backup{
-				HTTP:    options,
-				Verbose: verbose,
-			}
-
-			FB.Run()
-		}
-
-		printer.Done("Total requests:", fmt.Sprint(options.TotalRequests))
-	},
+	Run:   cmd.RootOptionsRun,
 }
 
-func init() {
-	cobra.OnInitialize(ibanner)
-
-	root.PersistentFlags().StringP("url", "u", "", "Target URL (Ex: http(s)://example.com/). "+printer.Required)
-	root.PersistentFlags().BoolP("detection-waf", "", false, "I will try to detect if the target is using any WAF Wordpress.")
-	root.PersistentFlags().BoolP("detection-honeypot", "", false, "I will try to detect if the target is a honeypot, based on the shodan.")
-	root.PersistentFlags().BoolP("users-enumerate", "", false, "Use the supplied mode to enumerate Users.")
-	root.PersistentFlags().BoolP("plugins-enumerate", "", false, "Use the supplied mode to enumerate Plugins.")
-	root.PersistentFlags().BoolP("themes-enumerate", "", false, "Use the supplied mode to enumerate themes.")
-	root.PersistentFlags().BoolP("fuzzer-backup", "", false, "Performs a fuzzing to try to find the backup file if it exists.")
-	root.PersistentFlags().BoolP("random-agent", "", false, "Use randomly selected HTTP(S) User-Agent header value.")
-	root.PersistentFlags().BoolP("tor", "", false, "Use Tor anonymity network")
-	root.PersistentFlags().BoolP("no-check-wp", "", false, "Will skip wordpress check on target.")
-	root.PersistentFlags().BoolP("disable-tls-checks", "", false, "Disables SSL/TLS certificate verification.")
-	root.PersistentFlags().BoolP("verbose", "v", false, "Verbosity mode.")
-
-	root.MarkPersistentFlagRequired("url")
-
-	root.SetHelpTemplate(banner.Help)
+var fuzzer = &cobra.Command{
+	Use:     "fuzzer",
+	Aliases: []string{"fuzz"},
+	Short:   "Uses directory/file enumeration mode",
+	Run:     cmd.FuzzerOptionsRun,
 }
 
 func ibanner() {
@@ -158,4 +42,32 @@ func Execute() {
 	if err := root.Execute(); err != nil {
 		os.Exit(0)
 	}
+}
+
+func init() {
+	cobra.OnInitialize(ibanner)
+
+	root.PersistentFlags().StringP("url", "u", "", "Target URL (Ex: http(s)://example.com/). "+printer.Required)
+	root.PersistentFlags().BoolP("random-agent", "", false, "Use randomly selected HTTP(S) User-Agent header value.")
+	root.PersistentFlags().BoolP("tor", "", false, "Use Tor anonymity network")
+	root.PersistentFlags().BoolP("disable-tls-checks", "", false, "Disables SSL/TLS certificate verification.")
+	root.PersistentFlags().BoolP("verbose", "v", false, "Verbosity mode.")
+
+	root.Flags().BoolP("detection-waf", "", false, "I will try to detect if the target is using any WAF Wordpress.")
+	root.Flags().BoolP("detection-honeypot", "", false, "I will try to detect if the target is a honeypot, based on the shodan.")
+	root.Flags().BoolP("users-enumerate", "", false, "Use the supplied mode to enumerate Users.")
+	root.Flags().BoolP("plugins-enumerate", "", false, "Use the supplied mode to enumerate Plugins.")
+	root.Flags().BoolP("themes-enumerate", "", false, "Use the supplied mode to enumerate themes.")
+	root.Flags().BoolP("force", "f", false, "Forces wprecon to not check if the target is running WordPress.")
+
+	root.MarkPersistentFlagRequired("url")
+
+	root.SetHelpTemplate(banner.HelpMain)
+
+	// fuzzer
+	fuzzer.Flags().StringP("wordlist", "w", "nil", "Wordlist")
+	fuzzer.Flags().BoolP("backup-file", "b", false, "Performs a fuzzing to try to find the backup file if it exists.")
+
+	fuzzer.SetHelpTemplate(banner.HelpFuzzer)
+	root.AddCommand(fuzzer)
 }
