@@ -1,20 +1,14 @@
 package fingerprint
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/blackcrw/wprecon/pkg/gohttp"
 	"github.com/blackcrw/wprecon/pkg/printer"
 )
-
-/*
-	WebApplicationFirewall.HTTP = &gohttp.HTTPOptions{
-		URL: gohttp.URLOptions{
-			Simple: options.URL,
-		},
-	}
-*/
 
 // WebApplicationFirewall ::
 type WebApplicationFirewall struct {
@@ -24,7 +18,6 @@ type WebApplicationFirewall struct {
 
 // Detection :: It is this function that must be performed for the detection of the web application firewall to be performed.
 func (options *WebApplicationFirewall) Detection() {
-	var question string
 
 	detection := func() (bool, int, string) {
 		if has, status, name := options.wordfence(); has {
@@ -52,19 +45,20 @@ func (options *WebApplicationFirewall) Detection() {
 		return false, 0, ""
 	}
 
-	printer.Loading("Active WAF detection module")
+	topline := printer.NewTopLine(":: Active WAF detection module ::")
 
 	if has, status, name := detection(); has {
-		printer.LoadingWarning(fmt.Sprint(status), "—", "WAF :", name)
+		topline.Warning(fmt.Sprint(status), "—", "WAF :", name)
 
 		printer.Warning("Do you wish to continue ?! [Y/n] :\r")
-		fmt.Scan(&question)
+		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Scan()
 
-		if strings.ToLower(question) != "y" {
+		if strings.ToLower(scanner.Text()) != "y" {
 			printer.Fatal("Exiting...")
 		}
 	} else {
-		printer.LoadingDanger("No WAF was detected! But that doesn't mean it doesn't.")
+		topline.Danger(":: No WAF was detected! But that doesn't mean it doesn't. ::")
 	}
 
 	printer.Println("")
