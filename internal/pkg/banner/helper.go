@@ -6,7 +6,7 @@ var HelpMain = `wprecon (Wordpress Recon) is a scanner based on wpscan, only don
 Usage:
   wprecon [flags]
 
-Commands:
+SubCommands:
   fuzzer, fuzz
 
 Flags:
@@ -22,6 +22,11 @@ Flags:
       --disable-tls-checks   Disables SSL/TLS certificate verification.
   -h, --help                 help for wprecon.
   -v, --verbose              Verbosity mode.
+
+Example:
+  wprecon --url "https://xxxxxxxx.com" --detection-waf
+  wprecon --url "https://xxxxxxxx.com" --detection-waf --detection-honeypot
+  wprecon --url "https://xxxxxxxx.com" --detection-waf --detection-honeypot --users-enumerate
 `
 
 // HelpFuzzer ::
@@ -31,7 +36,7 @@ Usage:
   wprecon fuzzer [flags]
 
 Flags:
-      --backup-file        Performs a fuzzing to try to find the backup file if it exists.
+      --backup-file          Performs a fuzzing to try to find the backup file if it exists.
   -h, --help                 help for wprecon.
 
 Global Flags:
@@ -41,4 +46,8 @@ Global Flags:
       --disable-tls-checks   Disables SSL/TLS certificate verification.
   -h, --help                 help for wprecon.
   -v, --verbose              Verbosity mode.
+
+Example:
+  wprecon fuzzer --url "https://xxxxxxxx.com" --backup-file
+  wprecon fuzzer --url "https://xxxxxxxx.com" --backup-file --random-agent -v
 `
