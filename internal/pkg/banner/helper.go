@@ -8,11 +8,12 @@ Usage:
 
 Flags:
   -u, --url string           Target URL (Ex: http(s)://example.com/). (Required)
+      --detection-waf        I will try to detect if the target is using any WAF.
+      --detection-honeypot   I will try to detect if the target is a honeypot, based on the shodan.
       --users-enumerate      Use the supplied mode to enumerate Users.
       --themes-enumerate     Use the supplied mode to enumerate Themes.
       --plugins-enumerate    Use the supplied mode to enumerate Plugins.
-      --detection-waf        I will try to detect if the target is using any WAF.
-      --detection-honeypot   I will try to detect if the target is a honeypot, based on the shodan.
+      --fuzzer-backup        Performs a fuzzing to try to find the backup file if it exists.
       --no-check-wp          Will skip wordpress check on target.
       --random-agent         Use randomly selected HTTP(S) User-Agent header value.
       --tor                  Use Tor anonymity network
