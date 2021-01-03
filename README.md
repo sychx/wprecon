@@ -11,7 +11,7 @@
 Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool in CMS Wordpress, 100% developed in Go.
 </p> 
 
-#### Version: 0.1.3.0a
+#### Version: 0.1.4.0a
 
 ### Notice:
 #### Why is the project out of updates these days ?! What happens is that I am doing the vulnerability scanner.
@@ -29,19 +29,20 @@ Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool i
 |   ✅          | Theme Scanner         |
 |   ✅          | Tor Proxy's           |
 |   ✅          | Detection Honeypot    |
+|   ✅          | Fuzzer Backup files   |
 |   ❌          | Vulnerability Scanner |
-|   ❌          | Backup files          |
 
 <h2 align="center">Usage</h2>
 
 | Flag(s)                    | Description                                                            |
 |----------------------------|------------------------------------------------------------------------|
 |  -u, --url string          | Target URL (Ex: http(s)://example.com/). (Required)                    |
+|      --detection-waf       | I will try to detect if the target is using any WAF.                   |
+|      --detection-honeypot  | I will try to detect if the target is a honeypot, based on the shodan. |
 |      --users-enumerate     | Use the supplied mode to enumerate Users.                              |
 |      --themes-enumerate    | Use the supplied mode to enumerate Themes.                             |
 |      --plugins-enumerate   | Use the supplied mode to enumerate Plugins.                            |
-|      --detection-waf       | I will try to detect if the target is using any WAF.                   |
-|      --detection-honeypot  | I will try to detect if the target is a honeypot, based on the shodan. |
+|      --fuzzer-backup       | Performs a fuzzing to try to find the backup file if it exists.        |
 |      --no-check-wp         | Will skip wordpress check on target.                                   |
 |      --random-agent        | Use randomly selected HTTP(S) User-Agent header value.                 |
 |      --tor                 | Use Tor anonymity network.                                             |
