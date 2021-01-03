@@ -20,7 +20,8 @@ var root = &cobra.Command{
 var fuzzer = &cobra.Command{
 	Use:     "fuzzer",
 	Aliases: []string{"fuzz"},
-	Short:   "Uses directory/file enumeration mode",
+	Short:   "Fuzzing directories or logins.",
+	Long:    "This subcommand is mainly focused on fuzzing directories or logins.",
 	Run:     cmd.FuzzerOptionsRun,
 }
 
