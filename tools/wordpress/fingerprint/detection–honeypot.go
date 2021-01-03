@@ -1,9 +1,11 @@
 package fingerprint
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	"net"
+	"os"
 	"strconv"
 	"strings"
 
@@ -19,7 +21,6 @@ type Honeypot struct {
 
 // Detection ::
 func (options *Honeypot) Detection() {
-	var question string
 
 	host, err := gohttp.GetHost(options.HTTP.URL.Simple)
 
@@ -62,18 +63,22 @@ func (options *Honeypot) Detection() {
 		printer.Fatal(err)
 	}
 
-	convert := options.convertfloat(string(body))
+	xConvert := options.convertfloat(string(body))
 
-	if x > 0.7 {
-		printer.Danger("With a", convert, "chance of this host being a Honeypot. Do you wish to continue ?! [y/N] ")
-		fmt.Scan(&question)
+	if x >= 0.7 {
+		printer.Danger("With a", xConvert, "chance of this host being a Honeypot. Do you wish to continue ?! [y/N]")
 
-		if strings.ToLower(question) != "y" {
+		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Scan()
+
+		if strings.ToLower(scanner.Text()) != "y" {
 			printer.Fatal("Exiting...")
 		}
 	} else {
-		printer.Done("With a", convert, "chance of this host being a Honeypot.")
+		printer.Done("With a", xConvert, "chance of this host being a Honeypot.")
 	}
+
+	printer.Println()
 }
 
 func (options *Honeypot) convertfloat(text string) string {
