@@ -29,7 +29,7 @@ Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool i
 |   ✅          | Theme Scanner         |
 |   ✅          | Tor Proxy's           |
 |   ✅          | Detection Honeypot    |
-|   ✅          | Fuzzer Backup files   |
+|   ✅          | Fuzzer Backup Files   |
 |   ❌          | Vulnerability Scanner |
 
 <h2 align="center">Usage</h2>
