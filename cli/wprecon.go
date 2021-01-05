@@ -53,13 +53,13 @@ func init() {
 	root.PersistentFlags().BoolP("tor", "", false, "Use Tor anonymity network")
 	root.PersistentFlags().BoolP("disable-tls-checks", "", false, "Disables SSL/TLS certificate verification.")
 	root.PersistentFlags().BoolP("verbose", "v", false, "Verbosity mode.")
+	root.PersistentFlags().BoolP("force", "f", false, "Forces wprecon to not check if the target is running WordPress.")
 
 	root.Flags().BoolP("detection-waf", "", false, "I will try to detect if the target is using any WAF Wordpress.")
 	root.Flags().BoolP("detection-honeypot", "", false, "I will try to detect if the target is a honeypot, based on the shodan.")
 	root.Flags().BoolP("users-enumerate", "", false, "Use the supplied mode to enumerate Users.")
 	root.Flags().BoolP("plugins-enumerate", "", false, "Use the supplied mode to enumerate Plugins.")
 	root.Flags().BoolP("themes-enumerate", "", false, "Use the supplied mode to enumerate themes.")
-	root.Flags().BoolP("force", "f", false, "Forces wprecon to not check if the target is running WordPress.")
 
 	root.MarkPersistentFlagRequired("url")
 
@@ -68,6 +68,9 @@ func init() {
 	// fuzzer
 	fuzzer.Flags().StringP("wordlist", "w", "nil", "Wordlist")
 	fuzzer.Flags().BoolP("backup-file", "b", false, "Performs a fuzzing to try to find the backup file if it exists.")
+	fuzzer.Flags().StringP("usernames", "U", "", "Set usernames attack passwords.")
+	fuzzer.Flags().StringP("passwords", "P", "", "Set usernames attack passwords.")
+	fuzzer.Flags().StringP("attack-method", "M", "xml-rpc", "Avaliable: xml-rpc and wp-login")
 
 	fuzzer.SetHelpTemplate(banner.HelpFuzzer)
 	root.AddCommand(fuzzer)
