@@ -9,6 +9,7 @@ import (
 // HTTPOptions :: This is Struct Http, it will inherit the struct Options and client.
 type HTTPOptions struct {
 	Method        string
+	Data          string
 	Proxy         func(*http.Request) (*url.URL, error)
 	URL           URLOptions
 	Options       Options
