@@ -18,6 +18,10 @@ func FuzzerOptionsRun(cmd *cobra.Command, args []string) {
 	randomuseragent, _ := cmd.Flags().GetBool("random-agent")
 
 	backupfile, _ := cmd.Flags().GetBool("backup-file")
+	usernames, _ := cmd.Flags().GetString("usernames")
+	password, _ := cmd.Flags().GetString("passwords")
+	attackmethod, _ := cmd.Flags().GetString("attack-method")
+	force, _ := cmd.Flags().GetBool("force")
 
 	options := &gohttp.HTTPOptions{
 		URL: gohttp.URLOptions{
@@ -37,6 +41,19 @@ func FuzzerOptionsRun(cmd *cobra.Command, args []string) {
 		}
 
 		FB.Run()
+	}
+
+	if usernames != "" && password != "" {
+		FL := fuzzing.Login{
+			HTTP:          options,
+			Verbose:       verbose,
+			Usernames:     usernames,
+			PasswordsFile: password,
+			Method:        attackmethod,
+			Force:         force,
+		}
+
+		FL.Run()
 	}
 
 	printer.Done("Total requests:", fmt.Sprint(options.TotalRequests))
