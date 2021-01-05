@@ -6,7 +6,7 @@ var HelpMain = `wprecon (Wordpress Recon) is a scanner based on wpscan, only don
 Usage:
   wprecon [flags]
 
-SubCommands:
+Subcommands:
   fuzzer, fuzz
 
 Flags:
