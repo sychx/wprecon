@@ -1,6 +1,7 @@
 package gohttp
 
 import (
+	"bytes"
 	"crypto/tls"
 	"fmt"
 	"net/http"
@@ -40,7 +41,7 @@ func HTTPRequest(options *HTTPOptions) (Response, error) {
 		},
 	}
 
-	request, err := http.NewRequest(options.Method, options.URL.Full, nil)
+	request, err := http.NewRequest(options.Method, options.URL.Full, bytes.NewBuffer([]byte(options.Data)))
 
 	if err != nil {
 		return Response{}, err
@@ -49,7 +50,7 @@ func HTTPRequest(options *HTTPOptions) (Response, error) {
 	if options.Options.RandomUserAgent {
 		request.Header.Set("User-Agent", randomuseragent())
 	} else {
-		request.Header.Set("User-Agent", "WPrecon - Wordpress Recon (Vulnerability Scanner) (GoHttp 1.0)")
+		request.Header.Set("User-Agent", "WPrecon - Wordpress Recon (Vulnerability Scanner) (GoHttp 2.0)")
 	}
 
 	resp, err := client.Do(request)
