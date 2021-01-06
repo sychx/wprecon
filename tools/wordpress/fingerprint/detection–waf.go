@@ -103,6 +103,7 @@ func (options *WebApplicationFirewall) bulletproof() (bool, int, string) {
 }
 
 func (options *WebApplicationFirewall) betterwp() (bool, int, string) {
+	options.HTTP.URL.Directory = "wp-content/plugins/better-wp-security/"
 
 	response, err := gohttp.HTTPRequest(options.HTTP)
 
@@ -112,13 +113,6 @@ func (options *WebApplicationFirewall) betterwp() (bool, int, string) {
 
 	if response.StatusCode == 200 || response.StatusCode == 403 {
 		return true, response.StatusCode, "Better WP Security"
-	}
-
-	switch response.StatusCode {
-	case 200:
-		return true, 200, "Better WP Security"
-	case 403:
-		return true, 403, "Better WP Security"
 	}
 
 	return false, response.StatusCode, ""
