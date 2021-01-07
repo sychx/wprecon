@@ -97,6 +97,7 @@ func (options *WebApplicationFirewall) bulletproof() (bool, int, string) {
 }
 
 func (options *WebApplicationFirewall) betterwp() (bool, int, string) {
+	options.HTTP.URL.Directory = "wp-content/plugins/better-wp-security/"
 
 	response, err := gohttp.HTTPRequest(options.HTTP)
 
