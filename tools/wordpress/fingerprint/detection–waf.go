@@ -50,7 +50,7 @@ func (options *WebApplicationFirewall) Detection() {
 	if has, status, name := detection(); has {
 		topline.Warning(fmt.Sprint(status), "—", "WAF :", name)
 
-		printer.Warning("Do you wish to continue ?! [Y/n] :\r")
+		printer.Warning("Do you wish to continue ?! [Y/n] :")
 		scanner := bufio.NewScanner(os.Stdin)
 		scanner.Scan()
 
