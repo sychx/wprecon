@@ -95,34 +95,33 @@ func (options *Wordpress) directory() {
 		"wp-content/plugins/",
 		"wp-content/themes/",
 		"wp-includes/",
-		"wp-admin/"}
+		"wp-admin"}
 
 	for _, directory := range directories {
-		go func(directory string) {
-			options.HTTP.URL.Directory = directory
+		options.HTTP.URL.Directory = directory
 
-			request, err := gohttp.HTTPRequest(options.HTTP)
+		request, err := gohttp.HTTPRequest(options.HTTP)
 
-			if err != nil {
-				printer.Fatal(err)
-			}
+		if err != nil {
+			printer.Fatal(err)
+		}
 
-			body, err := ioutil.ReadAll(request.Raw)
+		body, err := ioutil.ReadAll(request.Raw)
 
-			if err != nil {
-				printer.Fatal(err)
-			}
+		if err != nil {
+			printer.Fatal(err)
+		}
 
-			if directory == "wp-admin/" && request.StatusCode == 200 || request.StatusCode == 403 {
-				printer.Warning("Status Code:", fmt.Sprint(request.StatusCode), "—", "URL:", request.URL.Full)
-				options.accuracy++
-			} else if strings.Contains(string(body), "Index Of") {
+		if directory == "wp-admin" && request.StatusCode == 200 || request.StatusCode == 403 {
+			printer.Warning("Status Code:", fmt.Sprint(request.StatusCode), "—", "URL:", request.URL.Full)
+			options.accuracy++
+		} else if request.StatusCode == 200 || request.StatusCode == 403 {
+			if strings.Contains(string(body), "Index Of") {
 				printer.Done("Listing enable:", request.URL.Full)
-				options.accuracy++
 			}
-		}(directory)
 
-		time.Sleep(time.Millisecond * time.Duration(rand.Intn(2000)))
+			options.accuracy++
+		}
 	}
 
 }
