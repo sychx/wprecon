@@ -109,13 +109,6 @@ func (options *WebApplicationFirewall) betterwp() (bool, int, string) {
 		return true, response.StatusCode, "Better WP Security"
 	}
 
-	switch response.StatusCode {
-	case 200:
-		return true, 200, "Better WP Security"
-	case 403:
-		return true, 403, "Better WP Security"
-	}
-
 	return false, response.StatusCode, ""
 }
 
