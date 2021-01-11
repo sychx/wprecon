@@ -31,7 +31,7 @@ Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool i
 |   ✅          | Detection Honeypot    |
 |   ✅          | Fuzzing Backup Files  |
 |   🔨          | Fuzzing Passwords     |
-|   ❌          | Vulnerability Scanner |
+|   🔨          | Vulnerability Scanner |
 
 <h2 align="center">Usage</h2>
 
