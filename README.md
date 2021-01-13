@@ -14,7 +14,7 @@ Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool i
 #### Version: 0.2.0.0a
 
 ### Notice:
-#### Hello my friends, a new super improved version of wprecon is about to come out ... (13/01/2021).
+#### Hello my friends, a new super improved version of wprecon is coming... (13/01/2021)
 
 ### [Compile and Install](https://github.com/blackcrw/wprecon/blob/dev/doc/compile&install.md)
 
