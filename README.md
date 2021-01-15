@@ -34,7 +34,7 @@ But since they are not, it is for the reason that they are still in development.
 - [x] Scripts
 - [x] Tor Proxy
 - [x] User(s) Enumerator
-- [x] Vulnerability Version Checking
+- [x] Vulnerability Version Checking (Beta)
 
 <p align="center" >
   <h2 align="center">WPrecon running</h2>
