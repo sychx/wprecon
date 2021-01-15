@@ -15,9 +15,8 @@ type githubAPIJSON struct {
 		Email       string `json:"email"`
 	} `json:"Author"`
 	App struct {
-		Description     string `json:"description"`
-		Version         string `json:"version"`
-		VersionReselase string `json:"version-reselase"`
+		Description string `json:"description"`
+		Version     string `json:"version"`
 	} `json:"App"`
 }
 
@@ -29,7 +28,8 @@ func CheckUpdate() {
 
 	options := &gohttp.HTTPOptions{
 		URL: gohttp.URLOptions{
-			Simple: "https://raw.githubusercontent.com/blackcrw/wprecon/dev/internal/config/config.json",
+			Simple:    "https://raw.githubusercontent.com/",
+			Directory: "blackcrw/wprecon/dev/internal/config/config.json",
 		},
 	}
 
@@ -39,7 +39,7 @@ func CheckUpdate() {
 		printer.Fatal("Error checking for an update (", err, ")")
 	}
 
-	err = json.NewDecoder(request.Raw).Decode(&githubJSON)
+	err = json.NewDecoder(request.RawIo).Decode(&githubJSON)
 
 	if err != nil {
 		topline.Danger("An error occurred while trying to check the version.")

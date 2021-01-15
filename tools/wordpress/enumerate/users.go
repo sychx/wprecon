@@ -3,116 +3,116 @@ package enumerate
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"regexp"
 
-	"github.com/blackcrw/wprecon/pkg/gohttp"
+	. "github.com/blackcrw/wprecon/cli/config"
 	"github.com/blackcrw/wprecon/pkg/printer"
 	"github.com/blackcrw/wprecon/pkg/text"
+	"github.com/blackcrw/wprecon/tools/wordpress/extensions"
 )
-
-// Users ::
-type Users struct {
-	HTTP    *gohttp.HTTPOptions
-	Verbose bool
-}
 
 type uJSON []struct {
 	Name string `json:"name"`
 }
 
-// Enumerate ::
-func (options *Users) Enumerate() {
-	if has, json := options.json(); has {
-		printer.Done("⎡ User(s) :")
+// UsersEnumeratePassive :: Enumerate using feed
+func UsersEnumeratePassive() []string {
+	response := extensions.SimpleRequest(InfosWprecon.Target, "feed/")
 
-		for _, value := range json {
-			printer.Done("⎢", value.Name)
+	rex := regexp.MustCompile("<dc:creator><!\\[CDATA\\[(.+?)\\]\\]></dc:creator>")
+	submatch := rex.FindAllSubmatch([]byte(response.Raw), -1)
+
+	for _, value := range submatch {
+		valueString := fmt.Sprintf("%s", value[1])
+
+		if _, has := text.ContainsSliceString(InfosWprecon.OtherInformationsSlice["target.http.users"], valueString); !has {
+			InfosWprecon.OtherInformationsSlice["target.http.users"] = append(InfosWprecon.OtherInformationsSlice["target.http.users"], valueString)
 		}
-	} else if has, route := options.route(); has {
-		printer.Done("⎡ User(s) :")
+	}
 
-		for _, value := range route {
-			printer.Done("⎢", value.Name)
-		}
-	} else if has, rss := options.rss(); has {
-		var names []string
+	if len(InfosWprecon.OtherInformationsSlice["target.http.users"]) > 0 {
+		InfosWprecon.OtherInformationsString["target.http.users.method"] = "Feed"
+	}
 
-		printer.Done("⎡ User(s) :")
+	return InfosWprecon.OtherInformationsSlice["target.http.users"]
+}
 
-		for _, value := range rss {
-			valueString := fmt.Sprintf("%s", value[1])
+// UsersEnumerateAgressive ::
+func UsersEnumerateAgressive() []string {
+	var ujson uJSON
+	done := false
 
-			if _, has := text.ContainsSliceString(names, valueString); !has && valueString != "" {
-				printer.Done("⎢", valueString)
+	// Enumerate using Yoast SEO
+	func() {
+		if done == false {
+			response := extensions.SimpleRequest(InfosWprecon.Target, "author-sitemap.xml")
+
+			rex := regexp.MustCompile("<loc>.*?/author/(.*?)/</loc>")
+
+			submatch := rex.FindAllSubmatch([]byte(response.Raw), -1)
+
+			for _, value := range submatch {
+				valueString := fmt.Sprintf("%s", value[1])
+
+				if _, has := text.ContainsSliceString(InfosWprecon.OtherInformationsSlice["target.http.users"], valueString); !has {
+					InfosWprecon.OtherInformationsSlice["target.http.users"] = append(InfosWprecon.OtherInformationsSlice["target.http.users"], valueString)
+				}
+			}
+
+			if len(InfosWprecon.OtherInformationsSlice["target.http.users"]) > 0 {
+				InfosWprecon.OtherInformationsString["target.http.users.method"] = "YoastSEO"
+				done = true
 			}
 		}
-	} else {
-		printer.Danger("Unfortunately no user was found. ;-;")
-	}
+	}()
 
-	printer.Println("")
-}
+	// Enumerate using route
+	func() {
+		if done == false {
+			response := extensions.SimpleRequest(InfosWprecon.Target, "?rest_route=/wp/v2/users")
 
-func (options *Users) json() (bool, uJSON) {
-	options.HTTP.URL.Directory = "wp-json/wp/v2/users"
+			if response.StatusCode == 200 && response.Raw != "" {
+				json.NewDecoder(response.RawIo).Decode(&ujson)
 
-	var jsn uJSON
+				for _, value := range ujson {
+					if _, has := text.ContainsSliceString(InfosWprecon.OtherInformationsSlice["target.http.users"], value.Name); !has {
+						InfosWprecon.OtherInformationsSlice["target.http.users"] = append(InfosWprecon.OtherInformationsSlice["target.http.users"], value.Name)
+					}
+				}
 
-	if response, err := gohttp.HTTPRequest(options.HTTP); response.StatusCode == 200 {
-
-		json.NewDecoder(response.Raw).Decode(&jsn)
-
-		if len(jsn) > 0 {
-			return true, jsn
+				if len(InfosWprecon.OtherInformationsSlice["target.http.users"]) > 0 {
+					InfosWprecon.OtherInformationsString["target.http.users.method"] = "Route"
+					done = true
+				}
+			} else if response.StatusCode == 401 && response.Raw != "" && InfosWprecon.Verbose {
+				printer.Danger("Status code 401, I don't think I'm allowed to list users. Target Url:", response.URL.Full, "— Target source code:", response.Raw)
+			}
 		}
+	}()
 
-	} else if err != nil {
-		printer.Fatal(err)
-	}
+	// Enumerate using json file
+	func() {
+		if done == false {
+			response := extensions.SimpleRequest(InfosWprecon.Target, "wp-json/wp/v2/users")
 
-	return false, nil
-}
+			if response.StatusCode == 200 && response.Raw != "" {
+				json.NewDecoder(response.RawIo).Decode(&ujson)
 
-func (options *Users) route() (bool, uJSON) {
-	options.HTTP.URL.Directory = "?rest_route=/wp/v2/users"
+				for _, value := range ujson {
+					if _, has := text.ContainsSliceString(InfosWprecon.OtherInformationsSlice["target.http.users"], value.Name); !has {
+						InfosWprecon.OtherInformationsSlice["target.http.users"] = append(InfosWprecon.OtherInformationsSlice["target.http.users"], value.Name)
+					}
+				}
 
-	var jsn uJSON
-
-	if response, err := gohttp.HTTPRequest(options.HTTP); response.StatusCode == 200 {
-
-		json.NewDecoder(response.Raw).Decode(&jsn)
-
-		if len(jsn) > 0 {
-			return true, jsn
+				if len(InfosWprecon.OtherInformationsSlice["target.http.users"]) > 0 {
+					InfosWprecon.OtherInformationsString["target.http.users.method"] = "Json"
+					done = true
+				}
+			} else if response.StatusCode == 401 && response.Raw != "" && InfosWprecon.Verbose {
+				printer.Danger("Status code 401, I don't think I'm allowed to list users. Target Url:", response.URL.Full, "— Target source code:", response.Raw)
+			}
 		}
+	}()
 
-	} else if err != nil {
-		printer.Fatal(err)
-	}
-
-	return false, nil
-}
-
-func (options *Users) rss() (bool, [][][]byte) {
-	options.HTTP.URL.Directory = "feed/"
-
-	if response, err := gohttp.HTTPRequest(options.HTTP); response.StatusCode == 200 {
-		re := regexp.MustCompile("<dc:creator><!\\[CDATA\\[(.+?)\\]\\]></dc:creator>")
-
-		bodyBytes, err := ioutil.ReadAll(response.Raw)
-
-		if err != nil {
-			printer.Fatal(err)
-		}
-
-		submatchall := re.FindAllSubmatch([]byte(bodyBytes), -1)
-
-		return true, submatchall
-
-	} else if err != nil {
-		printer.Fatal(err)
-	}
-
-	return false, nil
+	return InfosWprecon.OtherInformationsSlice["target.http.users"]
 }

@@ -1,33 +1,33 @@
 package banner
 
 import (
-	"fmt"
 	"time"
 
-	version "github.com/blackcrw/wprecon/internal/pkg/version"
+	. "github.com/blackcrw/wprecon/cli/config"
+	"github.com/blackcrw/wprecon/internal/pkg/version"
 	"github.com/blackcrw/wprecon/pkg/gohttp"
 	"github.com/blackcrw/wprecon/pkg/printer"
+	"github.com/blackcrw/wprecon/pkg/scripts"
 )
 
 // Banner :: A simple banner.
 func Banner() {
-	fmt.Print("—————————————————————————————————————————————————————————————————————\n")
-	fmt.Print(`___       ______________________________________________   __
+	printer.Println("——————————————————————————————————————————————————————————————————")
+	printer.Println(`___       ______________________________________________   __
 __ |     / /__  __ \__  __ \__  ____/_  ____/_  __ \__  | / /
 __ | /| / /__  /_/ /_  /_/ /_  __/  _  /    _  / / /_   |/ / 
 __ |/ |/ / _  ____/_  _, _/_  /___  / /___  / /_/ /_  /|  /  
 ____/|__/  /_/     /_/ |_| /_____/  \____/  \____/ /_/ |_/   
-
 `)
-	fmt.Print("Github: ", "https://github.com/blackcrw/wprecon\n")
-	fmt.Print("Version: ", version.Version, "\n")
-	fmt.Print("—————————————————————————————————————————————————————————————————————\n")
+	printer.Println("Github: ", "https://github.com/blackcrw/wprecon")
+	printer.Println("Version: ", version.Version)
+	printer.Println("——————————————————————————————————————————————————————————————————")
 }
 
 // SBanner :: A banner that will only be executed if the scan is started correctly.
 func SBanner(target string, tor bool, verbose bool) {
 	Banner()
-	printer.Done("Target:", target)
+	printer.Done("Target:\t", target)
 
 	if tor {
 		ipTor, err := gohttp.TorCheck()
@@ -36,18 +36,26 @@ func SBanner(target string, tor bool, verbose bool) {
 			printer.Fatal(err)
 		}
 
-		printer.Done("Proxy:", ipTor)
+		printer.Done("Proxy:\t", ipTor)
 	}
 
-	timeFormat := time.Now().Format(("02/Jan/2006 15:04:05"))
+	InfosWprecon.TimeStart = time.Now().Format(("02/Jan/2006 15:04:05"))
 
-	printer.Done("Starting:", timeFormat)
+	printer.Done("Starting:\t", InfosWprecon.TimeStart)
+
+	if name := InfosWprecon.OtherInformationsString["scripts.name"]; name != "" {
+		_, infos := scripts.Initialize(name)
+
+		printer.Done("Script Name:", infos.Title)
+		printer.Done("Script Desc:", infos.Description)
+
+	}
 
 	if verbose && tor {
-		printer.Danger("(Alert) Activating verbose mode together with tor mode can make the wprecon super slow.", "\n")
+		printer.Danger("(Alert) Activating verbose mode together with tor mode can make the wprecon super slow. \n")
 	} else if verbose {
-		printer.Danger("(Alert) Enabling verbose mode can slow down wprecon.", "\n")
+		printer.Danger("(Alert) Enabling verbose mode can slow down wprecon. \n")
 	} else {
-		fmt.Println("")
+		printer.Println("")
 	}
 }

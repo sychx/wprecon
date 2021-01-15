@@ -2,102 +2,190 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
-	"github.com/blackcrw/wprecon/pkg/gohttp"
+	. "github.com/blackcrw/wprecon/cli/config"
 	"github.com/blackcrw/wprecon/pkg/printer"
+	"github.com/blackcrw/wprecon/pkg/scripts"
+	"github.com/blackcrw/wprecon/tools/wordpress/commons"
 	"github.com/blackcrw/wprecon/tools/wordpress/enumerate"
-	"github.com/blackcrw/wprecon/tools/wordpress/fingerprint"
+	"github.com/blackcrw/wprecon/tools/wordpress/extensions"
+	"github.com/blackcrw/wprecon/tools/wordpress/security"
 	"github.com/spf13/cobra"
 )
 
-// RootOptionsRun ::
-func RootOptionsRun(cmd *cobra.Command, args []string) {
-	tor, _ := cmd.Flags().GetBool("tor")
+func RootOptionsPreRun(cmd *cobra.Command, args []string) {
 	target, _ := cmd.Flags().GetString("url")
-	verbose, _ := cmd.Flags().GetBool("verbose")
+	tor, _ := cmd.Flags().GetBool("tor")
 	force, _ := cmd.Flags().GetBool("force")
-	detectionwaf, _ := cmd.Flags().GetBool("detection-waf")
-	detectionhoneypot, _ := cmd.Flags().GetBool("detection-honeypot")
+	verbose, _ := cmd.Flags().GetBool("verbose")
 	randomuseragent, _ := cmd.Flags().GetBool("random-agent")
-	userenumerate, _ := cmd.Flags().GetBool("users-enumerate")
-	pluginenumerate, _ := cmd.Flags().GetBool("plugins-enumerate")
-	themeenumerate, _ := cmd.Flags().GetBool("themes-enumerate")
-	tlscertificateverify, _ := cmd.Flags().GetBool("disable-tls-verify")
+	tlscertificateverify, _ := cmd.Flags().GetBool("tlscertificateverify")
+	scriptsS, _ := cmd.Flags().GetString("scripts")
 
-	options := &gohttp.HTTPOptions{
-		URL: gohttp.URLOptions{
-			Simple: target,
-		},
-		Options: gohttp.Options{
-			Tor:                  tor,
-			RandomUserAgent:      randomuseragent,
-			TLSCertificateVerify: tlscertificateverify,
-		},
-	}
+	InfosWprecon.Force = force
+	InfosWprecon.Target = target
+	InfosWprecon.Verbose = verbose
+	InfosWprecon.OtherInformationsBool["http.options.tor"] = tor
+	InfosWprecon.OtherInformationsBool["http.options.randomuseragent"] = randomuseragent
+	InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"] = tlscertificateverify
 
-	if detectionhoneypot {
-		/* HP :: Honeypot */
-		HP := fingerprint.Honeypot{
-			HTTP:    options,
-			Verbose: verbose,
+	InfosWprecon.OtherInformationsString["scripts.name"] = scriptsS
+
+	response := extensions.SimpleRequest(target, "")
+
+	InfosWprecon.OtherInformationsString["target.http.index.raw"] = response.Raw
+}
+
+func RootOptionsRun(cmd *cobra.Command, args []string) {
+	aggressivemode, _ := cmd.Flags().GetBool("aggressive-mode")
+	detectionwaf, _ := cmd.Flags().GetBool("detection-waf")
+
+	if confidence := wordpresscheck(); confidence >= 49.9 && !InfosWprecon.Force {
+		confidenceString := fmt.Sprintf("%.2f%%", confidence)
+		printer.Done("Wordpress confirmed with", confidenceString, "confidence!")
+		printer.Println()
+	} else if confidence < 49.9 && confidence > 33.3 && !InfosWprecon.Force {
+		confidenceString := fmt.Sprintf("%.2f%%", confidence)
+		if q := printer.ScanQ("I'm not absolutely sure that this target is using wordpress!", confidenceString, "chance. do you wish to continue ? [Y/n] : "); q == "n" {
+			printer.Fatal("Exiting...")
 		}
-		HP.Detection()
+		printer.Println()
+	} else {
+		printer.Fatal("This target is not running wordpress!")
 	}
 
-	// ———————————————Wordpress Block——————————————— //
-	if !force {
-		/* WP :: Wordpress */
-		WP := fingerprint.Wordpress{
-			HTTP:    options,
-			Verbose: verbose,
+	if detectionwaf || aggressivemode {
+		security.WAFAgressiveDetection()
+		printer.Println()
+	}
+
+	if scriptsS := InfosWprecon.OtherInformationsString["scripts.name"]; scriptsS != "" {
+		L, _ := scripts.Initialize(scriptsS)
+
+		scripts.Run(L)
+	}
+
+	if InfosWprecon.Verbose {
+		commons.Sitemap()
+		commons.Robots()
+		printer.Println()
+	}
+
+	if enumP := enumerate.UsersEnumeratePassive(); len(enumP) > 0 && !aggressivemode {
+		printer.Done(":: Username(s) Enumerate Passive Mode ::")
+		for _, username := range enumP {
+			printer.Done(username)
 		}
-
-		WP.Detection()
-	}
-
-	// ————————WebApplicationFirewall Block———————— //
-	if detectionwaf {
-		/* WAF :: Web Application Firewall */
-		WAF := fingerprint.WebApplicationFirewall{
-			HTTP:    options,
-			Verbose: verbose,
+		printer.Println()
+	} else if enumA := enumerate.UsersEnumerateAgressive(); len(enumA) > 0 && aggressivemode {
+		printer.Done(":: Username(s) Enumerate Agressive Mode ::")
+		for _, username := range enumA {
+			printer.Done(username)
 		}
-
-		WAF.Detection()
+		printer.Println()
+	} else if len(enumA) <= 0 && aggressivemode {
+		printer.Danger("Unfortunately no user was found.")
+		printer.Println()
+	} else {
+		printer.Danger("Unfortunately no user was found. Try to use agressive mode: --agressive-mode")
+		printer.Println()
 	}
 
-	// ———————————————Plugins Block—————————————— //
-	if pluginenumerate {
-		/* EP :: Enumeration Plugin(s) */
-		EP := enumerate.Plugins{
-			HTTP:    options,
-			Verbose: verbose,
+	if enumP := enumerate.PluginsEnumeratePassive(); len(enumP) > 0 && !aggressivemode {
+		printer.Done(":: Plugin(s) Enumerate Passive Mode ::")
+		for name, version := range enumP {
+			pluginenum(name, version)
 		}
-
-		EP.Enumerate()
-	}
-
-	// ———————————————Themes Block——————————————— //
-	if themeenumerate {
-		/* ET :: Enumeration Theme(s) */
-		ET := enumerate.Themes{
-			HTTP:    options,
-			Verbose: verbose,
+		printer.Println()
+	} else if enumA := enumerate.PluginsEnumerateAgressive(); len(enumA) > 0 && aggressivemode {
+		printer.Done(":: Plugin(s) Enumerate Agressive Mode ::")
+		for name, version := range enumA {
+			pluginenum(name, version)
 		}
-
-		ET.Enumerate()
+		printer.Println()
+	} else if len(enumA) <= 0 && aggressivemode {
+		printer.Danger("Unfortunately I was unable to passively list any plugin.")
+		printer.Println()
+	} else {
+		printer.Danger("Unfortunately I was unable to passively list any plugin. Try to use aggressive mode: --aggressive-mode")
+		printer.Println()
 	}
 
-	// ————————————————Users Block———————————————— //
-	if userenumerate {
-		/* EU :: Enumeration User(s) */
-		EU := enumerate.Users{
-			HTTP:    options,
-			Verbose: verbose,
+	if enumP := enumerate.ThemesEnumeratePassive(); len(enumP) > 0 && !aggressivemode {
+		printer.Done(":: Theme(s) Enumerate Passive Mode ::")
+		for name, version := range enumP {
+			printer.Done("Version:", version+"\t", "Plugins:", name)
 		}
+		if InfosWprecon.Verbose {
+			printer.Warning("Unfortunately wprecon doesn't have vulns for themas *yet*.")
+		}
+		printer.Println()
+	} else if enumA := enumerate.ThemesEnumerateAgressive(); len(enumA) > 0 && aggressivemode {
+		printer.Done(":: Theme(s) Enumerate Agressive Mode ::")
+		for name, version := range enumA {
+			printer.Done("Version:", version+"\t", "Plugin:", name)
+		}
+		if InfosWprecon.Verbose {
+			printer.Warning("Unfortunately wprecon doesn't have vulns for themas *yet*.")
+		}
+		printer.Println()
+	} else if len(enumA) <= 0 && aggressivemode {
+		printer.Danger("Unfortunately I was unable to passively list any theme.")
+		printer.Println()
+	} else {
+		printer.Danger("Unfortunately I was unable to passively list any theme. Try to use aggressive mode: --aggressive-mode")
+		printer.Println()
+	}
+}
 
-		EU.Enumerate()
+// Detection :: This function should be used to perform wordpress detection.
+// "How does this detection work?", I decided to make a 'percentage system' where I will check if each item in a list exists... and if that item exists it will add +1 to accuracy.
+// With "16.6" hits he says that wordpress is already detected. But it opens up an opportunity for you to choose whether to continue or not, because you are not 100% sure.
+func wordpresscheck() float32 {
+	var confidence float32
+	var payloads = [...]string{
+		`<meta name="generator content="WordPress`,
+		`<a href="http://www.wordpress.com">Powered by WordPress</a>`,
+		`<link rel='https://api.wordpress.org/'`}
+
+	if has, response := commons.AdminPage(); has == "true" {
+		printer.Done("The admin page found:", response.URL.Full)
+		confidence++
+	} else if has == "redirect" {
+		printer.Warning("The admin page is being redirected to:", response.RedirectURL)
+		confidence++
 	}
 
-	printer.Done("Total requests:", fmt.Sprint(options.TotalRequests))
+	if response := commons.DirectoryPlugins(); response.StatusCode == 200 || response.StatusCode == 403 {
+		confidence++
+	}
+	if response := commons.DirectoryThemes(); response.StatusCode == 200 || response.StatusCode == 403 {
+		confidence++
+	}
+
+	for _, payload := range payloads {
+		if strings.Contains(InfosWprecon.OtherInformationsString["target.http.index.raw"], payload) {
+			confidence++
+		}
+	}
+
+	return confidence / 6 * 100
+}
+
+func pluginenum(name string, version string) {
+	printer.Done("Version:", version+"\t", "Plugin:", name)
+
+	pntl := printer.NewTopLine("Find Vuln...")
+	if x := extensions.GetVuln(name, version); len(x.Vulnerabilities) > 0 {
+		pntl.Done("Vuln Title:", x.Vulnerabilities[0].Title)
+		printer.Done("Vuln Title:", x.Vulnerabilities[0].Version)
+		printer.Done("Vuln Plublish:", x.Vulnerabilities[0].Published)
+
+		for _, value := range x.Vulnerabilities[0].References {
+			printer.Done("Reference(s):", value)
+		}
+	} else {
+		pntl.Danger("Vuln not found...")
+	}
 }
