@@ -7,6 +7,12 @@ var WPchangesLogs = [...]string{
 	"changelog",
 }
 
+var WPreleaseLog = [...]string{
+	"release_log.txt",
+	"release_log.md",
+	"release_log",
+}
+
 // WPfpd :: These are the files that can contain a "full path disclosure".
 var WPfpd = [...]string{
 	"404.php",
@@ -45,6 +51,8 @@ var WPdirectorys = [...]string{
 	"logs",
 	"vendor",
 	"core",
+	"wp-admin",
+	"wp-content",
 }
 
 // WPreadme ::

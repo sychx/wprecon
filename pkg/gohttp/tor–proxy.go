@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 // TorURL ::
@@ -50,6 +51,10 @@ func TorCheck() (string, error) {
 
 	request, err := http.NewRequest("GET", "https://check.torproject.org/api/ip", nil)
 
+	if strings.Contains(fmt.Sprintf("%s", err), "connection refused") {
+		return "0.0.0.0", fmt.Errorf("Connection Refused, the tor with the command: \"tor --HTTPTunnelPort 9080\"")
+	}
+
 	if err != nil {
 		return "0.0.0.0", err
 	}
@@ -62,10 +67,6 @@ func TorCheck() (string, error) {
 
 	if err := json.NewDecoder(resp.Body).Decode(&torJSON); err != nil {
 		return "0.0.0.0", err
-	}
-
-	if !torJSON.IsTor {
-		return torJSON.IP, fmt.Errorf("Proxy TOR not connected")
 	}
 
 	return torJSON.IP, nil

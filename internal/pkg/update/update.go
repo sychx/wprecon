@@ -15,9 +15,8 @@ type githubAPIJSON struct {
 		Email       string `json:"email"`
 	} `json:"Author"`
 	App struct {
-		Description     string `json:"description"`
-		Version         string `json:"version"`
-		VersionReselase string `json:"version-reselase"`
+		Description string `json:"description"`
+		Version     string `json:"version"`
 	} `json:"App"`
 }
 
@@ -25,11 +24,12 @@ type githubAPIJSON struct {
 func CheckUpdate() {
 	var githubJSON githubAPIJSON
 
-	printer.Loading("Checking Version!")
+	topline := printer.NewTopLine("Checking Version!")
 
 	options := &gohttp.HTTPOptions{
 		URL: gohttp.URLOptions{
-			Simple: "https://raw.githubusercontent.com/blackcrw/wprecon/dev/internal/config/config.json",
+			Simple:    "https://raw.githubusercontent.com/",
+			Directory: "blackcrw/wprecon/dev/internal/config/config.json",
 		},
 	}
 
@@ -39,13 +39,13 @@ func CheckUpdate() {
 		printer.Fatal("Error checking for an update (", err, ")")
 	}
 
-	err = json.NewDecoder(request.Body).Decode(&githubJSON)
+	err = json.NewDecoder(request.RawIo).Decode(&githubJSON)
 
 	if err != nil {
-		printer.LoadingDanger("An error occurred while trying to check the version.")
+		topline.Danger("An error occurred while trying to check the version.")
 	} else if githubJSON.App.Version != version.Version {
-		printer.LoadingDone("There is a new version!", "New:", githubJSON.App.Version, "Download: https://github.com/blackcrw/wprecon")
+		topline.Done("There is a new version!", "New:", githubJSON.App.Version, "Download: https://github.com/blackcrw/wprecon")
 	} else {
-		printer.LoadingWarning("You have the most updated version.")
+		topline.Warning("You have the most updated version.")
 	}
 }

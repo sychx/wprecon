@@ -1,0 +1,38 @@
+package url
+
+import (
+	"net"
+	"net/url"
+
+	"github.com/blackcrw/wprecon/pkg/printer"
+	lua "github.com/yuin/gopher-lua"
+)
+
+func Loader(L *lua.LState) int {
+	mod := L.SetFuncs(L.NewTable(), exports)
+
+	L.Push(mod)
+	return 1
+}
+
+var exports = map[string]lua.LGFunction{
+	"host": gethost,
+}
+
+func gethost(L *lua.LState) int {
+	uri, err := url.ParseRequestURI(L.ToString(1))
+
+	if err != nil {
+		printer.Fatal(err)
+	}
+
+	_, err = net.LookupHost(uri.Host)
+
+	if err != nil {
+		printer.Fatal(err)
+	}
+
+	L.Push(lua.LString(uri.Host))
+
+	return 1
+}

@@ -6,7 +6,7 @@ And for that you will access the official website of golang and will download an
 Once downloaded and installed you will download **wprecon** directly from github with the command:
 ###### **(There are two ways to do this, and I will teach both.)**
 1. Primary way:
-- `go get github.com/blackcrw/wprecon`;
+- `go get -u github.com/blackcrw/wprecon`;
 
 2. Second way:
 - `mkdir ~/Go/src/github.com/blackcrw/wprecon`;

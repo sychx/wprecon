@@ -9,6 +9,7 @@ import (
 // HTTPOptions :: This is Struct Http, it will inherit the struct Options and client.
 type HTTPOptions struct {
 	Method  string
+	Data    string
 	Proxy   func(*http.Request) (*url.URL, error)
 	URL     URLOptions
 	Options Options
@@ -16,11 +17,13 @@ type HTTPOptions struct {
 
 // Response :: This struct will store the request data, and will be used for a return.
 type Response struct {
-	Method     string
-	StatusCode int
-	UserAgent  string
-	Body       io.Reader
-	URL        URLOptions
+	Method      string
+	StatusCode  int
+	UserAgent   string
+	Raw         string
+	RawIo       io.Reader
+	URL         URLOptions
+	RedirectURL string
 }
 
 // URLOptions :: This struct will be used to inform directories ... the complete URL ... or just the domain.
