@@ -7,8 +7,6 @@
   </a>
   <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/blackcrw/wprecon">
   <img alt="GitHub go.mod Go version (branch)" src="https://img.shields.io/github/go-mod/go-version/blackcrw/wprecon/master?label=Go&logo=go">
-
-  <p align="center">Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool in CMS Wordpress, 100% developed in Go.</p>
 </p> 
 
 <p align="center">
@@ -19,6 +17,11 @@
 </p>
 
 <h3><p align="center">New Version 1.0.0a!!!</p></h3>
+
+<h2 align="center">What is WPrecon ?</h2>
+WPrecon (Wordpress Recon) is a tool for wordpress exploration, fully developed in golang, to get better performance from your device.
+We are still in the alpha/beta phase, there are still bugs to be fixed, but we are discovering them over time.
+The focus is to make wprecon the best wordpress exploration tool, and keep wprecon completely free!
 
 <h2 align="center">Features</h2>
 
