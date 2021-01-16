@@ -21,7 +21,7 @@
 <h2 align="center">What is WPrecon ?</h2>
 WPrecon (Wordpress Recon) is a tool for wordpress exploration, fully developed in golang, to get better performance from your device.
 We are still in the alpha/beta phase, there are still bugs to be fixed, but we are discovering them over time.
-The focus is to make wprecon the best wordpress exploration tool, and keep wprecon completely free!
+The focus is to make wprecon the best wordpress exploration tool, and keeping wprecon for free.
 
 <h2 align="center">Features</h2>
 
