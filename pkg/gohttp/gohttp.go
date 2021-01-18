@@ -73,10 +73,6 @@ func HTTPRequest(options *HTTPOptions) (Response, error) {
 		return Response{}, fmt.Errorf("Connection refused, the tor with the command: tor --HTTPTunnelPort 9080")
 	}
 
-	if strings.Contains(fmt.Sprintf("%s", err), "dial tcp 144.217.235.104:8777: connect: connection refused") && options.Options.Tor {
-		return Response{}, fmt.Errorf("Connection refused to API")
-	}
-
 	if err != nil {
 		return Response{}, err
 	}
