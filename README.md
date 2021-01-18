@@ -20,7 +20,7 @@
 
 <h3><p align="center">New Version 1.0.0a!!!</p></h3>
 
-<h2 align="center">Features</h2>
+<h2 align="center">Features & Tasks List</h2>
 
 All that are already marked, are already on wprecon.
 But since they are not, it is for the reason that they are still in development.
@@ -34,7 +34,12 @@ But since they are not, it is for the reason that they are still in development.
 - [x] Scripts
 - [x] Tor Proxy
 - [x] User(s) Enumerator
-- [x] Vulnerability Version Checking (Beta)
+- [x] Vulnerability Version Checking (Plugins) **(Beta)**
+#### —————————————————— Task List ——————————————————
+- [ ] More Scripts Web Exploits
+- [ ] Website Dashboard to WPrecon
+- [ ] More Vulnerabilities (Plugins)
+- [ ] Vulnerability Version Checking (Theme)
 
 <p align="center" >
   <h2 align="center">WPrecon running</h2>
