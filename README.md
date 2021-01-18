@@ -37,7 +37,6 @@ But since they are not, it is for the reason that they are still in development.
 - [x] Vulnerability Version Checking (Plugins) **(Beta)**
 #### —————————————————— Task List ——————————————————
 - [ ] More Scripts Web Exploits
-- [ ] Website Dashboard to WPrecon
 - [ ] More Vulnerabilities (Plugins)
 - [ ] Vulnerability Version Checking (Theme)
 
