@@ -18,12 +18,10 @@
  <a href="https://github.com/blackcrw">Author</a>
 </p>
 
-<h2 align="center">Warning
-  <p align="center">I recently found out that my tool has the same name as a website ... which has the same "subject" as my tool.
+<h2 align="center">Warning</h2>
+<p align="center">I recently found out that my tool has the same name as a website ... which has the same "subject" as my tool.
 But I already warn you that this wprecon that you see on github has nothing to do with this site.
 I don't have a website yet!</p>
-</h2>
-  
  
  </h3>
 
