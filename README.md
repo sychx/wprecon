@@ -2,9 +2,6 @@
 
 <h1 align="center">WPrecon (Wordpress Recon)</h1>
 <p align="center"> 
-  <a href="https://www.gnu.org/licenses/gpl-3.0">
-    <img alt="License: GPL v3" src="https://img.shields.io/badge/License-GPLv3-blue.svg">
-  </a>
   <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/blackcrw/wprecon">
   <img alt="GitHub go.mod Go version (branch)" src="https://img.shields.io/github/go-mod/go-version/blackcrw/wprecon/master?label=Go&logo=go">
 
