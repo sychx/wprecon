@@ -29,7 +29,7 @@ But since they are not, it is for the reason that they are still in development.
 
 - [x] Detection WAF
 - [x] Fuzzing Backup Files
-- [x] Fuzzing Passwords
+- [x] Fuzzing Passwords (xml-rpc)
 - [x] Random User Agent
 - [x] Plugin(s) Enumerator
 - [x] Theme(s) Enumerator
@@ -38,9 +38,10 @@ But since they are not, it is for the reason that they are still in development.
 - [x] User(s) Enumerator
 - [x] Vulnerability Version Checking (Plugins) **(Beta)**
 #### —————————————————— Task List ——————————————————
+- [ ] 🔨 — Fuzzing Passwords (wp-login)
 - [ ] 🔨 — More Scripts Web Exploits
-- [ ] 🔨 — More Vulnerabilities (Plugins)
-- [ ] 🔨 — Vulnerability Version Checking (Theme)
+- [ ] More Vulnerabilities (Plugins)
+- [ ] Vulnerability Version Checking (Theme)
 
 <p align="center" >
   <h2 align="center">WPrecon running</h2>
