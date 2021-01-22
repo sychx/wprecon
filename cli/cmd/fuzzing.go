@@ -27,7 +27,7 @@ func FuzzerOptionsRun(cmd *cobra.Command, args []string) {
 	}
 
 	if InfosWprecon.OtherInformationsString["target.http.fuzzing.usernames"] != "" || InfosWprecon.OtherInformationsString["target.http.fuzzing.passwords.file.wordlist"] != "" {
+		printer.Done(":: Brute-Force to xml-rpc ::")
 		fuzzing.XMLRPC()
 	}
-
 }

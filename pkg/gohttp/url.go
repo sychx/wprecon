@@ -21,12 +21,6 @@ func IsURL(URL string) (bool, error) {
 		return false, errors.New("Invalid scheme")
 	}
 
-	_, err = net.LookupHost(uri.Host)
-
-	if err != nil {
-		return false, err
-	}
-
 	return true, nil
 }
 

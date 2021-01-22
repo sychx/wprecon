@@ -1,103 +1,199 @@
 package gohttp
 
 import (
-	"bytes"
 	"crypto/tls"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 
 	. "github.com/blackcrw/wprecon/cli/config"
+	"github.com/blackcrw/wprecon/pkg/printer"
 )
 
-// HTTPRequest :: This function will be used for any request that is made.
-func HTTPRequest(options *HTTPOptions) (Response, error) {
-	var redirect string
-	var data io.Reader
+// HTTPOptions :: This is Struct Http, it will inherit the struct Options and client.
+type httpoptions struct {
+	url                  *URLOptions
+	method               string
+	tlsCertificateVerify bool
+	tor                  bool
+	proxy                func(*http.Request) (*url.URL, error)
+	data                 io.Reader
+	userAgent            string
+}
 
-	if !strings.HasSuffix(options.URL.Simple, "/") {
-		options.URL.Simple = fmt.Sprintf("%s/", options.URL.Simple)
+// Response :: This struct will store the request data, and will be used for a return.
+type Response struct {
+	RawIo    io.Reader
+	Raw      string
+	URL      *URLOptions
+	Response *http.Response
+}
+
+// URLOptions :: This struct will be used to inform directories ... the complete URL ... or just the domain.
+// (Alert) The focus of this struct is to be used together with HTTPOptions!
+type URLOptions struct {
+	Simple    string
+	Full      string
+	Directory string
+	URL       *url.URL
+}
+
+// SimpleRequest :: The first parameter must always be the base url. The second must be the directory.
+func SimpleRequest(params ...string) *Response {
+	http := NewHTTPClient()
+	http.SetURL(params[0])
+
+	if len(params) > 1 {
+		http.SetURLDirectory(params[1])
 	}
 
-	if options.Method == "" {
-		options.Method = "GET"
+	http.OnTor(InfosWprecon.OtherInformationsBool["http.options.tor"])
+	http.OnRandomUserAgent(InfosWprecon.OtherInformationsBool["http.options.randomuseragent"])
+	http.OnTLSCertificateVerify(InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"])
+
+	response, err := http.Run()
+
+	if err != nil {
+		printer.Fatal(err)
 	}
 
-	if options.Options.Tor {
-		t, err := Tor()
+	return response
+}
+
+func NewHTTPClient() *httpoptions {
+	options := &httpoptions{
+		method:               "GET",
+		userAgent:            "WPrecon - Wordpress Recon (Vulnerability Scanner)",
+		proxy:                http.ProxyFromEnvironment,
+		tlsCertificateVerify: false,
+		tor:                  false,
+		data:                 nil}
+
+	options.url = &URLOptions{}
+
+	return options
+}
+
+func (options *httpoptions) SetURL(url string) *httpoptions {
+	if !strings.HasSuffix(url, "/") {
+		options.url.Simple = "/" + url
+		options.url.Full = "/" + url
+	} else {
+		options.url.Simple = url
+		options.url.Full = url
+	}
+
+	return options
+}
+
+func (options *httpoptions) SetURLDirectory(directory string) *httpoptions {
+	if !strings.HasPrefix(directory, "/") && !strings.HasSuffix(options.url.Simple, "/") {
+		options.url.Directory = "/" + directory
+		options.url.Full = options.url.Simple + "/" + directory
+	} else {
+		options.url.Directory = directory
+		options.url.Full = options.url.Simple + directory
+	}
+
+	return options
+}
+
+func (options *httpoptions) SetURLFull(full string) *httpoptions {
+	options.url.Full = full
+
+	return options
+}
+
+func (options *httpoptions) OnTor(status bool) (*httpoptions, error) {
+	if status {
+		tor, err := url.Parse("http://127.0.0.1:9080")
 
 		if err != nil {
-			return Response{}, err
+			return nil, fmt.Errorf("proxy URL is invalid (%w)", err)
 		}
 
-		options.Proxy = t
-	} else {
-		options.Proxy = http.ProxyFromEnvironment
+		options.proxy = http.ProxyURL(tor)
 	}
 
-	if options.Data != "" {
-		data = bytes.NewBuffer([]byte(options.Data))
-		options.Method = "POST"
-	} else {
-		data = nil
+	return options, nil
+}
+
+func (options *httpoptions) OnRandomUserAgent(status bool) *httpoptions {
+	if status {
+		options.userAgent = randomuseragent()
 	}
 
+	return options
+}
+
+func (options *httpoptions) OnTLSCertificateVerify(status bool) *httpoptions {
+	options.tlsCertificateVerify = status
+
+	return options
+}
+
+func (options *httpoptions) SetMethod(method string) *httpoptions {
+	options.method = method
+
+	return options
+}
+
+func (options *httpoptions) SetUserAgent(useragent string) *httpoptions {
+	options.userAgent = useragent
+
+	return options
+}
+
+func (options *httpoptions) SetForm(form *url.Values) *httpoptions {
+	options.data = strings.NewReader(form.Encode())
+
+	return options
+}
+
+func (options *httpoptions) SetData(data string) *httpoptions {
+	options.data = strings.NewReader(data)
+
+	return options
+}
+
+func (options *httpoptions) Run() (*Response, error) {
 	client := &http.Client{
 		Transport: &http.Transport{
-			Proxy: options.Proxy,
+			Proxy: options.proxy,
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: options.Options.TLSCertificateVerify,
+				InsecureSkipVerify: options.tlsCertificateVerify,
 			},
 		},
 	}
 
-	options.URL.Full = options.URL.Simple + options.URL.Directory
-
-	request, err := http.NewRequest(options.Method, options.URL.Full, data)
+	request, err := http.NewRequest(options.method, options.url.Full, options.data)
 
 	if err != nil {
-		return Response{}, err
+		return nil, err
 	}
 
-	if options.Options.RandomUserAgent {
-		request.Header.Set("User-Agent", randomuseragent())
-	} else {
-		request.Header.Set("User-Agent", "WPrecon - Wordpress Recon (Vulnerability Scanner)")
-	}
+	request.Header.Set("User-Agent", options.userAgent)
 
-	resp, err := client.Do(request)
-
-	if strings.Contains(fmt.Sprintf("%s", err), "proxyconnect tcp: dial tcp 127.0.0.1:9080: connect: connection refused") && options.Options.Tor {
-		return Response{}, fmt.Errorf("Connection refused, the tor with the command: tor --HTTPTunnelPort 9080")
-	}
+	response, err := client.Do(request)
 
 	if err != nil {
-		return Response{}, err
+		return nil, err
 	}
 
-	raw, err := ioutil.ReadAll(resp.Body)
+	raw, err := ioutil.ReadAll(response.Body)
 
 	if err != nil {
-		return Response{}, err
-	}
-
-	if resp.StatusCode == 302 {
-		redirect = resp.Header.Get("Location")
-	}
-
-	httpResponse := Response{
-		Method:      options.Method,
-		URL:         options.URL,
-		StatusCode:  resp.StatusCode,
-		UserAgent:   request.UserAgent(),
-		Raw:         string(raw),
-		RawIo:       resp.Body,
-		RedirectURL: redirect,
+		return nil, err
 	}
 
 	InfosWprecon.TotalRequests++
 
-	return httpResponse, nil
+	return &Response{
+		Raw:      string(raw),
+		URL:      options.url,
+		Response: response,
+	}, nil
 }

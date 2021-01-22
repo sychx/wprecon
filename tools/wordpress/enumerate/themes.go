@@ -5,6 +5,7 @@ import (
 	"regexp"
 
 	. "github.com/blackcrw/wprecon/cli/config"
+	"github.com/blackcrw/wprecon/pkg/gohttp"
 	"github.com/blackcrw/wprecon/pkg/wordlist"
 	"github.com/blackcrw/wprecon/tools/wordpress/commons"
 	"github.com/blackcrw/wprecon/tools/wordpress/extensions"
@@ -56,7 +57,7 @@ func ThemesEnumerateAgressive() map[string]string {
 		for _, value := range wordlist.WPchangesLogs {
 			dir := fmt.Sprintf("/wp-content/themes/%s/%s", key, value)
 
-			if response := extensions.SimpleRequest(InfosWprecon.Target, dir); response.StatusCode == 200 && response.Raw != "" {
+			if response := gohttp.SimpleRequest(InfosWprecon.Target, dir); response.Response.StatusCode == 200 && response.Raw != "" {
 				if version := extensions.GetVersionChangelog(response.Raw); version != "" {
 					InfosWprecon.OtherInformationsMapString["target.http.themes.versions"][key] = version
 					done = true
@@ -69,7 +70,7 @@ func ThemesEnumerateAgressive() map[string]string {
 			for _, value := range wordlist.WPreadme {
 				dir := fmt.Sprintf("/wp-content/themes/%s/%s", key, value)
 
-				if response := extensions.SimpleRequest(InfosWprecon.Target, dir); response.StatusCode == 200 && response.Raw != "" {
+				if response := gohttp.SimpleRequest(InfosWprecon.Target, dir); response.Response.StatusCode == 200 && response.Raw != "" {
 
 					if version := extensions.GetVersionStableTag(response.Raw); version != "" {
 						InfosWprecon.OtherInformationsMapString["target.http.themes.versions"][key] = version
@@ -88,7 +89,7 @@ func ThemesEnumerateAgressive() map[string]string {
 			for _, value := range wordlist.WPreleaseLog {
 				dir := fmt.Sprintf("/wp-content/themes/%s/%s", key, value)
 
-				if response := extensions.SimpleRequest(InfosWprecon.Target, dir); response.StatusCode == 200 && response.Raw != "" {
+				if response := gohttp.SimpleRequest(InfosWprecon.Target, dir); response.Response.StatusCode == 200 && response.Raw != "" {
 
 					if version := extensions.GetVersionStableTag(response.Raw); version != "" {
 						InfosWprecon.OtherInformationsMapString["target.http.themes.versions"][key] = version

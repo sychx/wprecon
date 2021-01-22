@@ -6,9 +6,9 @@ import (
 	"regexp"
 
 	. "github.com/blackcrw/wprecon/cli/config"
+	"github.com/blackcrw/wprecon/pkg/gohttp"
 	"github.com/blackcrw/wprecon/pkg/printer"
 	"github.com/blackcrw/wprecon/pkg/text"
-	"github.com/blackcrw/wprecon/tools/wordpress/extensions"
 )
 
 type uJSON []struct {
@@ -17,7 +17,7 @@ type uJSON []struct {
 
 // UsersEnumeratePassive :: Enumerate using feed
 func UsersEnumeratePassive() []string {
-	response := extensions.SimpleRequest(InfosWprecon.Target, "feed/")
+	response := gohttp.SimpleRequest(InfosWprecon.Target, "feed/")
 
 	rex := regexp.MustCompile("<dc:creator><!\\[CDATA\\[(.+?)\\]\\]></dc:creator>")
 	submatch := rex.FindAllSubmatch([]byte(response.Raw), -1)
@@ -45,7 +45,7 @@ func UsersEnumerateAgressive() []string {
 	// Enumerate using Yoast SEO
 	func() {
 		if done == false {
-			response := extensions.SimpleRequest(InfosWprecon.Target, "author-sitemap.xml")
+			response := gohttp.SimpleRequest(InfosWprecon.Target, "author-sitemap.xml")
 
 			rex := regexp.MustCompile("<loc>.*?/author/(.*?)/</loc>")
 
@@ -69,9 +69,9 @@ func UsersEnumerateAgressive() []string {
 	// Enumerate using route
 	func() {
 		if done == false {
-			response := extensions.SimpleRequest(InfosWprecon.Target, "?rest_route=/wp/v2/users")
+			response := gohttp.SimpleRequest(InfosWprecon.Target, "?rest_route=/wp/v2/users")
 
-			if response.StatusCode == 200 && response.Raw != "" {
+			if response.Response.StatusCode == 200 && response.Raw != "" {
 				json.NewDecoder(response.RawIo).Decode(&ujson)
 
 				for _, value := range ujson {
@@ -84,7 +84,7 @@ func UsersEnumerateAgressive() []string {
 					InfosWprecon.OtherInformationsString["target.http.users.method"] = "Route"
 					done = true
 				}
-			} else if response.StatusCode == 401 && response.Raw != "" && InfosWprecon.Verbose {
+			} else if response.Response.StatusCode == 401 && response.Raw != "" && InfosWprecon.Verbose {
 				printer.Danger("Status code 401, I don't think I'm allowed to list users. Target Url:", response.URL.Full, "— Target source code:", response.Raw)
 			}
 		}
@@ -93,9 +93,9 @@ func UsersEnumerateAgressive() []string {
 	// Enumerate using json file
 	func() {
 		if done == false {
-			response := extensions.SimpleRequest(InfosWprecon.Target, "wp-json/wp/v2/users")
+			response := gohttp.SimpleRequest(InfosWprecon.Target, "wp-json/wp/v2/users")
 
-			if response.StatusCode == 200 && response.Raw != "" {
+			if response.Response.StatusCode == 200 && response.Raw != "" {
 				json.NewDecoder(response.RawIo).Decode(&ujson)
 
 				for _, value := range ujson {
@@ -108,7 +108,7 @@ func UsersEnumerateAgressive() []string {
 					InfosWprecon.OtherInformationsString["target.http.users.method"] = "Json"
 					done = true
 				}
-			} else if response.StatusCode == 401 && response.Raw != "" && InfosWprecon.Verbose {
+			} else if response.Response.StatusCode == 401 && response.Raw != "" && InfosWprecon.Verbose {
 				printer.Danger("Status code 401, I don't think I'm allowed to list users. Target Url:", response.URL.Full, "— Target source code:", response.Raw)
 			}
 		}

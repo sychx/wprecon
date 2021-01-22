@@ -9,7 +9,6 @@ import (
 	"github.com/blackcrw/wprecon/internal/pkg/banner"
 	"github.com/blackcrw/wprecon/pkg/gohttp"
 	"github.com/blackcrw/wprecon/pkg/printer"
-	"github.com/blackcrw/wprecon/tools/wordpress/extensions"
 	"github.com/spf13/cobra"
 )
 
@@ -61,11 +60,9 @@ func init() {
 	root.SetHelpTemplate(banner.HelpMain)
 
 	// fuzzer
-	// fuzzer.Flags().StringP("wordlist", "w", "", "Wordlist")
 	fuzzer.Flags().StringP("usernames", "U", "", "Set usernames attack passwords.")
 	fuzzer.Flags().StringP("passwords", "P", "", "Set wordlist attack passwords.")
 	fuzzer.Flags().BoolP("backup-file", "B", false, "Performs a fuzzing to try to find the backup file if it exists.")
-	// fuzzer.Flags().StringP("attack-method", "M", "xml-rpc", "Avaliable: xml-rpc and wp-login")
 
 	fuzzer.SetHelpTemplate(banner.HelpFuzzer)
 	root.AddCommand(fuzzer)
@@ -81,7 +78,7 @@ func ibanner() {
 	InfosWprecon.OtherInformationsString["scripts.name"], _ = root.Flags().GetString("scripts")
 
 	go func() {
-		response := extensions.SimpleRequest(InfosWprecon.Target, "")
+		response := gohttp.SimpleRequest(InfosWprecon.Target, "")
 
 		InfosWprecon.OtherInformationsString["target.http.index.raw"] = response.Raw
 	}()

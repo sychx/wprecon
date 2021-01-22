@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	. "github.com/blackcrw/wprecon/cli/config"
+	"github.com/blackcrw/wprecon/pkg/gohttp"
 	"github.com/blackcrw/wprecon/pkg/printer"
 	"github.com/blackcrw/wprecon/pkg/scripts"
 	"github.com/blackcrw/wprecon/tools/wordpress/commons"
@@ -32,7 +33,7 @@ func RootOptionsPreRun(cmd *cobra.Command, args []string) {
 
 	InfosWprecon.OtherInformationsString["scripts.name"] = scriptsS
 
-	response := extensions.SimpleRequest(target, "")
+	response := gohttp.SimpleRequest(target)
 
 	InfosWprecon.OtherInformationsString["target.http.index.raw"] = response.Raw
 }
@@ -153,14 +154,14 @@ func wordpresscheck() float32 {
 		printer.Done("The admin page found:", response.URL.Full)
 		confidence++
 	} else if has == "redirect" {
-		printer.Warning("The admin page is being redirected to:", response.RedirectURL)
+		printer.Warning("The admin page is being redirected to:", response.Response.Header.Get("Location"))
 		confidence++
 	}
 
-	if response := commons.DirectoryPlugins(); response.StatusCode == 200 || response.StatusCode == 403 {
+	if response := commons.DirectoryPlugins(); response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
 		confidence++
 	}
-	if response := commons.DirectoryThemes(); response.StatusCode == 200 || response.StatusCode == 403 {
+	if response := commons.DirectoryThemes(); response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
 		confidence++
 	}
 

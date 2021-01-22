@@ -25,16 +25,16 @@ func WAFAgressiveDetection() *gohttp.Response {
 
 	for _, path := range PathWAF {
 		pathFormat := fmt.Sprintf("wp-content/plugins/%s/", path)
-		response := extensions.SimpleRequest(InfosWprecon.Target, pathFormat)
+		response := gohttp.SimpleRequest(InfosWprecon.Target, pathFormat)
 
-		if response.StatusCode == 200 || response.StatusCode == 403 {
+		if response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
 			printer.Done("I found this WAF")
 			printer.Warning("Name \t:", strings.Title(strings.ReplaceAll(path, "-", " ")))
-			printer.Warning("Status Code\t:", fmt.Sprint(response.StatusCode))
+			printer.Warning("Status Code\t:", fmt.Sprint(response.Response.StatusCode))
 			printer.Warning("URL \t:", response.URL.Full)
 
 			if importantfile := extensions.GetOneImportantFile(response.Raw); importantfile != "" {
-				response2 := extensions.SimpleRequest(InfosWprecon.Target, pathFormat+importantfile)
+				response2 := gohttp.SimpleRequest(InfosWprecon.Target, pathFormat+importantfile)
 
 				if readme := extensions.GetVersionStableTag(response2.Raw); readme != "" {
 					printer.Warning("Version \t:", readme)

@@ -5,6 +5,7 @@ import (
 	"regexp"
 
 	. "github.com/blackcrw/wprecon/cli/config"
+	"github.com/blackcrw/wprecon/pkg/gohttp"
 	"github.com/blackcrw/wprecon/pkg/wordlist"
 	"github.com/blackcrw/wprecon/tools/wordpress/commons"
 	"github.com/blackcrw/wprecon/tools/wordpress/extensions"
@@ -56,7 +57,7 @@ func PluginsEnumerateAgressive() map[string]string {
 
 		if InfosWprecon.Verbose == true {
 			go func() {
-				response := extensions.SimpleRequest(InfosWprecon.Target, fmt.Sprintf("wp-content/plugins/%s", name))
+				response := gohttp.SimpleRequest(InfosWprecon.Target, "wp-content/plugins/"+name)
 				extensions.GetFileExtensions(response.URL.Full, response.Raw)
 			}()
 		}
@@ -64,7 +65,7 @@ func PluginsEnumerateAgressive() map[string]string {
 		for _, value := range wordlist.WPchangesLogs {
 			dir := fmt.Sprintf("/wp-content/plugins/%s/%s", name, value)
 
-			if response := extensions.SimpleRequest(InfosWprecon.Target, dir); response.StatusCode == 200 && response.Raw != "" {
+			if response := gohttp.SimpleRequest(InfosWprecon.Target, dir); response.Response.StatusCode == 200 && response.Raw != "" {
 				if version := extensions.GetVersionChangelog(response.Raw); version != "" {
 					InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = version
 					done = true
@@ -77,7 +78,7 @@ func PluginsEnumerateAgressive() map[string]string {
 			for _, value := range wordlist.WPreadme {
 				dir := fmt.Sprintf("wp-content/plugins/%s/%s", name, value)
 
-				if response := extensions.SimpleRequest(InfosWprecon.Target, dir); response.StatusCode == 200 && response.Raw != "" {
+				if response := gohttp.SimpleRequest(InfosWprecon.Target, dir); response.Response.StatusCode == 200 && response.Raw != "" {
 					if version := extensions.GetVersionStableTag(response.Raw); version != "" {
 						InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = version
 						done = true
@@ -95,7 +96,7 @@ func PluginsEnumerateAgressive() map[string]string {
 			for _, value := range wordlist.WPreleaseLog {
 				dir := fmt.Sprintf("wp-content/plugins/%s/%s", name, value)
 
-				if response := extensions.SimpleRequest(InfosWprecon.Target, dir); response.StatusCode == 200 && response.Raw != "" {
+				if response := gohttp.SimpleRequest(InfosWprecon.Target, dir); response.Response.StatusCode == 200 && response.Raw != "" {
 					if version := extensions.GetVersionStableTag(response.Raw); version != "" {
 						InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = version
 						done = true

@@ -26,14 +26,9 @@ func CheckUpdate() {
 
 	topline := printer.NewTopLine("Checking Version!")
 
-	options := &gohttp.HTTPOptions{
-		URL: gohttp.URLOptions{
-			Simple:    "https://raw.githubusercontent.com/",
-			Directory: "blackcrw/wprecon/dev/internal/config/config.json",
-		},
-	}
+	http := gohttp.NewHTTPClient().SetURLFull("https://raw.githubusercontent.com/blackcrw/wprecon/dev/internal/config/config.json")
 
-	request, err := gohttp.HTTPRequest(options)
+	request, err := http.Run()
 
 	if err != nil {
 		printer.Fatal("Error checking for an update (", err, ")")
