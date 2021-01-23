@@ -22,6 +22,8 @@ type httpoptions struct {
 	proxy                func(*http.Request) (*url.URL, error)
 	data                 io.Reader
 	userAgent            string
+	redirect             func(req *http.Request, via []*http.Request) error
+	contentType          string
 }
 
 // Response :: This struct will store the request data, and will be used for a return.
@@ -65,12 +67,10 @@ func SimpleRequest(params ...string) *Response {
 
 func NewHTTPClient() *httpoptions {
 	options := &httpoptions{
-		method:               "GET",
-		userAgent:            "WPrecon - Wordpress Recon (Vulnerability Scanner)",
-		proxy:                http.ProxyFromEnvironment,
-		tlsCertificateVerify: false,
-		tor:                  false,
-		data:                 nil}
+		method:      "GET",
+		userAgent:   "WPrecon - Wordpress Recon (Vulnerability Scanner)",
+		data:        nil,
+		contentType: "text/html; charset=UTF-8"}
 
 	options.url = &URLOptions{}
 
@@ -79,8 +79,8 @@ func NewHTTPClient() *httpoptions {
 
 func (options *httpoptions) SetURL(url string) *httpoptions {
 	if !strings.HasSuffix(url, "/") {
-		options.url.Simple = "/" + url
-		options.url.Full = "/" + url
+		options.url.Simple = url + "/"
+		options.url.Full = url + "/"
 	} else {
 		options.url.Simple = url
 		options.url.Full = url
@@ -159,10 +159,24 @@ func (options *httpoptions) SetData(data string) *httpoptions {
 	return options
 }
 
+func (options *httpoptions) SetRedirectFunc(redirectFunc func(req *http.Request, via []*http.Request) error) *httpoptions {
+	options.redirect = redirectFunc
+
+	return options
+}
+
+func (options *httpoptions) SetContentType(contenttype string) *httpoptions {
+	options.contentType = contenttype
+
+	return options
+}
+
 func (options *httpoptions) Run() (*Response, error) {
 	client := &http.Client{
+		CheckRedirect: options.redirect,
 		Transport: &http.Transport{
-			Proxy: options.proxy,
+			Proxy:             options.proxy,
+			DisableKeepAlives: true,
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: options.tlsCertificateVerify,
 			},
@@ -176,6 +190,7 @@ func (options *httpoptions) Run() (*Response, error) {
 	}
 
 	request.Header.Set("User-Agent", options.userAgent)
+	request.Header.Set("Content-Type", options.contentType)
 
 	response, err := client.Do(request)
 

@@ -11,8 +11,7 @@ import (
 // TopLine :: "What is this struct for ?!" It will serve you some functions to write on the top line ... deleting the print of the NewTopLine function.
 type TopLine struct {
 	count  int
-	count2 int
-	size   int
+	Count2 int
 }
 
 // NewTopLine ::
@@ -85,10 +84,9 @@ func (topline *TopLine) Warning(text ...string) {
 }
 
 // Warning ::
-func (topline *TopLine) Progress(size int, text ...string) {
-	topline.size = size
+func (topline *TopLine) Progress(len int, text ...string) {
 
-	var prefix = color.Yellow(fmt.Sprintf("[%d/%d]", topline.count2, topline.size)).String()
+	var prefix = color.Yellow(fmt.Sprintf("[%d/%d]", topline.Count2, len)).String()
 	var textString = strings.Join(text, " ")
 
 	fmt.Print("\033[G\033[K")
@@ -98,5 +96,5 @@ func (topline *TopLine) Progress(size int, text ...string) {
 		panic(err)
 	}
 
-	topline.count2++
+	topline.Count2++
 }

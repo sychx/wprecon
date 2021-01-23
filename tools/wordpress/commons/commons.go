@@ -1,6 +1,7 @@
 package commons
 
 import (
+	"fmt"
 	"strings"
 
 	. "github.com/blackcrw/wprecon/cli/config"
@@ -20,16 +21,12 @@ func DirectoryPlugins() *gohttp.Response {
 	response, err := http.Run()
 
 	if err != nil {
-		printer.Fatal(err)
+		printer.Danger(fmt.Sprint(err))
 	}
 
 	if strings.Contains(response.Raw, "Index of") {
 		InfosWprecon.OtherInformationsSlice["target.http.indexof"] = append(InfosWprecon.OtherInformationsSlice["target.http.indexof"], response.URL.Full)
 		InfosWprecon.OtherInformationsString["target.http.wp-content/plugin.indexof.raw"] = response.Raw
-
-		if InfosWprecon.Verbose {
-			printer.Warning("\"index of\" found, in", response.URL.Full)
-		}
 	}
 
 	return response
@@ -47,16 +44,12 @@ func DirectoryThemes() *gohttp.Response {
 	response, err := http.Run()
 
 	if err != nil {
-		printer.Fatal(err)
+		printer.Danger(fmt.Sprint(err))
 	}
 
 	if strings.Contains(response.Raw, "Index of") {
 		InfosWprecon.OtherInformationsSlice["target.http.indexof"] = append(InfosWprecon.OtherInformationsSlice["target.http.indexof"], response.URL.Full)
 		InfosWprecon.OtherInformationsString["target.http.wp-content/themes.indexof.raw"] = response.Raw
-
-		if InfosWprecon.Verbose {
-			printer.Warning("\"index of\" found, in", response.URL.Full)
-		}
 	}
 
 	return response
@@ -64,7 +57,7 @@ func DirectoryThemes() *gohttp.Response {
 
 // AdminPage :: Simple requests to see if there is.
 func AdminPage() (string, *gohttp.Response) {
-	http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target).SetURLDirectory("wp-login/")
+	http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target).SetURLDirectory("wp-admin/")
 	http.OnTor(InfosWprecon.OtherInformationsBool["http.options.tor"])
 	http.OnRandomUserAgent(InfosWprecon.OtherInformationsBool["http.options.randomuseragent"])
 	http.OnTLSCertificateVerify(InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"])
@@ -72,7 +65,7 @@ func AdminPage() (string, *gohttp.Response) {
 	response, err := http.Run()
 
 	if err != nil {
-		printer.Fatal(err)
+		printer.Danger(fmt.Sprint(err))
 	}
 
 	if response.Response.StatusCode == 200 {
@@ -96,17 +89,12 @@ func Robots() *gohttp.Response {
 	response, err := http.Run()
 
 	if err != nil {
-		printer.Fatal(err)
+		printer.Danger(fmt.Sprint(err))
 	}
 
 	if response.Response.StatusCode == 200 {
 		InfosWprecon.OtherInformationsString["target.http.robots.txt.raw"] = response.Raw
 		InfosWprecon.OtherInformationsString["target.http.robots.txt.status"] = "sucess"
-
-		if InfosWprecon.Verbose && response.Raw != "" {
-			printer.Warning("Robots.txt file text:")
-			printer.Println(response.Raw)
-		}
 	}
 
 	return response
@@ -123,15 +111,11 @@ func Sitemap() *gohttp.Response {
 	response, err := http.Run()
 
 	if err != nil {
-		printer.Fatal(err)
+		printer.Danger(fmt.Sprint(err))
 	}
 
 	if response.Response.StatusCode == 200 {
 		InfosWprecon.OtherInformationsString["target.http.sitemap.xml.status"] = "true"
-
-		if InfosWprecon.Verbose {
-			printer.Warning("Sitemap.xml found:", response.URL.Full)
-		}
 	}
 
 	return response
@@ -148,7 +132,7 @@ func XMLRPC() (string, *gohttp.Response) {
 	response, err := http.Run()
 
 	if err != nil {
-		printer.Fatal(err)
+		printer.Danger(fmt.Sprint(err))
 	}
 
 	// Status Code Return: 405

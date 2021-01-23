@@ -7,7 +7,7 @@ import (
 	. "github.com/blackcrw/wprecon/cli/config"
 	"github.com/blackcrw/wprecon/pkg/gohttp"
 	"github.com/blackcrw/wprecon/pkg/printer"
-	"github.com/blackcrw/wprecon/tools/wordpress/extensions"
+	"github.com/blackcrw/wprecon/pkg/text"
 )
 
 var PathWAF = [...]string{
@@ -33,17 +33,17 @@ func WAFAgressiveDetection() *gohttp.Response {
 			printer.Warning("Status Code\t:", fmt.Sprint(response.Response.StatusCode))
 			printer.Warning("URL \t:", response.URL.Full)
 
-			if importantfile := extensions.GetOneImportantFile(response.Raw); importantfile != "" {
+			if importantfile := text.GetOneImportantFile(response.Raw); importantfile != "" {
 				response2 := gohttp.SimpleRequest(InfosWprecon.Target, pathFormat+importantfile)
 
-				if readme := extensions.GetVersionStableTag(response2.Raw); readme != "" {
+				if readme := text.GetVersionStableTag(response2.Raw); readme != "" {
 					printer.Warning("Version \t:", readme)
-				} else if changelog := extensions.GetVersionChangelog(response2.Raw); changelog != "" {
+				} else if changelog := text.GetVersionChangelog(response2.Raw); changelog != "" {
 					printer.Warning("Version \t:", changelog)
 				}
 			}
 
-			scan := printer.ScanQ("Do you wish to continue ?! [Y/n] : ")
+			scan := printer.ScanQ("Do you wish to continue ?! [Y]es | [n]o : ")
 
 			if scan == "n" && scan != "\n" {
 				printer.Fatal("Exiting...")

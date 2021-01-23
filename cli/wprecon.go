@@ -63,6 +63,7 @@ func init() {
 	fuzzer.Flags().StringP("usernames", "U", "", "Set usernames attack passwords.")
 	fuzzer.Flags().StringP("passwords", "P", "", "Set wordlist attack passwords.")
 	fuzzer.Flags().BoolP("backup-file", "B", false, "Performs a fuzzing to try to find the backup file if it exists.")
+	fuzzer.Flags().StringP("attack-method", "M", "xml-rpc", "Avaliable: xml-rpc and wp-login")
 
 	fuzzer.SetHelpTemplate(banner.HelpFuzzer)
 	root.AddCommand(fuzzer)
@@ -77,21 +78,15 @@ func ibanner() {
 	InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"], _ = root.Flags().GetBool("tlscertificateverify")
 	InfosWprecon.OtherInformationsString["scripts.name"], _ = root.Flags().GetString("scripts")
 
+	if isURL := gohttp.IsURL(InfosWprecon.Target); isURL {
+		banner.SBanner()
+	} else {
+		banner.Banner()
+	}
+
 	go func() {
-		response := gohttp.SimpleRequest(InfosWprecon.Target, "")
+		response := gohttp.SimpleRequest(InfosWprecon.Target)
 
 		InfosWprecon.OtherInformationsString["target.http.index.raw"] = response.Raw
 	}()
-
-	if isURL, err := gohttp.IsURL(InfosWprecon.Target); isURL {
-		banner.SBanner(
-			InfosWprecon.Target,
-			InfosWprecon.OtherInformationsBool["http.options.tor"],
-			InfosWprecon.Verbose)
-	} else if err != nil {
-		printer.Fatal(err)
-	} else {
-		banner.Banner()
-		printer.Fatal(err)
-	}
 }

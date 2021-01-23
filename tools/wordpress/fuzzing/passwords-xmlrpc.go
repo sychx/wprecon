@@ -8,8 +8,8 @@ import (
 	. "github.com/blackcrw/wprecon/cli/config"
 	"github.com/blackcrw/wprecon/pkg/gohttp"
 	"github.com/blackcrw/wprecon/pkg/printer"
+	"github.com/blackcrw/wprecon/pkg/text"
 	"github.com/blackcrw/wprecon/tools/wordpress/commons"
-	"github.com/blackcrw/wprecon/tools/wordpress/extensions"
 )
 
 func XMLRPC() int {
@@ -34,7 +34,7 @@ func XMLRPC() int {
 
 	newtopline := printer.NewTopLine(":: Loading wordlist... ::")
 
-	passwords, passwordscount := extensions.ReadAllFile(passwordsfile)
+	passwords, passwordscount := text.ReadAllFile(passwordsfile)
 
 	done := false
 

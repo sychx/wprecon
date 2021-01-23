@@ -6,9 +6,9 @@ import (
 
 	. "github.com/blackcrw/wprecon/cli/config"
 	"github.com/blackcrw/wprecon/pkg/gohttp"
+	"github.com/blackcrw/wprecon/pkg/text"
 	"github.com/blackcrw/wprecon/pkg/wordlist"
 	"github.com/blackcrw/wprecon/tools/wordpress/commons"
-	"github.com/blackcrw/wprecon/tools/wordpress/extensions"
 )
 
 // ThemesEnumeratePassive :: As the name says, this function will make an enumeration in an passive way.
@@ -58,7 +58,7 @@ func ThemesEnumerateAgressive() map[string]string {
 			dir := fmt.Sprintf("/wp-content/themes/%s/%s", key, value)
 
 			if response := gohttp.SimpleRequest(InfosWprecon.Target, dir); response.Response.StatusCode == 200 && response.Raw != "" {
-				if version := extensions.GetVersionChangelog(response.Raw); version != "" {
+				if version := text.GetVersionChangelog(response.Raw); version != "" {
 					InfosWprecon.OtherInformationsMapString["target.http.themes.versions"][key] = version
 					done = true
 					break
@@ -72,11 +72,11 @@ func ThemesEnumerateAgressive() map[string]string {
 
 				if response := gohttp.SimpleRequest(InfosWprecon.Target, dir); response.Response.StatusCode == 200 && response.Raw != "" {
 
-					if version := extensions.GetVersionStableTag(response.Raw); version != "" {
+					if version := text.GetVersionStableTag(response.Raw); version != "" {
 						InfosWprecon.OtherInformationsMapString["target.http.themes.versions"][key] = version
 						done = true
 						break
-					} else if version := extensions.GetVersionChangelog(response.Raw); version != "" {
+					} else if version := text.GetVersionChangelog(response.Raw); version != "" {
 						InfosWprecon.OtherInformationsMapString["target.http.themes.versions"][key] = version
 						done = true
 						break
@@ -91,11 +91,11 @@ func ThemesEnumerateAgressive() map[string]string {
 
 				if response := gohttp.SimpleRequest(InfosWprecon.Target, dir); response.Response.StatusCode == 200 && response.Raw != "" {
 
-					if version := extensions.GetVersionStableTag(response.Raw); version != "" {
+					if version := text.GetVersionStableTag(response.Raw); version != "" {
 						InfosWprecon.OtherInformationsMapString["target.http.themes.versions"][key] = version
 						done = true
 						break
-					} else if version := extensions.GetVersionChangelog(response.Raw); version != "" {
+					} else if version := text.GetVersionChangelog(response.Raw); version != "" {
 						InfosWprecon.OtherInformationsMapString["target.http.themes.versions"][key] = version
 						done = true
 						break

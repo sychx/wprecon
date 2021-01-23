@@ -48,7 +48,8 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 		printer.Println()
 	} else if confidence < 49.9 && confidence > 33.3 && !InfosWprecon.Force {
 		confidenceString := fmt.Sprintf("%.2f%%", confidence)
-		if q := printer.ScanQ("I'm not absolutely sure that this target is using wordpress!", confidenceString, "chance. do you wish to continue ? [Y/n] : "); q == "n" {
+
+		if q := printer.ScanQ("I'm not absolutely sure that this target is using wordpress!", confidenceString, "chance. do you wish to continue ? [Y]es | [n]o : "); q != "y" {
 			printer.Fatal("Exiting...")
 		}
 		printer.Println()
@@ -68,8 +69,15 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 	}
 
 	if InfosWprecon.Verbose {
-		commons.Sitemap()
-		commons.Robots()
+		if sitemapResponse := commons.Sitemap(); InfosWprecon.Verbose {
+			printer.Warning("Sitemap.xml found:", sitemapResponse.URL.Full)
+		}
+
+		if robotsResponse := commons.Robots(); robotsResponse.Raw != "" {
+			printer.Warning("Robots.txt file text:")
+			printer.Println(robotsResponse.Raw)
+		}
+
 		printer.Println()
 	}
 

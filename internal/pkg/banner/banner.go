@@ -25,16 +25,13 @@ ____/|__/  /_/     /_/ |_| /_____/  \____/  \____/ /_/ |_/
 }
 
 // SBanner :: A banner that will only be executed if the scan is started correctly.
-func SBanner(target string, tor bool, verbose bool) {
+func SBanner() {
 	Banner()
-	printer.Done("Target:\t", target)
 
-	if tor {
-		ipTor, err := gohttp.TorCheck()
+	printer.Done("Target:\t", InfosWprecon.Target)
 
-		if err != nil {
-			printer.Fatal(err)
-		}
+	if InfosWprecon.OtherInformationsBool["http.options.tor"] {
+		ipTor := gohttp.TorGetIP()
 
 		printer.Done("Proxy:\t", ipTor)
 	}
@@ -48,12 +45,11 @@ func SBanner(target string, tor bool, verbose bool) {
 
 		printer.Done("Script Name:", infos.Title)
 		printer.Done("Script Desc:", infos.Description)
-
 	}
 
-	if verbose && tor {
+	if InfosWprecon.Verbose && InfosWprecon.OtherInformationsBool["http.options.tor"] {
 		printer.Danger("(Alert) Activating verbose mode together with tor mode can make the wprecon super slow. \n")
-	} else if verbose {
+	} else if InfosWprecon.Verbose {
 		printer.Danger("(Alert) Enabling verbose mode can slow down wprecon. \n")
 	} else {
 		printer.Println("")

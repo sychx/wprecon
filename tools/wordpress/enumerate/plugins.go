@@ -6,14 +6,15 @@ import (
 
 	. "github.com/blackcrw/wprecon/cli/config"
 	"github.com/blackcrw/wprecon/pkg/gohttp"
+	"github.com/blackcrw/wprecon/pkg/printer"
+	"github.com/blackcrw/wprecon/pkg/text"
 	"github.com/blackcrw/wprecon/pkg/wordlist"
 	"github.com/blackcrw/wprecon/tools/wordpress/commons"
-	"github.com/blackcrw/wprecon/tools/wordpress/extensions"
 )
 
 // PluginsEnumeratePassive :: As the name says, this function will make an enumeration in an passive way.
 // Passive enumeration may not be the best option when searching for vulnerabilities.
-// (I don't recommend) 40% confidence.
+// (I don't recommend) 30% confidence.
 func PluginsEnumeratePassive() map[string]string {
 	raw := InfosWprecon.OtherInformationsString["target.http.index.raw"]
 
@@ -58,7 +59,13 @@ func PluginsEnumerateAgressive() map[string]string {
 		if InfosWprecon.Verbose == true {
 			go func() {
 				response := gohttp.SimpleRequest(InfosWprecon.Target, "wp-content/plugins/"+name)
-				extensions.GetFileExtensions(response.URL.Full, response.Raw)
+				text.GetFileExtensions(response.URL.Full, response.Raw)
+
+				for _, value := range text.GetFileExtensions(response.URL.Full, response.Raw) {
+					valueString := fmt.Sprintf("%s", value[1])
+
+					printer.Done("I found this file here :", fmt.Sprintf("%s/%s", response.URL.Full, valueString))
+				}
 			}()
 		}
 
@@ -66,7 +73,7 @@ func PluginsEnumerateAgressive() map[string]string {
 			dir := fmt.Sprintf("/wp-content/plugins/%s/%s", name, value)
 
 			if response := gohttp.SimpleRequest(InfosWprecon.Target, dir); response.Response.StatusCode == 200 && response.Raw != "" {
-				if version := extensions.GetVersionChangelog(response.Raw); version != "" {
+				if version := text.GetVersionChangelog(response.Raw); version != "" {
 					InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = version
 					done = true
 					break
@@ -79,11 +86,11 @@ func PluginsEnumerateAgressive() map[string]string {
 				dir := fmt.Sprintf("wp-content/plugins/%s/%s", name, value)
 
 				if response := gohttp.SimpleRequest(InfosWprecon.Target, dir); response.Response.StatusCode == 200 && response.Raw != "" {
-					if version := extensions.GetVersionStableTag(response.Raw); version != "" {
+					if version := text.GetVersionStableTag(response.Raw); version != "" {
 						InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = version
 						done = true
 						break
-					} else if version := extensions.GetVersionChangelog(response.Raw); version != "" {
+					} else if version := text.GetVersionChangelog(response.Raw); version != "" {
 						InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = version
 						done = true
 						break
@@ -97,11 +104,11 @@ func PluginsEnumerateAgressive() map[string]string {
 				dir := fmt.Sprintf("wp-content/plugins/%s/%s", name, value)
 
 				if response := gohttp.SimpleRequest(InfosWprecon.Target, dir); response.Response.StatusCode == 200 && response.Raw != "" {
-					if version := extensions.GetVersionStableTag(response.Raw); version != "" {
+					if version := text.GetVersionStableTag(response.Raw); version != "" {
 						InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = version
 						done = true
 						break
-					} else if version := extensions.GetVersionChangelog(response.Raw); version != "" {
+					} else if version := text.GetVersionChangelog(response.Raw); version != "" {
 						InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = version
 						done = true
 						break

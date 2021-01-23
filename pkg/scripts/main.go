@@ -43,7 +43,7 @@ func Initialize(script string) (*lua.LState, *structscript) {
 	var structscript structscript
 
 	if _, has := text.ContainsSliceString(AllScripts(), script); has == true {
-		PATHScript := fmt.Sprintf("scripts/%s.lua", script)
+		PATHScript := fmt.Sprintf("tools/scripts/%s.lua", script)
 
 		LuaNewState := lua.NewState()
 
@@ -70,7 +70,7 @@ func Initialize(script string) (*lua.LState, *structscript) {
 }
 
 func AllScripts() []string {
-	scriptsfileslist, err := filepath.Glob("scripts/*.lua")
+	scriptsfileslist, err := filepath.Glob("tools/scripts/*.lua")
 
 	if err != nil {
 		log.Fatal(err)

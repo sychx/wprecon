@@ -1,23 +1,18 @@
 package gohttp
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
+
+	"github.com/blackcrw/wprecon/pkg/handler"
 )
 
 // TorURL ::
 const (
 	TorURL = "http://127.0.0.1:9080"
 )
-
-type torAPIJSON struct {
-	IsTor bool   `json:"IsTor"`
-	IP    string `json:"IP"`
-}
 
 // Tor :: This will return the correctly formatted tor url.
 func Tor() (func(*http.Request) (*url.URL, error), error) {
@@ -30,44 +25,25 @@ func Tor() (func(*http.Request) (*url.URL, error), error) {
 	return http.ProxyURL(tor), nil
 }
 
-// TorCheck :: This will perform a check to see if your tor network is online or not.
-func TorCheck() (string, error) {
-	var torJSON torAPIJSON
+// TorGetIP :: This will perform a check to see if your tor network is online or not.
+func TorGetIP() string {
+	defer handler.HandlerErrorTorProxy()
 
-	proxy, err := Tor()
+	http, _ := NewHTTPClient().SetURLFull("https://check.torproject.org/api/ip").OnTor(true)
 
-	if err != nil {
-		return "0.0.0.0", err
-	}
-
-	client := &http.Client{
-		Transport: &http.Transport{
-			Proxy: proxy,
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
-			},
-		},
-	}
-
-	request, err := http.NewRequest("GET", "https://check.torproject.org/api/ip", nil)
-
-	if strings.Contains(fmt.Sprintf("%s", err), "connection refused") {
-		return "0.0.0.0", fmt.Errorf("Connection Refused, the tor with the command: \"tor --HTTPTunnelPort 9080\"")
-	}
+	response, err := http.Run()
 
 	if err != nil {
-		return "0.0.0.0", err
+		panic(err)
 	}
 
-	resp, err := client.Do(request)
+	var marshal map[string]interface{}
+
+	err = json.Unmarshal([]byte(response.Raw), &marshal)
 
 	if err != nil {
-		return "0.0.0.0", err
+		panic(err)
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&torJSON); err != nil {
-		return "0.0.0.0", err
-	}
-
-	return torJSON.IP, nil
+	return fmt.Sprintf("%s", marshal["IP"])
 }
