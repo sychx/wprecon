@@ -68,11 +68,12 @@ func AdminPage() (string, *gohttp.Response) {
 		printer.Danger(fmt.Sprint(err))
 	}
 
-	if response.Response.StatusCode == 200 {
+	switch response.Response.StatusCode {
+	case 200:
 		return "true", response
-	} else if response.Response.StatusCode == 302 {
+	case 403:
 		return "redirect", response
-	} else {
+	default:
 		return "false", response
 	}
 }
