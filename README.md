@@ -15,7 +15,7 @@
  <a href="https://github.com/blackcrw">Author</a>
 </p>
 
-<h3><p align="center">Version: 1.2.0a</p></h3>
+<h3><p align="center">Version: 1.2.1a</p></h3>
 
 <h2 align="center">Features & Tasks List</h2>
 
