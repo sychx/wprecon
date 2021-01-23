@@ -8,6 +8,7 @@ import (
 	"github.com/blackcrw/wprecon/pkg/gohttp"
 	"github.com/blackcrw/wprecon/pkg/printer"
 	"github.com/blackcrw/wprecon/pkg/scripts"
+	"github.com/blackcrw/wprecon/pkg/text"
 	"github.com/blackcrw/wprecon/tools/wordpress/commons"
 	"github.com/blackcrw/wprecon/tools/wordpress/enumerate"
 	"github.com/blackcrw/wprecon/tools/wordpress/extensions"
@@ -58,7 +59,35 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 	}
 
 	if detectionwaf || aggressivemode {
-		security.WAFAgressiveDetection()
+		printer.Done(":: Active WAF Agressive Detection Module ::")
+
+		if waf := security.WAFAgressiveDetection(); waf != nil {
+			name := strings.ReplaceAll(waf.URL.Directory, "wp-content/plugins/", "")
+			name = strings.ReplaceAll(name, "/", "")
+			name = strings.ReplaceAll(name, "-", " ")
+			name = strings.Title(name)
+
+			printer.Warning("Name \t:", name)
+			printer.Warning("Status Code\t:", fmt.Sprint(waf.Response.StatusCode))
+			printer.Warning("URL \t:", waf.URL.Full)
+
+			if importantfile := text.GetOneImportantFile(waf.Raw); importantfile != "" {
+				response := gohttp.SimpleRequest(InfosWprecon.Target, waf.URL.Directory+importantfile)
+
+				if readme := text.GetVersionStableTag(response.Raw); readme != "" {
+					printer.Warning("Version \t:", readme)
+				} else if changelog := text.GetVersionChangelog(response.Raw); changelog != "" {
+					printer.Warning("Version \t:", changelog)
+				}
+			}
+
+			if scan := printer.ScanQ("Do you wish to continue ?! [Y]es | [n]o : "); scan == "n" && scan != "\n" {
+				printer.Fatal("Exiting...")
+			}
+		} else {
+			printer.Warning(":: No WAF was detected! But that doesn't mean it doesn't. ::")
+		}
+
 		printer.Println()
 	}
 
