@@ -6,7 +6,7 @@ import (
 	"os"
 	"syscall"
 
-	color "github.com/logrusorgru/aurora" // This is color lib
+	color "github.com/logrusorgru/aurora"
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -29,7 +29,6 @@ var exports = map[string]lua.LGFunction{
 	"fatal":   fatal,
 }
 
-// Done ::
 func done(L *lua.LState) int {
 	var prefix = color.Green("[✔]").String()
 
@@ -42,7 +41,6 @@ func done(L *lua.LState) int {
 	return 0
 }
 
-// Danger ::
 func danger(L *lua.LState) int {
 	var prefix = color.Red("[✗]").String()
 
@@ -55,7 +53,6 @@ func danger(L *lua.LState) int {
 	return 0
 }
 
-// Warning ::
 func warning(L *lua.LState) int {
 	var prefix = color.Yellow("[!]").String()
 
@@ -68,7 +65,6 @@ func warning(L *lua.LState) int {
 	return 0
 }
 
-// Fatal ::
 func fatal(L *lua.LState) int {
 	var prefix = color.Red("[!]").String()
 

@@ -3,7 +3,7 @@ package banner
 import (
 	"fmt"
 
-	"github.com/blackcrw/wprecon/pkg/printer"
+	"github.com/blackbinn/wprecon/pkg/printer"
 )
 
 // HelpMain ::
@@ -18,7 +18,7 @@ Subcommands:
 Flags:
   -u, --url string           Target URL (Ex: http(s)://example.com/). %s
   -f, --force                Forces wprecon to not check if the target is running WordPress and forces other executions.
-      --aggressive-mode      Activates the aggressive mode of wprecon.
+  -A, --aggressive-mode      Activates the aggressive mode of wprecon.
       --detection-waf        I will try to detect if the target is using any WAF.
       --random-agent         Use randomly selected HTTP(S) User-Agent header value.
       --tor                  Use Tor anonymity network.

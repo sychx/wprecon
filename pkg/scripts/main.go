@@ -2,12 +2,14 @@ package scripts
 
 import (
 	"fmt"
+	"log"
+	"path/filepath"
 
-	. "github.com/blackcrw/wprecon/cli/config"
-	"github.com/blackcrw/wprecon/pkg/printer"
-	luaNet "github.com/blackcrw/wprecon/pkg/scripts/pkg/net"
-	luaPrinter "github.com/blackcrw/wprecon/pkg/scripts/pkg/printer"
-	luaUrl "github.com/blackcrw/wprecon/pkg/scripts/pkg/url"
+	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/pkg/printer"
+	luaNet "github.com/blackbinn/wprecon/pkg/scripts/pkg/net"
+	luaPrinter "github.com/blackbinn/wprecon/pkg/scripts/pkg/printer"
+	luaUrl "github.com/blackbinn/wprecon/pkg/scripts/pkg/url"
 	luaLibs "github.com/vadv/gopher-lua-libs"
 	"github.com/yuin/gluamapper"
 	lua "github.com/yuin/gopher-lua"
@@ -39,7 +41,7 @@ func Run(l *lua.LState) {
 func Initialize(script string) (*lua.LState, *structscript) {
 	var structscript structscript
 
-	PATHScript := fmt.Sprintf("scripts/%s.lua", script)
+	PATHScript := fmt.Sprintf("tools/scripts/%s.lua", script)
 
 	LuaNewState := lua.NewState()
 
@@ -60,4 +62,14 @@ func Initialize(script string) (*lua.LState, *structscript) {
 	}
 
 	return LuaNewState, &structscript
+}
+
+func AllScripts() []string {
+	scriptsfileslist, err := filepath.Glob("tools/scripts/*.lua")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return scriptsfileslist
 }

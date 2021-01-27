@@ -3,49 +3,31 @@ package update
 import (
 	"encoding/json"
 
-	version "github.com/blackcrw/wprecon/internal/pkg/version"
-	"github.com/blackcrw/wprecon/pkg/gohttp"
-	"github.com/blackcrw/wprecon/pkg/printer"
+	"github.com/blackbinn/wprecon/internal/pkg/version"
+	"github.com/blackbinn/wprecon/pkg/gohttp"
 )
 
 type githubAPIJSON struct {
-	Author struct {
-		Name        string `json:"name"`
-		Description string `json:"description"`
-		Email       string `json:"email"`
-	} `json:"Author"`
 	App struct {
 		Description string `json:"description"`
 		Version     string `json:"version"`
+		Endpoint    string `json:"endpoint"`
 	} `json:"App"`
 }
 
 // CheckUpdate :: This function will be responsible for checking and printing on the screen whether there is an update or not.
-func CheckUpdate() {
+func CheckUpdate() string {
 	var githubJSON githubAPIJSON
 
-	topline := printer.NewTopLine("Checking Version!")
+	http := gohttp.NewHTTPClient().SetURLFull("https://raw.githubusercontent.com/blackbinn/wprecon/dev/internal/config/config.json")
 
-	options := &gohttp.HTTPOptions{
-		URL: gohttp.URLOptions{
-			Simple:    "https://raw.githubusercontent.com/",
-			Directory: "blackcrw/wprecon/dev/internal/config/config.json",
-		},
+	request, _ := http.Run()
+
+	json.Unmarshal([]byte(request.Raw), &githubJSON)
+
+	if githubJSON.App.Version != version.Version {
+		return githubJSON.App.Version
 	}
 
-	request, err := gohttp.HTTPRequest(options)
-
-	if err != nil {
-		printer.Fatal("Error checking for an update (", err, ")")
-	}
-
-	err = json.NewDecoder(request.RawIo).Decode(&githubJSON)
-
-	if err != nil {
-		topline.Danger("An error occurred while trying to check the version.")
-	} else if githubJSON.App.Version != version.Version {
-		topline.Done("There is a new version!", "New:", githubJSON.App.Version, "Download: https://github.com/blackcrw/wprecon")
-	} else {
-		topline.Warning("You have the most updated version.")
-	}
+	return ""
 }

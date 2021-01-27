@@ -16,7 +16,7 @@ func ScanQ(text ...string) string {
 	_, err := io.WriteString(&stdout, prefix+" "+textString)
 
 	if err != nil {
-		panic(err)
+		Fatal(err)
 	}
 
 	scanner := bufio.NewReader(os.Stdin)

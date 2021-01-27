@@ -1,33 +1,36 @@
 package gohttp
 
 import (
-	"errors"
 	"net"
 	"net/url"
+
+	"github.com/blackbinn/wprecon/pkg/handler"
 )
 
 // IsURL :: This function will be used for URL validation
-func IsURL(URL string) (bool, error) {
+func IsURL(URL string) bool {
+	defer handler.HandlerErrorURL()
+
 	uri, err := url.ParseRequestURI(URL)
 
 	if err != nil {
-		return false, err
+		panic(err)
 	}
 
 	switch uri.Scheme {
 	case "http":
 	case "https":
 	default:
-		return false, errors.New("Invalid scheme")
+		panic("Invalid scheme")
 	}
 
-	_, err = net.LookupHost(uri.Host)
+	//_, err = net.LookupHost(uri.Host)
 
-	if err != nil {
-		return false, err
-	}
+	//if err != nil {
+	//	panic(err)
+	//}
 
-	return true, nil
+	return true
 }
 
 // GetHost ::

@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"regexp"
 
-	. "github.com/blackcrw/wprecon/cli/config"
-	"github.com/blackcrw/wprecon/pkg/wordlist"
-	"github.com/blackcrw/wprecon/tools/wordpress/commons"
-	"github.com/blackcrw/wprecon/tools/wordpress/extensions"
+	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/tools/wordpress/commons"
+	"github.com/blackbinn/wprecon/tools/wordpress/extensions"
 )
 
 // PluginsEnumeratePassive :: As the name says, this function will make an enumeration in an passive way.
@@ -36,77 +35,43 @@ func PluginsEnumeratePassive() map[string]string {
 // The plugins will be returned based on this list: InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"]
 // (Recommend) 80% confidence
 func PluginsEnumerateAgressive() map[string]string {
-	commons.DirectoryPlugins()
-	PluginsEnumeratePassive()
-
-	if InfosWprecon.OtherInformationsString["target.http.wp-content/plugin.indexof.raw"] != "" && len(InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"]) <= 4 {
+	if response := commons.DirectoryPlugins(); response.Raw != "" {
 		rex := regexp.MustCompile("<a href=\"(.*?)/\">.*?/</a>")
 
-		submatchall := rex.FindAllSubmatch([]byte(InfosWprecon.OtherInformationsString["target.http.wp-content/plugin.indexof.raw"]), -1)
+		submatchall := rex.FindAllSubmatch([]byte(response.Raw), -1)
 
 		for _, plugin := range submatchall {
 			name := fmt.Sprintf("%s", plugin[1])
 
-			InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = "Not found"
+			InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = ""
 		}
+	} else if pluginslist := PluginsEnumeratePassive(); len(pluginslist) > 0 {
+	} else if len(pluginslist) == 0 {
+		raw := InfosWprecon.OtherInformationsString["target.http.index.raw"]
+
+		rex := regexp.MustCompile("/wp-content/plugins/(.*?)/.*?[css|js]")
+		submatchall := rex.FindAllSubmatch([]byte(raw), -1)
+
+		for _, plugin := range submatchall {
+			name := fmt.Sprintf("%s", plugin[1])
+
+			InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = ""
+		}
+	} else {
+		return make(map[string]string)
 	}
 
 	for name := range InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"] {
-		done := false
+		path := "/wp-content/plugins/" + name + "/"
 
-		if InfosWprecon.Verbose == true {
-			go func() {
-				response := extensions.SimpleRequest(InfosWprecon.Target, fmt.Sprintf("wp-content/plugins/%s", name))
-				extensions.GetFileExtensions(response.URL.Full, response.Raw)
-			}()
-		}
-
-		for _, value := range wordlist.WPchangesLogs {
-			dir := fmt.Sprintf("/wp-content/plugins/%s/%s", name, value)
-
-			if response := extensions.SimpleRequest(InfosWprecon.Target, dir); response.StatusCode == 200 && response.Raw != "" {
-				if version := extensions.GetVersionChangelog(response.Raw); version != "" {
-					InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = version
-					done = true
-					break
-				}
-			}
-		}
-
-		if done == false {
-			for _, value := range wordlist.WPreadme {
-				dir := fmt.Sprintf("wp-content/plugins/%s/%s", name, value)
-
-				if response := extensions.SimpleRequest(InfosWprecon.Target, dir); response.StatusCode == 200 && response.Raw != "" {
-					if version := extensions.GetVersionStableTag(response.Raw); version != "" {
-						InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = version
-						done = true
-						break
-					} else if version := extensions.GetVersionChangelog(response.Raw); version != "" {
-						InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = version
-						done = true
-						break
-					}
-				}
-			}
-		}
-
-		if done == false {
-			for _, value := range wordlist.WPreleaseLog {
-				dir := fmt.Sprintf("wp-content/plugins/%s/%s", name, value)
-
-				if response := extensions.SimpleRequest(InfosWprecon.Target, dir); response.StatusCode == 200 && response.Raw != "" {
-					if version := extensions.GetVersionStableTag(response.Raw); version != "" {
-						InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = version
-						done = true
-						break
-					} else if version := extensions.GetVersionChangelog(response.Raw); version != "" {
-						InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = version
-						done = true
-						break
-					}
-				}
-			}
+		if version := extensions.GetVersionByIndexOf(path); version != "" {
+			InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = version
+		} else if version := extensions.GetVersionByReadme(path); version != "" {
+			InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = version
+		} else if version := extensions.GetVersionByChangeLogs(path); version != "" {
+			InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = version
+		} else if version := extensions.GetVersionByReleaseLog(path); version != "" {
+			InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = version
 		}
 	}
 

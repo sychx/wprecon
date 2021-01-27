@@ -3,10 +3,10 @@ package fuzzing
 import (
 	"time"
 
-	. "github.com/blackcrw/wprecon/cli/config"
-	"github.com/blackcrw/wprecon/pkg/printer"
-	"github.com/blackcrw/wprecon/pkg/wordlist"
-	"github.com/blackcrw/wprecon/tools/wordpress/extensions"
+	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/pkg/gohttp"
+	"github.com/blackbinn/wprecon/pkg/printer"
+	"github.com/blackbinn/wprecon/pkg/wordlist"
 )
 
 func BackupFile() {
@@ -17,12 +17,12 @@ func BackupFile() {
 	for _, directory := range [...]string{"", "wp-content/", "wp-admin/", "wp-includes/"} {
 		for _, file := range wordlist.BackupFiles {
 			go func(file string) {
-				response := extensions.SimpleRequest(InfosWprecon.Target, directory+file)
+				response := gohttp.SimpleRequest(InfosWprecon.Target, directory+file)
 
-				if response.StatusCode == 200 {
+				if response.Response.StatusCode == 200 {
 					printer.Done("Status Code: 200", "URL:", response.URL.Full)
 					done = true
-				} else if response.StatusCode == 403 {
+				} else if response.Response.StatusCode == 403 {
 					printer.Warning("Status Code: 403", "URL:", response.URL.Full)
 					done = true
 				}
