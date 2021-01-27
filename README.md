@@ -15,7 +15,16 @@
  <a href="https://github.com/blackbinn">Author</a>
 </p>
 
+
 <h3><p align="center">Version: 1.3.0a</p></h3>
+
+<h2 align="center">Warning</h2>
+<p align="center">I recently found out that my tool has the same name as a website ... which has the same "subject" as my tool.
+But I already warn you that this wprecon that you see on github has nothing to do with this site.
+I don't have a website yet!</p>
+ 
+ </h3>
+
 
 <h2 align="center">Features & Tasks List</h2>
 
@@ -49,4 +58,3 @@ But since they are not, it is for the reason that they are still in development.
  
   <code>$ wprecon -u https://xxxx.com/ --agressive-mode --tor --random-agent</code>
   <img alt="wprecon -u https://xxxx.com/ --agressive-mode --tor --random-gent" src="https://i.imgur.com/5rfWI17.png">
-</p>
