@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/blackcrw/wprecon/pkg/wordlist"
+	"github.com/blackbinn/wprecon/pkg/wordlist"
 )
 
 // randomuseragent : this function "generates" user-agents randomly.

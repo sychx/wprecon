@@ -2,20 +2,20 @@
 
 <h1 align="center">WPrecon (Wordpress Recon)</h1>
 <p align="center"> 
-  <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/blackcrw/wprecon">
-  <img alt="GitHub go.mod Go version (branch)" src="https://img.shields.io/github/go-mod/go-version/blackcrw/wprecon/master?label=Go&logo=go">
+  <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/blackbinn/wprecon">
+  <img alt="GitHub go.mod Go version (branch)" src="https://img.shields.io/github/go-mod/go-version/blackbinn/wprecon/master?label=Go&logo=go">
 
   <p align="center">Hello! Welcome. Wprecon (Wordpress Recon), is a vulnerability recognition tool in CMS Wordpress, 100% developed in Go.</p>
 </p> 
 
 <p align="center">
  <a href="#features">Features</a> •
- <a href="https://github.com/blackcrw/wprecon/wiki/Compile-and-Install">Compile & Install</a> •
- <a href="https://github.com/blackcrw/wprecon/blob/master/LICENSE">License</a> • 
- <a href="https://github.com/blackcrw">Author</a>
+ <a href="https://github.com/blackbinn/wprecon/wiki/Compile-and-Install">Compile & Install</a> •
+ <a href="https://github.com/blackbinn/wprecon/blob/master/LICENSE">License</a> • 
+ <a href="https://github.com/blackbinn">Author</a>
 </p>
 
-<h3><p align="center">Version: 1.2.1a</p></h3>
+<h3><p align="center">Version: 1.3.0a</p></h3>
 
 <h2 align="center">Features & Tasks List</h2>
 
@@ -50,5 +50,3 @@ But since they are not, it is for the reason that they are still in development.
   <code>$ wprecon -u https://xxxx.com/ --agressive-mode --tor --random-agent</code>
   <img alt="wprecon -u https://xxxx.com/ --agressive-mode --tor --random-gent" src="https://i.imgur.com/5rfWI17.png">
 </p>
-
-### Yes Baby, Thank You! ✋

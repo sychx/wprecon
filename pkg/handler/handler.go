@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/blackcrw/wprecon/pkg/printer"
+	"github.com/blackbinn/wprecon/pkg/printer"
 )
 
 // HandlerErrorTorProxy ::

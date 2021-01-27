@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/blackcrw/wprecon/pkg/handler"
+	"github.com/blackbinn/wprecon/pkg/handler"
 )
 
 // TorURL ::

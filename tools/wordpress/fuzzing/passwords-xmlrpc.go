@@ -5,11 +5,11 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/blackcrw/wprecon/cli/config"
-	"github.com/blackcrw/wprecon/pkg/gohttp"
-	"github.com/blackcrw/wprecon/pkg/printer"
-	"github.com/blackcrw/wprecon/pkg/text"
-	"github.com/blackcrw/wprecon/tools/wordpress/commons"
+	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/pkg/gohttp"
+	"github.com/blackbinn/wprecon/pkg/printer"
+	"github.com/blackbinn/wprecon/pkg/text"
+	"github.com/blackbinn/wprecon/tools/wordpress/commons"
 )
 
 func XMLRPC() int {

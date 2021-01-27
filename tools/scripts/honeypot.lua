@@ -40,10 +40,10 @@ script = {
 
 -- It is extremely important that the main function is named run, since it will be executed when script is called.
 function run(target)
-    uri_host = url.host(target)
-    ip = net.lookup_ip(uri_host)
+    local uri_host = url.host(target)
+    local ip = net.lookup_ip(uri_host)
     
-    request = http.request("GET", "https://api.shodan.io/labs/honeyscore/"..ip.."?key=C23OXE0bVMrul2YeqcL7zxb6jZ4pj2by")
+    local request = http.request("GET", "https://api.shodan.io/labs/honeyscore/"..ip.."?key=C23OXE0bVMrul2YeqcL7zxb6jZ4pj2by")
 
     local response, err = client:do_request(request)
 
@@ -54,6 +54,8 @@ function run(target)
     if response.code == 200 then
         printer.done("With a "..convert(response.body).." chance of this host being a Honeypot.")
     end
+
+    print()
 end
 
 function convert(text)

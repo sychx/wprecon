@@ -5,12 +5,11 @@ import (
 	"log"
 	"path/filepath"
 
-	. "github.com/blackcrw/wprecon/cli/config"
-	"github.com/blackcrw/wprecon/pkg/printer"
-	luaNet "github.com/blackcrw/wprecon/pkg/scripts/pkg/net"
-	luaPrinter "github.com/blackcrw/wprecon/pkg/scripts/pkg/printer"
-	luaUrl "github.com/blackcrw/wprecon/pkg/scripts/pkg/url"
-	"github.com/blackcrw/wprecon/pkg/text"
+	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/pkg/printer"
+	luaNet "github.com/blackbinn/wprecon/pkg/scripts/pkg/net"
+	luaPrinter "github.com/blackbinn/wprecon/pkg/scripts/pkg/printer"
+	luaUrl "github.com/blackbinn/wprecon/pkg/scripts/pkg/url"
 	luaLibs "github.com/vadv/gopher-lua-libs"
 	"github.com/yuin/gluamapper"
 	lua "github.com/yuin/gopher-lua"
@@ -42,31 +41,27 @@ func Run(l *lua.LState) {
 func Initialize(script string) (*lua.LState, *structscript) {
 	var structscript structscript
 
-	if _, has := text.ContainsSliceString(AllScripts(), script); has == true {
-		PATHScript := fmt.Sprintf("tools/scripts/%s.lua", script)
+	PATHScript := fmt.Sprintf("tools/scripts/%s.lua", script)
 
-		LuaNewState := lua.NewState()
+	LuaNewState := lua.NewState()
 
-		LuaNewState.PreloadModule("url", luaUrl.Loader)
-		LuaNewState.PreloadModule("printer", luaPrinter.Loader)
-		LuaNewState.PreloadModule("net", luaNet.Loader)
+	LuaNewState.PreloadModule("url", luaUrl.Loader)
+	LuaNewState.PreloadModule("printer", luaPrinter.Loader)
+	LuaNewState.PreloadModule("net", luaNet.Loader)
 
-		luaLibs.Preload(LuaNewState)
+	luaLibs.Preload(LuaNewState)
 
-		if err := LuaNewState.DoFile(PATHScript); err != nil {
-			printer.Fatal(err)
-		}
-
-		LuaNewState.SetGlobal("tor_url", lua.LString("http://127.0.0.1:9080"))
-
-		if err := gluamapper.Map(LuaNewState.GetGlobal("script").(*lua.LTable), &structscript); err != nil {
-			printer.Fatal(err)
-		}
-
-		return LuaNewState, &structscript
+	if err := LuaNewState.DoFile(PATHScript); err != nil {
+		printer.Fatal(err)
 	}
 
-	return &lua.LState{}, &structscript
+	LuaNewState.SetGlobal("tor_url", lua.LString("http://127.0.0.1:9080"))
+
+	if err := gluamapper.Map(LuaNewState.GetGlobal("script").(*lua.LTable), &structscript); err != nil {
+		printer.Fatal(err)
+	}
+
+	return LuaNewState, &structscript
 }
 
 func AllScripts() []string {

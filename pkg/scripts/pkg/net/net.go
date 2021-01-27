@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/blackcrw/wprecon/pkg/printer"
+	"github.com/blackbinn/wprecon/pkg/printer"
 	lua "github.com/yuin/gopher-lua"
 )
 

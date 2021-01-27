@@ -9,8 +9,8 @@ import (
 	"net/url"
 	"strings"
 
-	. "github.com/blackcrw/wprecon/cli/config"
-	"github.com/blackcrw/wprecon/pkg/printer"
+	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/pkg/printer"
 )
 
 // HTTPOptions :: This is Struct Http, it will inherit the struct Options and client.

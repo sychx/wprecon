@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/blackcrw/wprecon/pkg/printer"
+	"github.com/blackbinn/wprecon/pkg/printer"
 	"golang.org/x/net/html/charset"
 )
 
@@ -31,7 +31,7 @@ func Decode(text string) string {
 }
 
 func GetOneImportantFile(raw string) string {
-	rex := regexp.MustCompile("<a href=\"(readme.*?|README.*?|Readme.*?|Changelog.*?|changelog.*?|CHANGELOG.*?)\">.*?</a>")
+	rex := regexp.MustCompile("<a href=\"(readme*?|README*?|Readme*?|Changelog*?|changelog*?|CHANGELOG*?)\">.*?</a>")
 
 	submatchall := rex.FindStringSubmatch(raw)
 

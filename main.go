@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/blackcrw/wprecon/cli"
+	"github.com/blackbinn/wprecon/cli"
 )
 
 func main() {

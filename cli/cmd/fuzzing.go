@@ -1,12 +1,14 @@
 package cmd
 
 import (
-	"github.com/blackcrw/wprecon/pkg/printer"
-	"github.com/blackcrw/wprecon/pkg/scripts"
-	"github.com/blackcrw/wprecon/tools/wordpress/fuzzing"
+	"fmt"
+
+	"github.com/blackbinn/wprecon/pkg/printer"
+	"github.com/blackbinn/wprecon/pkg/scripts"
+	"github.com/blackbinn/wprecon/tools/wordpress/fuzzing"
 	"github.com/spf13/cobra"
 
-	. "github.com/blackcrw/wprecon/cli/config"
+	. "github.com/blackbinn/wprecon/cli/config"
 )
 
 func FuzzerOptionsRun(cmd *cobra.Command, args []string) {
@@ -34,4 +36,8 @@ func FuzzerOptionsRun(cmd *cobra.Command, args []string) {
 		printer.Done(":: Brute-Force to wp-login ::")
 		fuzzing.WPLogin()
 	}
+}
+
+func FuzzerOptionsPostRun(cmd *cobra.Command, args []string) {
+	printer.Done("Total requests:", fmt.Sprint(InfosWprecon.TotalRequests))
 }

@@ -4,72 +4,47 @@ import (
 	"fmt"
 	"strings"
 
-	. "github.com/blackcrw/wprecon/cli/config"
-	"github.com/blackcrw/wprecon/pkg/gohttp"
-	"github.com/blackcrw/wprecon/pkg/printer"
-	"github.com/blackcrw/wprecon/pkg/scripts"
-	"github.com/blackcrw/wprecon/pkg/text"
-	"github.com/blackcrw/wprecon/tools/wordpress/commons"
-	"github.com/blackcrw/wprecon/tools/wordpress/enumerate"
-	"github.com/blackcrw/wprecon/tools/wordpress/extensions"
-	"github.com/blackcrw/wprecon/tools/wordpress/security"
+	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/pkg/gohttp"
+	"github.com/blackbinn/wprecon/pkg/printer"
+	"github.com/blackbinn/wprecon/pkg/scripts"
+	"github.com/blackbinn/wprecon/pkg/text"
+	"github.com/blackbinn/wprecon/tools/wordpress/commons"
+	"github.com/blackbinn/wprecon/tools/wordpress/enumerate"
+	"github.com/blackbinn/wprecon/tools/wordpress/extensions"
+	"github.com/blackbinn/wprecon/tools/wordpress/security"
 	"github.com/spf13/cobra"
 )
-
-func RootOptionsPreRun(cmd *cobra.Command, args []string) {
-	target, _ := cmd.Flags().GetString("url")
-	tor, _ := cmd.Flags().GetBool("tor")
-	force, _ := cmd.Flags().GetBool("force")
-	verbose, _ := cmd.Flags().GetBool("verbose")
-	randomuseragent, _ := cmd.Flags().GetBool("random-agent")
-	tlscertificateverify, _ := cmd.Flags().GetBool("tlscertificateverify")
-	scriptsS, _ := cmd.Flags().GetString("scripts")
-
-	InfosWprecon.Force = force
-	InfosWprecon.Target = target
-	InfosWprecon.Verbose = verbose
-	InfosWprecon.OtherInformationsBool["http.options.tor"] = tor
-	InfosWprecon.OtherInformationsBool["http.options.randomuseragent"] = randomuseragent
-	InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"] = tlscertificateverify
-
-	InfosWprecon.OtherInformationsString["scripts.name"] = scriptsS
-
-	response := gohttp.SimpleRequest(target)
-
-	InfosWprecon.OtherInformationsString["target.http.index.raw"] = response.Raw
-}
 
 func RootOptionsRun(cmd *cobra.Command, args []string) {
 	aggressivemode, _ := cmd.Flags().GetBool("aggressive-mode")
 	detectionwaf, _ := cmd.Flags().GetBool("detection-waf")
 
-	if confidence := wordpresscheck(); confidence >= 49.9 && !InfosWprecon.Force {
+	if confidence := wordpresscheck(); confidence >= 40.0 {
 		confidenceString := fmt.Sprintf("%.2f%%", confidence)
-		printer.Done("Wordpress confirmed with", confidenceString, "confidence!")
+		printer.Done("WordPress confirmed with", confidenceString, "confidence!")
 		printer.Println()
-	} else if confidence < 49.9 && confidence > 33.3 && !InfosWprecon.Force {
+	} else if confidence < 40.0 && confidence > 15.0 && !InfosWprecon.Force {
 		confidenceString := fmt.Sprintf("%.2f%%", confidence)
 
-		if q := printer.ScanQ("I'm not absolutely sure that this target is using wordpress!", confidenceString, "chance. do you wish to continue ? [Y]es | [n]o : "); q != "y" {
+		if q := printer.ScanQ("I'm not absolutely sure that this target is using wordpress!", confidenceString, "chance. do you wish to continue ? [Y]es | [n]o : "); q != "y" && q != "\n" {
 			printer.Fatal("Exiting...")
 		}
 		printer.Println()
-	} else {
+	} else if confidence < 15.0 && !InfosWprecon.Force {
 		printer.Fatal("This target is not running wordpress!")
 	}
 
 	if detectionwaf || aggressivemode {
-		printer.Done(":: Active WAF Agressive Detection Module ::")
-
 		if waf := security.WAFAgressiveDetection(); waf != nil {
 			name := strings.ReplaceAll(waf.URL.Directory, "wp-content/plugins/", "")
 			name = strings.ReplaceAll(name, "/", "")
 			name = strings.ReplaceAll(name, "-", " ")
 			name = strings.Title(name)
 
-			printer.Warning("Name \t:", name)
-			printer.Warning("Status Code\t:", fmt.Sprint(waf.Response.StatusCode))
-			printer.Warning("URL \t:", waf.URL.Full)
+			printer.Done("Web Application Firewall (WAF):", name, "(Aggressive Detection)")
+			printer.List("Location:", waf.URL.Full)
+			printer.List("Status Code:", fmt.Sprint(waf.Response.Status))
 
 			if importantfile := text.GetOneImportantFile(waf.Raw); importantfile != "" {
 				response := gohttp.SimpleRequest(InfosWprecon.Target, waf.URL.Directory+importantfile)
@@ -81,7 +56,7 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 				}
 			}
 
-			if scan := printer.ScanQ("Do you wish to continue ?! [Y]es | [n]o : "); scan == "n" && scan != "\n" {
+			if scan := printer.ScanQ("Do you wish to continue ?! [Y]es | [n]o : "); scan != "y" && scan != "\n" {
 				printer.Fatal("Exiting...")
 			}
 		} else {
@@ -110,65 +85,95 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 		printer.Println()
 	}
 
-	if enumP := enumerate.UsersEnumeratePassive(); len(enumP) > 0 && !aggressivemode {
-		printer.Done(":: Username(s) Enumerate Passive Mode ::")
-		for _, username := range enumP {
-			printer.Done(username)
+	if usersEnumerateP, response := enumerate.UsersEnumeratePassive(); len(usersEnumerateP) > 0 && !aggressivemode {
+		printer.Done("WordPress Users:")
+		for _, username := range usersEnumerateP {
+			printer.List(username, "("+InfosWprecon.OtherInformationsString["target.http.users.method"]+")")
 		}
-		printer.Println()
-	} else if enumA := enumerate.UsersEnumerateAgressive(); len(enumA) > 0 && aggressivemode {
-		printer.Done(":: Username(s) Enumerate Agressive Mode ::")
-		for _, username := range enumA {
-			printer.Done(username)
+		printer.List("All users were found at:", response.URL.Full)
+	} else if usersEnumerateA, response := enumerate.UsersEnumerateAgressive(); len(usersEnumerateA) > 0 && aggressivemode {
+		printer.Done("WordPress Users:")
+		for _, username := range usersEnumerateA {
+			printer.List(username, "("+InfosWprecon.OtherInformationsString["target.http.users.method"]+")")
 		}
-		printer.Println()
-	} else if len(enumA) <= 0 && aggressivemode {
+		printer.List("All users were found at:", response.URL.Full)
+	} else if len(usersEnumerateA) <= 0 && aggressivemode {
 		printer.Danger("Unfortunately no user was found.")
-		printer.Println()
 	} else {
 		printer.Danger("Unfortunately no user was found. Try to use agressive mode: --agressive-mode")
-		printer.Println()
 	}
 
-	if enumP := enumerate.PluginsEnumeratePassive(); len(enumP) > 0 && !aggressivemode {
-		printer.Done(":: Plugin(s) Enumerate Passive Mode ::")
-		for name, version := range enumP {
-			pluginenum(name, version)
+	if pluginsEnumerateP := enumerate.PluginsEnumeratePassive(); len(pluginsEnumerateP) > 0 && !aggressivemode {
+		for plugin, version := range pluginsEnumerateP {
+			printer.Println()
+			if version != "" {
+				printer.Done("Plugin:", plugin, "(Enumerate Passive Mode)")
+				printer.List("Location:", InfosWprecon.Target+"wp-content/plugins/"+plugin+"/")
+				printer.List("Version:", version)
+				pluginvulnenum(plugin, version)
+			} else {
+				printer.Done("Plugin:", plugin, "(Enumerate Passive Mode)")
+				printer.List("Location:", InfosWprecon.Target+"wp-content/plugins/"+plugin+"/")
+				printer.List("Version: Unidentified version")
+			}
 		}
-		printer.Println()
-	} else if enumA := enumerate.PluginsEnumerateAgressive(); len(enumA) > 0 && aggressivemode {
-		printer.Done(":: Plugin(s) Enumerate Agressive Mode ::")
-		for name, version := range enumA {
-			pluginenum(name, version)
+	} else if pluginsEnumerateA := enumerate.PluginsEnumerateAgressive(); len(pluginsEnumerateA) > 0 && aggressivemode {
+		for plugin, version := range pluginsEnumerateA {
+			printer.Println()
+			if version != "" {
+				printer.Done("Plugin:", plugin, "(Enumerate Aggressive Mode)")
+				printer.List("Location:", InfosWprecon.Target+"wp-content/plugins/"+plugin+"/")
+				printer.List("Version:", version)
+				pluginvulnenum(plugin, version)
+			} else {
+				printer.Done("Plugin:", plugin, "(Enumerate Aggressive Mode)")
+				printer.List("Location:", InfosWprecon.Target+"wp-content/plugins/"+plugin+"/")
+				printer.List("Version: Unidentified version")
+			}
 		}
-		printer.Println()
-	} else if len(enumA) <= 0 && aggressivemode {
+	} else if len(pluginsEnumerateA) <= 0 && aggressivemode {
 		printer.Danger("Unfortunately I was unable to passively list any plugin.")
-		printer.Println()
 	} else {
 		printer.Danger("Unfortunately I was unable to passively list any plugin. Try to use aggressive mode: --aggressive-mode")
-		printer.Println()
 	}
 
-	if enumP := enumerate.ThemesEnumeratePassive(); len(enumP) > 0 && !aggressivemode {
-		printer.Done(":: Theme(s) Enumerate Passive Mode ::")
-		for name, version := range enumP {
-			printer.Done("Version:", version+"\t", "Plugins:", name)
-		}
-		if InfosWprecon.Verbose {
-			printer.Warning("Unfortunately wprecon doesn't have vulns for themas *yet*.")
+	if themesEnumerateP := enumerate.ThemesEnumeratePassive(); len(themesEnumerateP) > 0 && !aggressivemode {
+		for theme, version := range themesEnumerateP {
+			printer.Println()
+			if version != "" {
+				printer.Done("Theme:", theme, "(Enumerate Passive Mode)")
+				printer.List("Location:", InfosWprecon.Target+"wp-content/themes/"+theme+"/")
+				printer.List("Version:", version)
+
+				if InfosWprecon.Verbose {
+					printer.List("Unfortunately wprecon doesn't have vulns for themas *yet*.")
+				}
+			} else {
+				printer.Done("Theme:", theme, "(Enumerate Passive Mode)")
+				printer.List("Location:", InfosWprecon.Target+"wp-content/themes/"+theme+"/")
+				printer.List("Version: Unidentified version")
+			}
 		}
 		printer.Println()
-	} else if enumA := enumerate.ThemesEnumerateAgressive(); len(enumA) > 0 && aggressivemode {
-		printer.Done(":: Theme(s) Enumerate Agressive Mode ::")
-		for name, version := range enumA {
-			printer.Done("Version:", version+"\t", "Plugin:", name)
-		}
-		if InfosWprecon.Verbose {
-			printer.Warning("Unfortunately wprecon doesn't have vulns for themas *yet*.")
+	} else if themesEnumerateA := enumerate.ThemesEnumerateAgressive(); len(themesEnumerateA) > 0 && aggressivemode {
+		for theme, version := range themesEnumerateP {
+			printer.Println()
+			if version != "" {
+				printer.Done("Theme:", theme, "(Enumerate Aggressive Mode)")
+				printer.List("Location:", InfosWprecon.Target+"wp-content/themes/"+theme+"/")
+				printer.List("Version:", version)
+
+				if InfosWprecon.Verbose {
+					printer.List("Unfortunately wprecon doesn't have vulns for themas *yet*.")
+				}
+			} else {
+				printer.Done("Theme:", theme, "(Enumerate Aggressive Mode)")
+				printer.List("Location:", InfosWprecon.Target+"wp-content/themes/"+theme+"/")
+				printer.List("Version: Unidentified version")
+			}
 		}
 		printer.Println()
-	} else if len(enumA) <= 0 && aggressivemode {
+	} else if len(themesEnumerateA) <= 0 && aggressivemode {
 		printer.Danger("Unfortunately I was unable to passively list any theme.")
 		printer.Println()
 	} else {
@@ -177,28 +182,63 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 	}
 }
 
+func RootOptionsPostRun(cmd *cobra.Command, args []string) {
+	printer.Info("Other interesting information:")
+	printer.Println()
+
+	if len(InfosWprecon.OtherInformationsSlice["target.http.indexof"]) > 0 {
+		printer.Done("Index Of's:")
+		for _, indexofs := range InfosWprecon.OtherInformationsSlice["target.http.indexof"] {
+			printer.List(indexofs)
+		}
+		printer.Println()
+	}
+
+	if status, _ := commons.XMLRPC(); status != "false" {
+		printer.Done("XML-RPC Enabled:")
+		printer.List("Location:", InfosWprecon.Target+"xmlrpc.php")
+		printer.List("Checked By:", InfosWprecon.OtherInformationsString["target.http.xmlrpc.php.checkedby"])
+		printer.Println()
+	}
+
+	if URL := InfosWprecon.OtherInformationsString["target.http.admin-page"]; URL != "" {
+		printer.Done("Admin Page Found:")
+		printer.List("Location:", URL)
+		printer.List("Checked by: Access")
+		printer.Println()
+	}
+
+	if response := commons.Readme(); response.Response.StatusCode == 200 {
+		printer.Done("WordPress Readme:")
+		printer.List("Location:", response.URL.Full)
+		printer.List("Checked by: Access")
+		printer.Println()
+	}
+
+	printer.Done("Total requests:", fmt.Sprint(InfosWprecon.TotalRequests))
+}
+
 // Detection :: This function should be used to perform wordpress detection.
 // "How does this detection work?", I decided to make a 'percentage system' where I will check if each item in a list exists... and if that item exists it will add +1 to accuracy.
 // With "16.6" hits he says that wordpress is already detected. But it opens up an opportunity for you to choose whether to continue or not, because you are not 100% sure.
 func wordpresscheck() float32 {
 	var confidence float32
-	var payloads = [...]string{
-		`<meta name="generator content="WordPress`,
-		`<a href="http://www.wordpress.com">Powered by WordPress</a>`,
-		`<link rel='https://api.wordpress.org/'`}
+	var payloads = [4]string{
+		"<meta name=\"generator content=\"WordPress",
+		"<a href=\"http://www.wordpress.com\">Powered by WordPress</a>",
+		"<link rel=\"https://api.wordpress.org/",
+		"<link rel=\"https://api.w.org/\""}
 
-	if has, response := commons.AdminPage(); has == "true" {
-		printer.Done("The admin page found:", response.URL.Full)
-		confidence++
-	} else if has == "redirect" {
-		printer.Warning("The admin page is being redirected to:", response.Response.Header.Get("Location"))
+	if has, _ := commons.AdminPage(); has == "true" || has == "redirect" {
 		confidence++
 	}
-
 	if response := commons.DirectoryPlugins(); response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
 		confidence++
 	}
 	if response := commons.DirectoryThemes(); response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
+		confidence++
+	}
+	if response := commons.DirectoryUploads(); response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
 		confidence++
 	}
 
@@ -208,22 +248,18 @@ func wordpresscheck() float32 {
 		}
 	}
 
-	return confidence / 6 * 100
+	return confidence / 8 * 100
 }
 
-func pluginenum(name string, version string) {
-	printer.Done("Version:", version+"\t", "Plugin:", name)
+func pluginvulnenum(name string, version string) {
+	if vuln := extensions.GetVuln(name, version); len(vuln.Vulnerabilities) > 0 {
+		printer.List("Vuln Title:", vuln.Vulnerabilities[0].Title)
+		printer.List("Vuln Plublish:", vuln.Vulnerabilities[0].Published)
 
-	pntl := printer.NewTopLine("Find Vuln...")
-	if x := extensions.GetVuln(name, version); len(x.Vulnerabilities) > 0 {
-		pntl.Done("Vuln Title:", x.Vulnerabilities[0].Title)
-		printer.Done("Vuln Title:", x.Vulnerabilities[0].Version)
-		printer.Done("Vuln Plublish:", x.Vulnerabilities[0].Published)
-
-		for _, value := range x.Vulnerabilities[0].References {
-			printer.Done("Reference(s):", value)
+		for _, value := range vuln.Vulnerabilities[0].References {
+			printer.List("Reference(s):", value)
 		}
 	} else {
-		pntl.Danger("Vuln not found...")
+		printer.List("I have not found any vulnerability for this version.")
 	}
 }

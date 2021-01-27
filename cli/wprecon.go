@@ -1,26 +1,23 @@
 package cli
 
 import (
-	"fmt"
 	"os"
+	"strings"
 
-	"github.com/blackcrw/wprecon/cli/cmd"
-	. "github.com/blackcrw/wprecon/cli/config"
-	"github.com/blackcrw/wprecon/internal/pkg/banner"
-	"github.com/blackcrw/wprecon/pkg/gohttp"
-	"github.com/blackcrw/wprecon/pkg/printer"
+	"github.com/blackbinn/wprecon/cli/cmd"
+	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/internal/pkg/banner"
+	"github.com/blackbinn/wprecon/pkg/gohttp"
+	"github.com/blackbinn/wprecon/pkg/printer"
 	"github.com/spf13/cobra"
 )
 
 var root = &cobra.Command{
-	Use:    "wprecon",
-	Short:  "Wordpress Recon",
-	Long:   `wprecon (Wordpress Recon) is a tool for wordpress exploration!`,
-	PreRun: cmd.RootOptionsPreRun,
-	Run:    cmd.RootOptionsRun,
-	PostRun: func(cmd *cobra.Command, args []string) {
-		printer.Done("Total requests:", fmt.Sprint(InfosWprecon.TotalRequests))
-	},
+	Use:     "wprecon",
+	Short:   "Wordpress Recon",
+	Long:    `wprecon (Wordpress Recon) is a tool for wordpress exploration!`,
+	Run:     cmd.RootOptionsRun,
+	PostRun: cmd.RootOptionsPostRun,
 }
 
 var fuzzer = &cobra.Command{
@@ -29,9 +26,7 @@ var fuzzer = &cobra.Command{
 	Short:   "Fuzzing directories or logins.",
 	Long:    "This subcommand is mainly focused on fuzzing directories or logins.",
 	Run:     cmd.FuzzerOptionsRun,
-	PostRun: func(cmd *cobra.Command, args []string) {
-		printer.Done("Total requests:", fmt.Sprint(InfosWprecon.TotalRequests))
-	},
+	PostRun: cmd.FuzzerOptionsPostRun,
 }
 
 // Execute ::
@@ -52,7 +47,7 @@ func init() {
 	root.PersistentFlags().BoolP("verbose", "v", false, "Verbosity mode.")
 	root.PersistentFlags().BoolP("force", "f", false, "Forces wprecon to not check if the target is running WordPress and forces other executions.")
 
-	root.Flags().BoolP("aggressive-mode", "", false, "Activates the aggressive mode of wprecon.")
+	root.Flags().BoolP("aggressive-mode", "A", false, "Activates the aggressive mode of wprecon.")
 	root.Flags().BoolP("detection-waf", "", false, "I will try to detect if the target is using any WAF Wordpress.")
 
 	root.MarkPersistentFlagRequired("url")
@@ -70,7 +65,12 @@ func init() {
 }
 
 func ibanner() {
-	InfosWprecon.Target, _ = root.Flags().GetString("url")
+	if target, _ := root.Flags().GetString("url"); !strings.HasSuffix(target, "/") {
+		InfosWprecon.Target = target + "/"
+	} else {
+		InfosWprecon.Target = target
+	}
+
 	InfosWprecon.Force, _ = root.Flags().GetBool("force")
 	InfosWprecon.Verbose, _ = root.Flags().GetBool("verbose")
 	InfosWprecon.OtherInformationsBool["http.options.tor"], _ = root.Flags().GetBool("tor")

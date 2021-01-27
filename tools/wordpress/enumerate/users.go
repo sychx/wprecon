@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"regexp"
 
-	. "github.com/blackcrw/wprecon/cli/config"
-	"github.com/blackcrw/wprecon/pkg/gohttp"
-	"github.com/blackcrw/wprecon/pkg/printer"
-	"github.com/blackcrw/wprecon/pkg/text"
+	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/pkg/gohttp"
+	"github.com/blackbinn/wprecon/pkg/printer"
+	"github.com/blackbinn/wprecon/pkg/text"
 )
 
 type uJSON []struct {
@@ -16,7 +16,7 @@ type uJSON []struct {
 }
 
 // UsersEnumeratePassive :: Enumerate using feed
-func UsersEnumeratePassive() []string {
+func UsersEnumeratePassive() ([]string, *gohttp.Response) {
 	response := gohttp.SimpleRequest(InfosWprecon.Target, "feed/")
 
 	rex := regexp.MustCompile("<dc:creator><!\\[CDATA\\[(.+?)\\]\\]></dc:creator>")
@@ -34,11 +34,12 @@ func UsersEnumeratePassive() []string {
 		InfosWprecon.OtherInformationsString["target.http.users.method"] = "Feed"
 	}
 
-	return InfosWprecon.OtherInformationsSlice["target.http.users"]
+	return InfosWprecon.OtherInformationsSlice["target.http.users"], response
 }
 
 // UsersEnumerateAgressive ::
-func UsersEnumerateAgressive() []string {
+func UsersEnumerateAgressive() ([]string, *gohttp.Response) {
+	var responseReturn *gohttp.Response
 	var ujson uJSON
 	done := false
 
@@ -63,6 +64,8 @@ func UsersEnumerateAgressive() []string {
 				InfosWprecon.OtherInformationsString["target.http.users.method"] = "YoastSEO"
 				done = true
 			}
+
+			responseReturn = response
 		}
 	}()
 
@@ -87,6 +90,8 @@ func UsersEnumerateAgressive() []string {
 			} else if response.Response.StatusCode == 401 && response.Raw != "" && InfosWprecon.Verbose {
 				printer.Danger("Status code 401, I don't think I'm allowed to list users. Target Url:", response.URL.Full, "— Target source code:", response.Raw)
 			}
+
+			responseReturn = response
 		}
 	}()
 
@@ -111,8 +116,10 @@ func UsersEnumerateAgressive() []string {
 			} else if response.Response.StatusCode == 401 && response.Raw != "" && InfosWprecon.Verbose {
 				printer.Danger("Status code 401, I don't think I'm allowed to list users. Target Url:", response.URL.Full, "— Target source code:", response.Raw)
 			}
+
+			responseReturn = response
 		}
 	}()
 
-	return InfosWprecon.OtherInformationsSlice["target.http.users"]
+	return InfosWprecon.OtherInformationsSlice["target.http.users"], responseReturn
 }

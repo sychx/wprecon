@@ -4,7 +4,7 @@ import (
 	"net"
 	"net/url"
 
-	"github.com/blackcrw/wprecon/pkg/handler"
+	"github.com/blackbinn/wprecon/pkg/handler"
 )
 
 // IsURL :: This function will be used for URL validation
@@ -27,7 +27,7 @@ func IsURL(URL string) bool {
 	//_, err = net.LookupHost(uri.Host)
 
 	//if err != nil {
-	//	return false, err
+	//	panic(err)
 	//}
 
 	return true

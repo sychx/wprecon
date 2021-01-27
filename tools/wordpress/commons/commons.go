@@ -4,16 +4,13 @@ import (
 	"fmt"
 	"strings"
 
-	. "github.com/blackcrw/wprecon/cli/config"
-	"github.com/blackcrw/wprecon/pkg/gohttp"
-	"github.com/blackcrw/wprecon/pkg/printer"
+	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/pkg/gohttp"
+	"github.com/blackbinn/wprecon/pkg/printer"
 )
 
-// DirectoryPlugins :: Simple requests to see if it exists and if it has index of.
-// If this directory is identified with Index Of, its source code will be saved in this map :: InfosWprecon.OtherInformationsString["target.http.wp-content/plugin.indexof.raw"]
-// Any directory that is identified with Index Of will be saved on this map :: InfosWprecon.OtherInformationsSlice["target.http.indexof"]
-func DirectoryPlugins() *gohttp.Response {
-	http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target).SetURLDirectory("/wp-content/plugins/")
+func DirectoryUploads() *gohttp.Response {
+	http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target).SetURLDirectory("wp-content/uploads/")
 	http.OnTor(InfosWprecon.OtherInformationsBool["http.options.tor"])
 	http.OnRandomUserAgent(InfosWprecon.OtherInformationsBool["http.options.randomuseragent"])
 	http.OnTLSCertificateVerify(InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"])
@@ -21,7 +18,30 @@ func DirectoryPlugins() *gohttp.Response {
 	response, err := http.Run()
 
 	if err != nil {
-		printer.Danger(fmt.Sprint(err))
+		printer.Danger(fmt.Sprintf("%s", err))
+	}
+
+	if strings.Contains(response.Raw, "Index of") {
+		InfosWprecon.OtherInformationsSlice["target.http.indexof"] = append(InfosWprecon.OtherInformationsSlice["target.http.indexof"], response.URL.Full)
+		InfosWprecon.OtherInformationsString["target.http.wp-content/uploads.indexof.raw"] = response.Raw
+	}
+
+	return response
+}
+
+// DirectoryPlugins :: Simple requests to see if it exists and if it has index of.
+// If this directory is identified with Index Of, its source code will be saved in this map :: InfosWprecon.OtherInformationsString["target.http.wp-content/plugin.indexof.raw"]
+// Any directory that is identified with Index Of will be saved on this map :: InfosWprecon.OtherInformationsSlice["target.http.indexof"]
+func DirectoryPlugins() *gohttp.Response {
+	http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target).SetURLDirectory("wp-content/plugins/")
+	http.OnTor(InfosWprecon.OtherInformationsBool["http.options.tor"])
+	http.OnRandomUserAgent(InfosWprecon.OtherInformationsBool["http.options.randomuseragent"])
+	http.OnTLSCertificateVerify(InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"])
+
+	response, err := http.Run()
+
+	if err != nil {
+		printer.Danger(fmt.Sprintf("%s", err))
 	}
 
 	if strings.Contains(response.Raw, "Index of") {
@@ -36,7 +56,7 @@ func DirectoryPlugins() *gohttp.Response {
 // If this directory is identified with Index Of, its source code will be saved in this map :: InfosWprecon.OtherInformationsString["target.http.wp-content/plugin.indexof.raw"]
 // Any directory that is identified with Index Of will be saved on this map :: InfosWprecon.OtherInformationsSlice["target.http.indexof"]
 func DirectoryThemes() *gohttp.Response {
-	http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target).SetURLDirectory("/wp-content/themes/")
+	http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target).SetURLDirectory("wp-content/themes/")
 	http.OnTor(InfosWprecon.OtherInformationsBool["http.options.tor"])
 	http.OnRandomUserAgent(InfosWprecon.OtherInformationsBool["http.options.randomuseragent"])
 	http.OnTLSCertificateVerify(InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"])
@@ -44,7 +64,7 @@ func DirectoryThemes() *gohttp.Response {
 	response, err := http.Run()
 
 	if err != nil {
-		printer.Danger(fmt.Sprint(err))
+		printer.Danger(fmt.Sprintf("%s", err))
 	}
 
 	if strings.Contains(response.Raw, "Index of") {
@@ -65,15 +85,18 @@ func AdminPage() (string, *gohttp.Response) {
 	response, err := http.Run()
 
 	if err != nil {
-		printer.Danger(fmt.Sprint(err))
+		printer.Danger(fmt.Sprintf("%s", err))
 	}
 
 	switch response.Response.StatusCode {
 	case 200:
+		InfosWprecon.OtherInformationsString["target.http.admin-page"] = response.URL.Full
 		return "true", response
 	case 403:
+		InfosWprecon.OtherInformationsString["target.http.admin-page"] = response.URL.Full
 		return "redirect", response
 	default:
+		InfosWprecon.OtherInformationsString["target.http.admin-page"] = ""
 		return "false", response
 	}
 }
@@ -90,7 +113,7 @@ func Robots() *gohttp.Response {
 	response, err := http.Run()
 
 	if err != nil {
-		printer.Danger(fmt.Sprint(err))
+		printer.Danger(fmt.Sprintf("%s", err))
 	}
 
 	if response.Response.StatusCode == 200 {
@@ -112,7 +135,7 @@ func Sitemap() *gohttp.Response {
 	response, err := http.Run()
 
 	if err != nil {
-		printer.Danger(fmt.Sprint(err))
+		printer.Danger(fmt.Sprintf("%s", err))
 	}
 
 	if response.Response.StatusCode == 200 {
@@ -122,10 +145,8 @@ func Sitemap() *gohttp.Response {
 	return response
 }
 
-// XMLRPC :: Simple requests to see if there is.
-// The command's message will be saved on this map. :: InfosWprecon.OtherInformationsString["target.http.xmlrpc.php.status"]
-func XMLRPC() (string, *gohttp.Response) {
-	http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target).SetURLDirectory("xmlrpc.php")
+func Readme() *gohttp.Response {
+	http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target).SetURLDirectory("readme.html")
 	http.OnTor(InfosWprecon.OtherInformationsBool["http.options.tor"])
 	http.OnRandomUserAgent(InfosWprecon.OtherInformationsBool["http.options.randomuseragent"])
 	http.OnTLSCertificateVerify(InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"])
@@ -133,23 +154,47 @@ func XMLRPC() (string, *gohttp.Response) {
 	response, err := http.Run()
 
 	if err != nil {
-		printer.Danger(fmt.Sprint(err))
+		printer.Danger(fmt.Sprintf("%s", err))
 	}
 
-	// Status Code Return: 405
-	if strings.Contains(response.Raw, "XML-RPC server accepts POST requests only.") {
-		InfosWprecon.OtherInformationsString["target.http.xmlrpc.php.status"] = "Sucess"
+	return response
+}
 
-		return "true", response
-	} else if strings.Contains(response.Raw, "This error was generated by Mod_Security.") {
-		InfosWprecon.OtherInformationsString["target.http.xmlrpc.php.status"] = "Mod_Security"
+// XMLRPC :: Simple requests to see if there is.
+// The command's message will be saved on this map. :: InfosWprecon.OtherInformationsString["target.http.xmlrpc.php.status"]
+func XMLRPC() (string, *gohttp.Response) {
+	if strings.Contains(InfosWprecon.OtherInformationsString["target.http.index.raw"], "xmlrpc.php") {
+		InfosWprecon.OtherInformationsString["target.http.xmlrpc.php.checkedby"] = "Link tag"
 
-		return "mod_security", response
-	} else if response.Response.StatusCode == 403 {
-		InfosWprecon.OtherInformationsString["target.http.xmlrpc.php.status"] = "Forbidden"
+		return "Link tag", &gohttp.Response{}
+	} else {
+		http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target).SetURLDirectory("xmlrpc.php")
+		http.OnTor(InfosWprecon.OtherInformationsBool["http.options.tor"])
+		http.OnRandomUserAgent(InfosWprecon.OtherInformationsBool["http.options.randomuseragent"])
+		http.OnTLSCertificateVerify(InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"])
 
-		return "forbidden", response
+		response, err := http.Run()
+
+		if err != nil {
+			printer.Danger(fmt.Sprintf("%s", err))
+		}
+
+		InfosWprecon.OtherInformationsString["target.http.xmlrpc.php.checkedby"] = "Access"
+
+		// Status Code Return: 405
+		if strings.Contains(response.Raw, "XML-RPC server accepts POST requests only.") {
+			InfosWprecon.OtherInformationsString["target.http.xmlrpc.php.status"] = "Sucess"
+
+			return "true", response
+		} else if strings.Contains(response.Raw, "This error was generated by Mod_Security.") {
+			InfosWprecon.OtherInformationsString["target.http.xmlrpc.php.status"] = "Mod_Security"
+
+			return "mod_security", response
+		} else if response.Response.StatusCode == 403 {
+			InfosWprecon.OtherInformationsString["target.http.xmlrpc.php.status"] = "Forbidden"
+
+			return "forbidden", response
+		}
+		return "false", response
 	}
-
-	return "false", response
 }

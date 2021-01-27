@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/blackcrw/wprecon/cli/config"
-	"github.com/blackcrw/wprecon/pkg/gohttp"
-	"github.com/blackcrw/wprecon/pkg/printer"
-	"github.com/blackcrw/wprecon/pkg/text"
+	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/pkg/gohttp"
+	"github.com/blackbinn/wprecon/pkg/printer"
+	"github.com/blackbinn/wprecon/pkg/text"
 )
 
 func WPLogin() int {

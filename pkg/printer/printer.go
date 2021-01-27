@@ -7,7 +7,7 @@ import (
 	"strings"
 	"syscall"
 
-	color "github.com/logrusorgru/aurora" // This is color lib
+	color "github.com/logrusorgru/aurora"
 )
 
 // Required :: Constant with the word "required" in red.
@@ -47,6 +47,30 @@ func Danger(text ...string) {
 // Warning ::
 func Warning(text ...string) {
 	var prefix = color.Yellow("[!]").String()
+	var textString = strings.Join(text, " ")
+
+	_, err := io.WriteString(&stdout, prefix+" "+textString+"\n")
+
+	if err != nil {
+		panic(err)
+	}
+}
+
+// List ::
+func List(text ...string) {
+	var prefix = color.White("    —").String()
+	var textString = strings.Join(text, " ")
+
+	_, err := io.WriteString(&stdout, prefix+" "+textString+"\n")
+
+	if err != nil {
+		panic(err)
+	}
+}
+
+// Info ::
+func Info(text ...string) {
+	var prefix = color.Magenta("[i]").String()
 	var textString = strings.Join(text, " ")
 
 	_, err := io.WriteString(&stdout, prefix+" "+textString+"\n")
