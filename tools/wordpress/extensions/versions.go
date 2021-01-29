@@ -9,11 +9,14 @@ import (
 	"github.com/blackbinn/wprecon/pkg/wordlist"
 )
 
+// GetVersionByRequest ::
 func GetVersionByRequest(path string) string {
 	if response := gohttp.SimpleRequest(InfosWprecon.Target, path); response.Response.StatusCode == 200 && response.Raw != "" {
 		if version := text.GetVersionStableTag(response.Raw); version != "" {
 			return version
 		} else if version := text.GetVersionChangelog(response.Raw); version != "" {
+			return version
+		} else if version := text.GetVersionReleaseLog(response.Raw); version != "" {
 			return version
 		}
 	}
@@ -21,6 +24,7 @@ func GetVersionByRequest(path string) string {
 	return ""
 }
 
+// GetVersionByChangeLogs ::
 func GetVersionByChangeLogs(path string) string {
 	channel := make(chan string)
 
@@ -44,6 +48,7 @@ func GetVersionByChangeLogs(path string) string {
 	return ""
 }
 
+// GetVersionByReadme ::
 func GetVersionByReadme(path string) string {
 	channel := make(chan string)
 
@@ -67,6 +72,7 @@ func GetVersionByReadme(path string) string {
 	return ""
 }
 
+// GetVersionByReleaseLog ::
 func GetVersionByReleaseLog(path string) string {
 	channel := make(chan string)
 
@@ -91,6 +97,7 @@ func GetVersionByReleaseLog(path string) string {
 	return ""
 }
 
+// GetVersionByIndexOf ::
 func GetVersionByIndexOf(path string) string {
 	raw := gohttp.SimpleRequest(InfosWprecon.Target, path).Raw
 
@@ -100,6 +107,8 @@ func GetVersionByIndexOf(path string) string {
 		if version := text.GetVersionChangelog(raw); version != "" {
 			return version
 		} else if version := text.GetVersionStableTag(raw); version != "" {
+			return version
+		} else if version := text.GetVersionChangelog(raw); version != "" {
 			return version
 		}
 	}

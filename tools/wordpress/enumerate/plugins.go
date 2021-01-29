@@ -45,6 +45,8 @@ func PluginsEnumerateAgressive() map[string]string {
 
 			InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = ""
 		}
+
+		PluginsEnumeratePassive()
 	} else if pluginslist := PluginsEnumeratePassive(); len(pluginslist) > 0 {
 	} else if len(pluginslist) == 0 {
 		raw := InfosWprecon.OtherInformationsString["target.http.index.raw"]

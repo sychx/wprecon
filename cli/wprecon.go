@@ -88,5 +88,7 @@ func ibanner() {
 		response := gohttp.SimpleRequest(InfosWprecon.Target)
 
 		InfosWprecon.OtherInformationsString["target.http.index.raw"] = response.Raw
+		InfosWprecon.OtherInformationsString["target.http.index.server"] = response.Response.Header.Get("Server")
+		InfosWprecon.OtherInformationsString["target.http.index.php.version"] = response.Response.Header.Get("x-powered-by")
 	}()
 }

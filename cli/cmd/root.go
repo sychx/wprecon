@@ -186,6 +186,17 @@ func RootOptionsPostRun(cmd *cobra.Command, args []string) {
 	printer.Info("Other interesting information:")
 	printer.Println()
 
+	if InfosWprecon.OtherInformationsString["target.http.index.server"] != "" || InfosWprecon.OtherInformationsString["target.http.index.php.version"] != "" {
+		printer.Done("Target information(s):")
+		if InfosWprecon.OtherInformationsString["target.http.index.server"] != "" {
+			printer.List("Server:", InfosWprecon.OtherInformationsString["target.http.index.server"])
+		}
+		if InfosWprecon.OtherInformationsString["target.http.index.php.version"] != "" {
+			printer.List("PHP Version:", InfosWprecon.OtherInformationsString["target.http.index.php.version"])
+		}
+		printer.Println()
+	}
+
 	if len(InfosWprecon.OtherInformationsSlice["target.http.indexof"]) > 0 {
 		printer.Done("Index Of's:")
 		for _, indexofs := range InfosWprecon.OtherInformationsSlice["target.http.indexof"] {
@@ -213,6 +224,16 @@ func RootOptionsPostRun(cmd *cobra.Command, args []string) {
 		printer.List("Location:", response.URL.Full)
 		printer.List("Checked by: Access")
 		printer.Println()
+	}
+
+	if raw := InfosWprecon.OtherInformationsString["target.http.wp-content/uploads.indexof.raw"]; raw != "" {
+		if list := extensions.FindBackupFileOrPath(raw); len(list) > 0 {
+			printer.Done("File or Path backup:")
+			for _, path := range list {
+				printer.List(InfosWprecon.Target + "wp-content/uploads/" + path)
+			}
+			printer.Println()
+		}
 	}
 
 	printer.Done("Total requests:", fmt.Sprint(InfosWprecon.TotalRequests))

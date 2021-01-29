@@ -5,11 +5,13 @@ var InfosWprecon informationsWPRecon
 type informationsWPRecon struct {
 	Target        string
 	TotalRequests int
-	Verbose       bool
-	Force         bool
+
+	Verbose bool
+	Force   bool
 
 	TimeStart, TimeFinish string
 	TimeSleepRequests     int
+	TimeOutRequests       int
 
 	OtherInformationsString    map[string]string
 	OtherInformationsInt       map[string]int

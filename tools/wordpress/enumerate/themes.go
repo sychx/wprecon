@@ -44,6 +44,8 @@ func ThemesEnumerateAgressive() map[string]string {
 
 			InfosWprecon.OtherInformationsMapString["target.http.themes.versions"][name] = ""
 		}
+
+		ThemesEnumeratePassive()
 	} else if themesList := ThemesEnumeratePassive(); len(themesList) > 0 {
 	} else if len(themesList) == 0 {
 		raw := InfosWprecon.OtherInformationsString["target.http.index.raw"]
