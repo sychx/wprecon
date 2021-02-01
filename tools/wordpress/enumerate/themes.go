@@ -15,7 +15,7 @@ import (
 func ThemesEnumeratePassive() map[string]string {
 	raw := InfosWprecon.OtherInformationsString["target.http.index.raw"]
 
-	rex := regexp.MustCompile("/wp-content/themes/(.*?)/.*?[css|js].*?ver=([0-9\\.]*)")
+	rex := regexp.MustCompile(InfosWprecon.WPContent + "/themes/(.*?)/.*?[css|js].*?ver=([0-9\\.]*)")
 
 	submatchall := rex.FindAllSubmatch([]byte(raw), -1)
 
@@ -50,7 +50,7 @@ func ThemesEnumerateAgressive() map[string]string {
 	} else if len(themesList) == 0 {
 		raw := InfosWprecon.OtherInformationsString["target.http.index.raw"]
 
-		rex := regexp.MustCompile("/wp-content/themes/(.*?)/.*?[css|js]")
+		rex := regexp.MustCompile(InfosWprecon.WPContent + "/themes/(.*?)/.*?[css|js]")
 		submatchall := rex.FindAllSubmatch([]byte(raw), -1)
 
 		for _, theme := range submatchall {
@@ -63,7 +63,7 @@ func ThemesEnumerateAgressive() map[string]string {
 	}
 
 	for name := range InfosWprecon.OtherInformationsMapString["target.http.themes.versions"] {
-		path := "/wp-content/themes/" + name + "/"
+		path := InfosWprecon.WPContent + "/themes/" + name + "/"
 
 		if version := extensions.GetVersionByIndexOf(path); version != "" {
 			InfosWprecon.OtherInformationsMapString["target.http.themes.versions"][name] = version

@@ -79,6 +79,7 @@ func wploginSimpleRequest(username, password string) (bool, error) {
 		return nil
 	})
 	http.SetContentType("application/x-www-form-urlencoded")
+	http.FirewallDetection(true)
 
 	_, err := http.Run()
 

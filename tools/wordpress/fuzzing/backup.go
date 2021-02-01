@@ -14,7 +14,7 @@ func BackupFile() {
 
 	done := false
 
-	for _, directory := range [...]string{"", "wp-content/", "wp-admin/", "wp-includes/", "wp-uploads/"} {
+	for _, directory := range [...]string{"", InfosWprecon.WPContent, "wp-includes/", "wp-uploads/"} {
 		for _, file := range wordlist.BackupFiles {
 			go func(file string) {
 				response := gohttp.SimpleRequest(InfosWprecon.Target, directory+file)

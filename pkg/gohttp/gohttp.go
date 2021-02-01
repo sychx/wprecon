@@ -13,8 +13,10 @@ import (
 	"github.com/blackbinn/wprecon/pkg/printer"
 )
 
+var firewallPassing = false
+
 // HTTPOptions :: This is Struct Http, it will inherit the struct Options and client.
-type httpoptions struct {
+type httpOptions struct {
 	url                  *URLOptions
 	method               string
 	tlsCertificateVerify bool
@@ -24,6 +26,7 @@ type httpoptions struct {
 	userAgent            string
 	redirect             func(req *http.Request, via []*http.Request) error
 	contentType          string
+	firewall             bool
 }
 
 // Response :: This struct will store the request data, and will be used for a return.
@@ -55,6 +58,7 @@ func SimpleRequest(params ...string) *Response {
 	http.OnTor(InfosWprecon.OtherInformationsBool["http.options.tor"])
 	http.OnRandomUserAgent(InfosWprecon.OtherInformationsBool["http.options.randomuseragent"])
 	http.OnTLSCertificateVerify(InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"])
+	http.FirewallDetection(true)
 
 	response, err := http.Run()
 
@@ -65,8 +69,8 @@ func SimpleRequest(params ...string) *Response {
 	return response
 }
 
-func NewHTTPClient() *httpoptions {
-	options := &httpoptions{
+func NewHTTPClient() *httpOptions {
+	options := &httpOptions{
 		method:      "GET",
 		userAgent:   "WPrecon - Wordpress Recon (Vulnerability Scanner)",
 		data:        nil,
@@ -77,7 +81,7 @@ func NewHTTPClient() *httpoptions {
 	return options
 }
 
-func (options *httpoptions) SetURL(url string) *httpoptions {
+func (options *httpOptions) SetURL(url string) *httpOptions {
 	if !strings.HasSuffix(url, "/") {
 		options.url.Simple = url + "/"
 		options.url.Full = url + "/"
@@ -89,7 +93,7 @@ func (options *httpoptions) SetURL(url string) *httpoptions {
 	return options
 }
 
-func (options *httpoptions) SetURLDirectory(directory string) *httpoptions {
+func (options *httpOptions) SetURLDirectory(directory string) *httpOptions {
 	if !strings.HasPrefix(directory, "/") && !strings.HasSuffix(options.url.Simple, "/") {
 		options.url.Directory = "/" + directory
 		options.url.Full = options.url.Simple + "/" + directory
@@ -101,13 +105,13 @@ func (options *httpoptions) SetURLDirectory(directory string) *httpoptions {
 	return options
 }
 
-func (options *httpoptions) SetURLFull(full string) *httpoptions {
+func (options *httpOptions) SetURLFull(full string) *httpOptions {
 	options.url.Full = full
 
 	return options
 }
 
-func (options *httpoptions) OnTor(status bool) (*httpoptions, error) {
+func (options *httpOptions) OnTor(status bool) (*httpOptions, error) {
 	if status {
 		tor, err := url.Parse("http://127.0.0.1:9080")
 
@@ -121,7 +125,7 @@ func (options *httpoptions) OnTor(status bool) (*httpoptions, error) {
 	return options, nil
 }
 
-func (options *httpoptions) OnRandomUserAgent(status bool) *httpoptions {
+func (options *httpOptions) OnRandomUserAgent(status bool) *httpOptions {
 	if status {
 		options.userAgent = randomuseragent()
 	}
@@ -129,49 +133,76 @@ func (options *httpoptions) OnRandomUserAgent(status bool) *httpoptions {
 	return options
 }
 
-func (options *httpoptions) OnTLSCertificateVerify(status bool) *httpoptions {
+func (options *httpOptions) OnTLSCertificateVerify(status bool) *httpOptions {
 	options.tlsCertificateVerify = status
 
 	return options
 }
 
-func (options *httpoptions) SetMethod(method string) *httpoptions {
+func (options *httpOptions) SetMethod(method string) *httpOptions {
 	options.method = method
 
 	return options
 }
 
-func (options *httpoptions) SetUserAgent(useragent string) *httpoptions {
-	options.userAgent = useragent
+func (options *httpOptions) SetUserAgent(userAgent string) *httpOptions {
+	options.userAgent = userAgent
 
 	return options
 }
 
-func (options *httpoptions) SetForm(form *url.Values) *httpoptions {
+func (options *httpOptions) SetForm(form *url.Values) *httpOptions {
 	options.data = strings.NewReader(form.Encode())
 
 	return options
 }
 
-func (options *httpoptions) SetData(data string) *httpoptions {
+func (options *httpOptions) SetData(data string) *httpOptions {
 	options.data = strings.NewReader(data)
 
 	return options
 }
 
-func (options *httpoptions) SetRedirectFunc(redirectFunc func(req *http.Request, via []*http.Request) error) *httpoptions {
+func (options *httpOptions) SetRedirectFunc(redirectFunc func(req *http.Request, via []*http.Request) error) *httpOptions {
 	options.redirect = redirectFunc
 
 	return options
 }
 
-func (options *httpoptions) SetContentType(contenttype string) *httpoptions {
-	options.contentType = contenttype
+func (options *httpOptions) SetContentType(contentType string) *httpOptions {
+	options.contentType = contentType
 
 	return options
 }
 
-func (options *httpoptions) Run() (*Response, error) {
+func (options *httpOptions) FirewallDetection(status bool) *httpOptions {
+	options.firewall = status
+
+	return options
+}
+
+func (options *httpOptions) f(http *Response) {
+	exists, firewall, output, solve, confidence := NewFirewallDetectionPassive(http).All().Run()
+
+	if exists {
+		printer.Danger("Firewall Active Detection:")
+		printer.List("Firewall:", firewall).D()
+		printer.List("Detection By:", output).D()
+		printer.List("Confidence:", fmt.Sprintf("%d%%", confidence)).D()
+		if solve != "" {
+			printer.List("Solve:", solve).Warning()
+		}
+
+		if response := printer.ScanQ("Do you wish to continue ? [y]es | [N]o : "); response != "y" {
+			printer.Fatal("Exiting...")
+		}
+
+		printer.Println()
+		firewallPassing = true
+	}
+}
+
+func (options *httpOptions) Run() (*Response, error) {
 	client := &http.Client{
 		CheckRedirect: options.redirect,
 		Transport: &http.Transport{
@@ -206,9 +237,15 @@ func (options *httpoptions) Run() (*Response, error) {
 
 	InfosWprecon.TotalRequests++
 
-	return &Response{
+	structResponse := &Response{
 		Raw:      string(raw),
 		URL:      options.url,
 		Response: response,
-	}, nil
+	}
+
+	if options.firewall && !firewallPassing {
+		options.f(structResponse)
+	}
+
+	return structResponse, nil
 }

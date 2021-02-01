@@ -10,10 +10,12 @@ import (
 )
 
 func DirectoryUploads() *gohttp.Response {
-	http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target).SetURLDirectory("wp-content/uploads/")
+	http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target)
+	http.SetURLDirectory(InfosWprecon.WPContent + "/uploads/")
 	http.OnTor(InfosWprecon.OtherInformationsBool["http.options.tor"])
 	http.OnRandomUserAgent(InfosWprecon.OtherInformationsBool["http.options.randomuseragent"])
 	http.OnTLSCertificateVerify(InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"])
+	http.FirewallDetection(true)
 
 	response, err := http.Run()
 
@@ -33,10 +35,12 @@ func DirectoryUploads() *gohttp.Response {
 // If this directory is identified with Index Of, its source code will be saved in this map :: InfosWprecon.OtherInformationsString["target.http.wp-content/plugin.indexof.raw"]
 // Any directory that is identified with Index Of will be saved on this map :: InfosWprecon.OtherInformationsSlice["target.http.indexof"]
 func DirectoryPlugins() *gohttp.Response {
-	http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target).SetURLDirectory("wp-content/plugins/")
+	http := gohttp.NewHTTPClient()
+	http.SetURL(InfosWprecon.Target).SetURLDirectory(InfosWprecon.WPContent + "/plugins/")
 	http.OnTor(InfosWprecon.OtherInformationsBool["http.options.tor"])
 	http.OnRandomUserAgent(InfosWprecon.OtherInformationsBool["http.options.randomuseragent"])
 	http.OnTLSCertificateVerify(InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"])
+	http.FirewallDetection(true)
 
 	response, err := http.Run()
 
@@ -56,10 +60,12 @@ func DirectoryPlugins() *gohttp.Response {
 // If this directory is identified with Index Of, its source code will be saved in this map :: InfosWprecon.OtherInformationsString["target.http.wp-content/plugin.indexof.raw"]
 // Any directory that is identified with Index Of will be saved on this map :: InfosWprecon.OtherInformationsSlice["target.http.indexof"]
 func DirectoryThemes() *gohttp.Response {
-	http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target).SetURLDirectory("wp-content/themes/")
+	http := gohttp.NewHTTPClient()
+	http.SetURL(InfosWprecon.Target).SetURLDirectory(InfosWprecon.WPContent + "/themes/")
 	http.OnTor(InfosWprecon.OtherInformationsBool["http.options.tor"])
 	http.OnRandomUserAgent(InfosWprecon.OtherInformationsBool["http.options.randomuseragent"])
 	http.OnTLSCertificateVerify(InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"])
+	http.FirewallDetection(true)
 
 	response, err := http.Run()
 
@@ -77,10 +83,12 @@ func DirectoryThemes() *gohttp.Response {
 
 // AdminPage :: Simple requests to see if there is.
 func AdminPage() (string, *gohttp.Response) {
-	http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target).SetURLDirectory("wp-admin/")
+	http := gohttp.NewHTTPClient()
+	http.SetURL(InfosWprecon.Target).SetURLDirectory("wp-admin/")
 	http.OnTor(InfosWprecon.OtherInformationsBool["http.options.tor"])
 	http.OnRandomUserAgent(InfosWprecon.OtherInformationsBool["http.options.randomuseragent"])
 	http.OnTLSCertificateVerify(InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"])
+	http.FirewallDetection(true)
 
 	response, err := http.Run()
 
@@ -105,10 +113,12 @@ func AdminPage() (string, *gohttp.Response) {
 // The command's message will be saved on this map :: InfosWprecon.OtherInformationsString["target.http.robots.txt.status"]
 // The source code of the robots file will be saved within this map :: InfosWprecon.OtherInformationsString["target.http.robots.txt.raw"]
 func Robots() *gohttp.Response {
-	http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target).SetURLDirectory("robots.txt")
+	http := gohttp.NewHTTPClient()
+	http.SetURL(InfosWprecon.Target).SetURLDirectory("robots.txt")
 	http.OnTor(InfosWprecon.OtherInformationsBool["http.options.tor"])
 	http.OnRandomUserAgent(InfosWprecon.OtherInformationsBool["http.options.randomuseragent"])
 	http.OnTLSCertificateVerify(InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"])
+	http.FirewallDetection(true)
 
 	response, err := http.Run()
 
@@ -127,10 +137,12 @@ func Robots() *gohttp.Response {
 // Sitemap :: Simple requests to see if there is.
 // The command's message will be saved on this map. :: InfosWprecon.OtherInformationsString["target.http.sitemap.xml.status"]
 func Sitemap() *gohttp.Response {
-	http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target).SetURLDirectory("sitemap.xml")
+	http := gohttp.NewHTTPClient()
+	http.SetURL(InfosWprecon.Target).SetURLDirectory("sitemap.xml")
 	http.OnTor(InfosWprecon.OtherInformationsBool["http.options.tor"])
 	http.OnRandomUserAgent(InfosWprecon.OtherInformationsBool["http.options.randomuseragent"])
 	http.OnTLSCertificateVerify(InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"])
+	http.FirewallDetection(true)
 
 	response, err := http.Run()
 
@@ -146,10 +158,12 @@ func Sitemap() *gohttp.Response {
 }
 
 func Readme() *gohttp.Response {
-	http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target).SetURLDirectory("readme.html")
+	http := gohttp.NewHTTPClient()
+	http.SetURL(InfosWprecon.Target).SetURLDirectory("readme.html")
 	http.OnTor(InfosWprecon.OtherInformationsBool["http.options.tor"])
 	http.OnRandomUserAgent(InfosWprecon.OtherInformationsBool["http.options.randomuseragent"])
 	http.OnTLSCertificateVerify(InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"])
+	http.FirewallDetection(true)
 
 	response, err := http.Run()
 
@@ -168,10 +182,12 @@ func XMLRPC() (string, *gohttp.Response) {
 
 		return "Link tag", &gohttp.Response{}
 	} else {
-		http := gohttp.NewHTTPClient().SetURL(InfosWprecon.Target).SetURLDirectory("xmlrpc.php")
+		http := gohttp.NewHTTPClient()
+		http.SetURL(InfosWprecon.Target).SetURLDirectory("xmlrpc.php")
 		http.OnTor(InfosWprecon.OtherInformationsBool["http.options.tor"])
 		http.OnRandomUserAgent(InfosWprecon.OtherInformationsBool["http.options.randomuseragent"])
 		http.OnTLSCertificateVerify(InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"])
+		http.FirewallDetection(true)
 
 		response, err := http.Run()
 

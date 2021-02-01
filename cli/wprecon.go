@@ -49,6 +49,7 @@ func init() {
 
 	root.Flags().BoolP("aggressive-mode", "A", false, "Activates the aggressive mode of wprecon.")
 	root.Flags().BoolP("detection-waf", "", false, "I will try to detect if the target is using any WAF Wordpress.")
+	root.Flags().StringP("wp-content-dir", "", "wp-content", "In case the wp-content directory is customized.")
 
 	root.MarkPersistentFlagRequired("url")
 
@@ -73,6 +74,7 @@ func ibanner() {
 
 	InfosWprecon.Force, _ = root.Flags().GetBool("force")
 	InfosWprecon.Verbose, _ = root.Flags().GetBool("verbose")
+	InfosWprecon.WPContent, _ = root.Flags().GetString("wp-content-dir")
 	InfosWprecon.OtherInformationsBool["http.options.tor"], _ = root.Flags().GetBool("tor")
 	InfosWprecon.OtherInformationsBool["http.options.randomuseragent"], _ = root.Flags().GetBool("random-agent")
 	InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"], _ = root.Flags().GetBool("tlscertificateverify")
@@ -84,11 +86,12 @@ func ibanner() {
 		banner.Banner()
 	}
 
-	go func() {
+	func() {
 		response := gohttp.SimpleRequest(InfosWprecon.Target)
 
 		InfosWprecon.OtherInformationsString["target.http.index.raw"] = response.Raw
 		InfosWprecon.OtherInformationsString["target.http.index.server"] = response.Response.Header.Get("Server")
 		InfosWprecon.OtherInformationsString["target.http.index.php.version"] = response.Response.Header.Get("x-powered-by")
+		InfosWprecon.OtherInformationsString["target.http.index.cookie"] = response.Response.Header.Get("Set-Cookie")
 	}()
 }
