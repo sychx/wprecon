@@ -75,7 +75,7 @@ func UsersEnumerateAgressive() ([]string, *gohttp.Response) {
 			response := gohttp.SimpleRequest(InfosWprecon.Target, "?rest_route=/wp/v2/users")
 
 			if response.Response.StatusCode == 200 && response.Raw != "" {
-				json.NewDecoder(response.RawIo).Decode(&ujson)
+				json.Unmarshal([]byte(response.Raw), &ujson)
 
 				for _, value := range ujson {
 					if _, has := text.ContainsSliceString(InfosWprecon.OtherInformationsSlice["target.http.users"], value.Name); !has {
@@ -101,7 +101,7 @@ func UsersEnumerateAgressive() ([]string, *gohttp.Response) {
 			response := gohttp.SimpleRequest(InfosWprecon.Target, "wp-json/wp/v2/users")
 
 			if response.Response.StatusCode == 200 && response.Raw != "" {
-				json.NewDecoder(response.RawIo).Decode(&ujson)
+				json.Unmarshal([]byte(response.Raw), &ujson)
 
 				for _, value := range ujson {
 					if _, has := text.ContainsSliceString(InfosWprecon.OtherInformationsSlice["target.http.users"], value.Name); !has {
