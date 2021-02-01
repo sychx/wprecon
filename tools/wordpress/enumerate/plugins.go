@@ -15,7 +15,7 @@ import (
 func PluginsEnumeratePassive() map[string]string {
 	raw := InfosWprecon.OtherInformationsString["target.http.index.raw"]
 
-	rex := regexp.MustCompile("/wp-content/plugins/(.*?)/.*?[css|js].*?ver=([0-9\\.]*)")
+	rex := regexp.MustCompile(InfosWprecon.WPContent + "/plugins/(.*?)/.*?[css|js].*?ver=([0-9\\.]*)")
 
 	submatchall := rex.FindAllSubmatch([]byte(raw), -1)
 
@@ -45,11 +45,13 @@ func PluginsEnumerateAgressive() map[string]string {
 
 			InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = ""
 		}
+
+		PluginsEnumeratePassive()
 	} else if pluginslist := PluginsEnumeratePassive(); len(pluginslist) > 0 {
 	} else if len(pluginslist) == 0 {
 		raw := InfosWprecon.OtherInformationsString["target.http.index.raw"]
 
-		rex := regexp.MustCompile("/wp-content/plugins/(.*?)/.*?[css|js]")
+		rex := regexp.MustCompile(InfosWprecon.WPContent + "/plugins/(.*?)/.*?[css|js]")
 		submatchall := rex.FindAllSubmatch([]byte(raw), -1)
 
 		for _, plugin := range submatchall {
@@ -62,7 +64,7 @@ func PluginsEnumerateAgressive() map[string]string {
 	}
 
 	for name := range InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"] {
-		path := "/wp-content/plugins/" + name + "/"
+		path := InfosWprecon.WPContent + "/plugins/" + name + "/"
 
 		if version := extensions.GetVersionByIndexOf(path); version != "" {
 			InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"][name] = version

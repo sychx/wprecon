@@ -79,6 +79,7 @@ func xmlrpcSimpleRequest(username, password string) (bool, error) {
 	http.OnRandomUserAgent(InfosWprecon.OtherInformationsBool["http.options.randomuseragent"])
 	http.OnTLSCertificateVerify(InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"])
 	http.SetData(fmt.Sprintf(`<methodCall><methodName>wp.getUsersBlogs</methodName><params><param><value>%s</value></param><param><value>%s</value></param></params></methodCall>`, username, password))
+	http.FirewallDetection(true)
 
 	response, err := http.Run()
 

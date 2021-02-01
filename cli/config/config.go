@@ -5,11 +5,15 @@ var InfosWprecon informationsWPRecon
 type informationsWPRecon struct {
 	Target        string
 	TotalRequests int
-	Verbose       bool
-	Force         bool
+
+	Verbose bool
+	Force   bool
 
 	TimeStart, TimeFinish string
 	TimeSleepRequests     int
+	TimeOutRequests       int
+
+	WPContent string
 
 	OtherInformationsString    map[string]string
 	OtherInformationsInt       map[string]int
@@ -20,11 +24,11 @@ type informationsWPRecon struct {
 
 func init() {
 	InfosWprecon.OtherInformationsSlice = map[string][]string{}
-	InfosWprecon.OtherInformationsString = make(map[string]string)
-	InfosWprecon.OtherInformationsInt = make(map[string]int)
-	InfosWprecon.OtherInformationsBool = make(map[string]bool)
-	InfosWprecon.OtherInformationsMapString = make(map[string]map[string]string)
+	InfosWprecon.OtherInformationsString = map[string]string{}
+	InfosWprecon.OtherInformationsInt = map[string]int{}
+	InfosWprecon.OtherInformationsBool = map[string]bool{}
+	InfosWprecon.OtherInformationsMapString = map[string]map[string]string{}
 
-	InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"] = make(map[string]string)
-	InfosWprecon.OtherInformationsMapString["target.http.themes.versions"] = make(map[string]string)
+	InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"] = map[string]string{}
+	InfosWprecon.OtherInformationsMapString["target.http.themes.versions"] = map[string]string{}
 }

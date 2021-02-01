@@ -59,6 +59,6 @@ func SBanner() {
 	} else if InfosWprecon.Verbose {
 		printer.Danger("(Alert) Enabling verbose mode can slow down wprecon. \n")
 	} else {
-		printer.Println("")
+		printer.Println()
 	}
 }

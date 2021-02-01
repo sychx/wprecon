@@ -36,15 +36,15 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 	}
 
 	if detectionwaf || aggressivemode {
-		if waf := security.WAFAgressiveDetection(); waf != nil {
-			name := strings.ReplaceAll(waf.URL.Directory, "wp-content/plugins/", "")
+		if waf := security.WAFAggressiveDetection(); waf != nil {
+			name := strings.ReplaceAll(waf.URL.Directory, InfosWprecon.WPContent+"/plugins/", "")
 			name = strings.ReplaceAll(name, "/", "")
 			name = strings.ReplaceAll(name, "-", " ")
 			name = strings.Title(name)
 
 			printer.Done("Web Application Firewall (WAF):", name, "(Aggressive Detection)")
-			printer.List("Location:", waf.URL.Full)
-			printer.List("Status Code:", fmt.Sprint(waf.Response.Status))
+			printer.List("Location:", waf.URL.Full).D()
+			printer.List("Status Code:", fmt.Sprint(waf.Response.Status)).D()
 
 			if importantfile := text.GetOneImportantFile(waf.Raw); importantfile != "" {
 				response := gohttp.SimpleRequest(InfosWprecon.Target, waf.URL.Directory+importantfile)
@@ -88,15 +88,15 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 	if usersEnumerateP, response := enumerate.UsersEnumeratePassive(); len(usersEnumerateP) > 0 && !aggressivemode {
 		printer.Done("WordPress Users:")
 		for _, username := range usersEnumerateP {
-			printer.List(username, "("+InfosWprecon.OtherInformationsString["target.http.users.method"]+")")
+			printer.List(username, "("+InfosWprecon.OtherInformationsString["target.http.users.method"]+")").D()
 		}
-		printer.List("All users were found at:", response.URL.Full)
+		printer.List("All users were found at:", response.URL.Full).D()
 	} else if usersEnumerateA, response := enumerate.UsersEnumerateAgressive(); len(usersEnumerateA) > 0 && aggressivemode {
 		printer.Done("WordPress Users:")
 		for _, username := range usersEnumerateA {
-			printer.List(username, "("+InfosWprecon.OtherInformationsString["target.http.users.method"]+")")
+			printer.List(username, "("+InfosWprecon.OtherInformationsString["target.http.users.method"]+")").D()
 		}
-		printer.List("All users were found at:", response.URL.Full)
+		printer.List("All users were found at:", response.URL.Full).D()
 	} else if len(usersEnumerateA) <= 0 && aggressivemode {
 		printer.Danger("Unfortunately no user was found.")
 	} else {
@@ -108,13 +108,13 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 			printer.Println()
 			if version != "" {
 				printer.Done("Plugin:", plugin, "(Enumerate Passive Mode)")
-				printer.List("Location:", InfosWprecon.Target+"wp-content/plugins/"+plugin+"/")
-				printer.List("Version:", version)
+				printer.List("Location:", InfosWprecon.Target+InfosWprecon.WPContent+"/plugins/"+plugin+"/").D()
+				printer.List("Version:", version).D()
 				pluginvulnenum(plugin, version)
 			} else {
 				printer.Done("Plugin:", plugin, "(Enumerate Passive Mode)")
-				printer.List("Location:", InfosWprecon.Target+"wp-content/plugins/"+plugin+"/")
-				printer.List("Version: Unidentified version")
+				printer.List("Location:", InfosWprecon.Target+InfosWprecon.WPContent+"/plugins/"+plugin+"/").D()
+				printer.List("Version: Unidentified version").D()
 			}
 		}
 	} else if pluginsEnumerateA := enumerate.PluginsEnumerateAgressive(); len(pluginsEnumerateA) > 0 && aggressivemode {
@@ -122,18 +122,20 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 			printer.Println()
 			if version != "" {
 				printer.Done("Plugin:", plugin, "(Enumerate Aggressive Mode)")
-				printer.List("Location:", InfosWprecon.Target+"wp-content/plugins/"+plugin+"/")
-				printer.List("Version:", version)
+				printer.List("Location:", InfosWprecon.Target+InfosWprecon.WPContent+"/plugins/"+plugin+"/").D()
+				printer.List("Version:", version).D()
 				pluginvulnenum(plugin, version)
 			} else {
 				printer.Done("Plugin:", plugin, "(Enumerate Aggressive Mode)")
-				printer.List("Location:", InfosWprecon.Target+"wp-content/plugins/"+plugin+"/")
-				printer.List("Version: Unidentified version")
+				printer.List("Location:", InfosWprecon.Target+InfosWprecon.WPContent+"/plugins/"+plugin+"/").D()
+				printer.List("Version: Unidentified version").D()
 			}
 		}
 	} else if len(pluginsEnumerateA) <= 0 && aggressivemode {
+		printer.Println()
 		printer.Danger("Unfortunately I was unable to passively list any plugin.")
 	} else {
+		printer.Println()
 		printer.Danger("Unfortunately I was unable to passively list any plugin. Try to use aggressive mode: --aggressive-mode")
 	}
 
@@ -142,16 +144,16 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 			printer.Println()
 			if version != "" {
 				printer.Done("Theme:", theme, "(Enumerate Passive Mode)")
-				printer.List("Location:", InfosWprecon.Target+"wp-content/themes/"+theme+"/")
-				printer.List("Version:", version)
+				printer.List("Location:", InfosWprecon.Target+InfosWprecon.WPContent+"/themes/"+theme+"/").D()
+				printer.List("Version:", version).D()
 
 				if InfosWprecon.Verbose {
-					printer.List("Unfortunately wprecon doesn't have vulns for themas *yet*.")
+					printer.List("Unfortunately wprecon doesn't have vulns for themas *yet*.").Warning()
 				}
 			} else {
 				printer.Done("Theme:", theme, "(Enumerate Passive Mode)")
-				printer.List("Location:", InfosWprecon.Target+"wp-content/themes/"+theme+"/")
-				printer.List("Version: Unidentified version")
+				printer.List("Location:", InfosWprecon.Target+InfosWprecon.WPContent+"/themes/"+theme+"/").D()
+				printer.List("Version: Unidentified version").D()
 			}
 		}
 		printer.Println()
@@ -160,23 +162,25 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 			printer.Println()
 			if version != "" {
 				printer.Done("Theme:", theme, "(Enumerate Aggressive Mode)")
-				printer.List("Location:", InfosWprecon.Target+"wp-content/themes/"+theme+"/")
-				printer.List("Version:", version)
+				printer.List("Location:", InfosWprecon.Target+InfosWprecon.WPContent+"/themes/"+theme+"/").D()
+				printer.List("Version:", version).D()
 
 				if InfosWprecon.Verbose {
-					printer.List("Unfortunately wprecon doesn't have vulns for themas *yet*.")
+					printer.List("Unfortunately wprecon doesn't have vulns for themas *yet*.").Warning()
 				}
 			} else {
 				printer.Done("Theme:", theme, "(Enumerate Aggressive Mode)")
-				printer.List("Location:", InfosWprecon.Target+"wp-content/themes/"+theme+"/")
-				printer.List("Version: Unidentified version")
+				printer.List("Location:", InfosWprecon.Target+InfosWprecon.WPContent+"/themes/"+theme+"/").D()
+				printer.List("Version: Unidentified version").D()
 			}
 		}
 		printer.Println()
 	} else if len(themesEnumerateA) <= 0 && aggressivemode {
+		printer.Println()
 		printer.Danger("Unfortunately I was unable to passively list any theme.")
 		printer.Println()
 	} else {
+		printer.Println()
 		printer.Danger("Unfortunately I was unable to passively list any theme. Try to use aggressive mode: --aggressive-mode")
 		printer.Println()
 	}
@@ -186,33 +190,54 @@ func RootOptionsPostRun(cmd *cobra.Command, args []string) {
 	printer.Info("Other interesting information:")
 	printer.Println()
 
+	if InfosWprecon.OtherInformationsString["target.http.index.server"] != "" || InfosWprecon.OtherInformationsString["target.http.index.php.version"] != "" {
+		printer.Done("Target information(s):")
+		if InfosWprecon.OtherInformationsString["target.http.index.server"] != "" {
+			printer.List("Server:", InfosWprecon.OtherInformationsString["target.http.index.server"]).D()
+		}
+		if InfosWprecon.OtherInformationsString["target.http.index.php.version"] != "" {
+			printer.List("PHP Version:", InfosWprecon.OtherInformationsString["target.http.index.php.version"]).Warning()
+		}
+		printer.Println()
+	}
+
 	if len(InfosWprecon.OtherInformationsSlice["target.http.indexof"]) > 0 {
 		printer.Done("Index Of's:")
 		for _, indexofs := range InfosWprecon.OtherInformationsSlice["target.http.indexof"] {
-			printer.List(indexofs)
+			printer.List(indexofs).D()
 		}
 		printer.Println()
 	}
 
 	if status, _ := commons.XMLRPC(); status != "false" {
 		printer.Done("XML-RPC Enabled:")
-		printer.List("Location:", InfosWprecon.Target+"xmlrpc.php")
-		printer.List("Checked By:", InfosWprecon.OtherInformationsString["target.http.xmlrpc.php.checkedby"])
+		printer.List("Location:", InfosWprecon.Target+"xmlrpc.php").D()
+		printer.List("Checked By:", InfosWprecon.OtherInformationsString["target.http.xmlrpc.php.checkedby"]).D()
 		printer.Println()
 	}
 
 	if URL := InfosWprecon.OtherInformationsString["target.http.admin-page"]; URL != "" {
 		printer.Done("Admin Page Found:")
-		printer.List("Location:", URL)
-		printer.List("Checked by: Access")
+		printer.List("Location:", URL).D()
+		printer.List("Checked by: Access").D()
 		printer.Println()
 	}
 
 	if response := commons.Readme(); response.Response.StatusCode == 200 {
 		printer.Done("WordPress Readme:")
-		printer.List("Location:", response.URL.Full)
-		printer.List("Checked by: Access")
+		printer.List("Location:", response.URL.Full).D()
+		printer.List("Checked by: Access").D()
 		printer.Println()
+	}
+
+	if raw := InfosWprecon.OtherInformationsString["target.http.wp-content/uploads.indexof.raw"]; raw != "" {
+		if list := extensions.FindBackupFileOrPath(raw); len(list) > 0 {
+			printer.Done("File or Path backup:")
+			for _, path := range list {
+				printer.List(InfosWprecon.Target + InfosWprecon.WPContent + "/uploads/" + path).Done()
+			}
+			printer.Println()
+		}
 	}
 
 	printer.Done("Total requests:", fmt.Sprint(InfosWprecon.TotalRequests))
@@ -253,13 +278,13 @@ func wordpresscheck() float32 {
 
 func pluginvulnenum(name string, version string) {
 	if vuln := extensions.GetVuln(name, version); len(vuln.Vulnerabilities) > 0 {
-		printer.List("Vuln Title:", vuln.Vulnerabilities[0].Title)
-		printer.List("Vuln Plublish:", vuln.Vulnerabilities[0].Published)
+		printer.List("Vuln Title:", vuln.Vulnerabilities[0].Title).Done()
+		printer.List("Vuln Plublish:", vuln.Vulnerabilities[0].Published).Done()
 
 		for _, value := range vuln.Vulnerabilities[0].References {
-			printer.List("Reference(s):", value)
+			printer.List("Reference(s):", value).Done()
 		}
 	} else {
-		printer.List("I have not found any vulnerability for this version.")
+		printer.List("I have not found any vulnerability for this version.").Danger()
 	}
 }
