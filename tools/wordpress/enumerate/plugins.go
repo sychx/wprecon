@@ -15,7 +15,7 @@ import (
 func PluginsEnumeratePassive() map[string]string {
 	raw := InfosWprecon.OtherInformationsString["target.http.index.raw"]
 
-	rex := regexp.MustCompile(InfosWprecon.WPContent + "/plugins/(.*?)/.*?[css|js].*?ver=([0-9\\.]*)")
+	rex := regexp.MustCompile(InfosWprecon.WPContent + "/plugins/(.*?)/.*?[css|js].*?ver=([0-9\\.-]*)")
 
 	submatchall := rex.FindAllSubmatch([]byte(raw), -1)
 

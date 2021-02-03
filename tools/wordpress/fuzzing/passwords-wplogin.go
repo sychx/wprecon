@@ -31,25 +31,25 @@ func WPLogin() int {
 		for key, password := range passwords {
 			if !done {
 				go func() {
-					newtopline.Progress(passwordscount, "Username:", username, "— Password:", password)
+					p := newtopline.Progress(passwordscount, "Username:", username, "— Password:", password)
 
 					is, err := wploginSimpleRequest(username, password)
 
 					if err != nil {
-						newtopline.DownLine()
+						printer.Println()
 						printer.Fatal(err)
 					}
 
 					if is {
 						newtopline.Done("Passoword Found!")
 						printer.Done("Username:", username, "— Password:", password)
-						newtopline.Count2 = 0
+						p.Fill()
 						done = true
 					}
 
 					if 1+key >= passwordscount {
 						newtopline.Danger("No password worked for the user:", username)
-						newtopline.Count2 = 0
+						p.Fill()
 					}
 				}()
 			} else {
@@ -59,6 +59,8 @@ func WPLogin() int {
 		}
 		done = false
 	}
+
+	printer.Println()
 
 	return 0
 }

@@ -47,7 +47,7 @@ func XMLRPC() int {
 					is, err := xmlrpcSimpleRequest(username, password)
 
 					if err != nil {
-						newtopline.DownLine()
+						printer.Println()
 						printer.Fatal(err)
 					}
 
@@ -66,6 +66,8 @@ func XMLRPC() int {
 		}
 		done = false
 	}
+
+	printer.Println()
 
 	return 0
 }
