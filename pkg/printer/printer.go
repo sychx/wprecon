@@ -6,91 +6,101 @@ import (
 	"io"
 	"os"
 	"strings"
-	"syscall"
 
 	color "github.com/logrusorgru/aurora"
 )
 
-// Required :: Constant with the word "required" in red.
-var Required = color.Red("(Required)").Bold().String()
-var stdout = *os.NewFile(uintptr(syscall.Stdout), "/dev/stdout")
-var stderr = *os.NewFile(uintptr(syscall.Stdout), "/dev/stderr")
+var (
+	stdin    = *os.Stdin
+	stdout   = *os.Stdout
+	stderr   = *os.Stderr
+	line     = &ln{}
+	zfill    = &z{}
+	Required = color.Red("(Required)").Bold().String()
+)
+
+var (
+	prefixDanger  = color.Red("[✗]").String()
+	prefixFatal   = color.Red("[!]").String()
+	prefixDone    = color.Green("[✔]").String()
+	prefixWarning = color.Yellow("[!]").String()
+	prefixScan    = color.Yellow("[?]").String()
+	prefixInfo    = color.Magenta("[i]").String()
+
+	prefixListDanger  = color.Red("    —").String()
+	prefixListDone    = color.Green("    —").String()
+	prefixListDefault = color.White("    —").String()
+	prefixListWarning = color.Yellow("    —").String()
+
+	prefixTopLine = color.Yellow("[✲]").String()
+)
+
+var (
+	seekCurrent = 1
+)
+
+type ln struct{}
+
+func (l *ln) L() *ln {
+	fmt.Fprintln(&stdout)
+
+	return l
+}
 
 // Println ::
-func Println(text ...interface{}) {
-	fmt.Fprintln(&stdout, text...)
+func Println(t ...interface{}) {
+	fmt.Fprintln(&stdout, t...)
 }
 
-// Done ::
-func Done(text ...string) {
-	var prefix = color.Green("[✔]").String()
-	var textString = strings.Join(text, " ")
-
-	_, err := io.WriteString(&stdout, prefix+" "+textString+"\n")
-
-	if err != nil {
-		panic(err)
-	}
+func Printf(format string, t ...interface{}) {
+	fmt.Fprintf(&stdout, format, t...)
 }
 
-// Danger ::
-func Danger(text ...string) {
-	var prefix = color.Red("[✗]").String()
-	var textString = strings.Join(text, " ")
+func Done(t ...string) *ln {
+	var raw = strings.Join(t, " ")
 
-	_, err := io.WriteString(&stdout, prefix+" "+textString+"\n")
+	io.WriteString(&stdout, prefixDone+" "+raw+"\n")
 
-	if err != nil {
-		panic(err)
-	}
+	return line
 }
 
-// Warning ::
-func Warning(text ...string) {
-	var prefix = color.Yellow("[!]").String()
-	var textString = strings.Join(text, " ")
+func Danger(t ...string) *ln {
+	var raw = strings.Join(t, " ")
 
-	_, err := io.WriteString(&stdout, prefix+" "+textString+"\n")
+	io.WriteString(&stdout, prefixDanger+" "+raw+"\n")
 
-	if err != nil {
-		panic(err)
-	}
+	return line
 }
 
-// Info ::
-func Info(text ...string) {
-	var prefix = color.Magenta("[i]").String()
-	var textString = strings.Join(text, " ")
+func Warning(t ...string) *ln {
+	var raw = strings.Join(t, " ")
 
-	_, err := io.WriteString(&stdout, prefix+" "+textString+"\n")
+	io.WriteString(&stdout, prefixWarning+" "+raw+"\n")
 
-	if err != nil {
-		panic(err)
-	}
+	return line
 }
 
-// Fatal ::
-func Fatal(text ...interface{}) {
-	var prefix = color.Red("[!]").String()
+func Info(t ...string) *ln {
+	var raw = strings.Join(t, " ")
 
-	fmt.Fprint(&stderr, prefix, " ")
-	fmt.Fprintln(&stderr, text...)
+	io.WriteString(&stdout, prefixInfo+" "+raw+"\n")
+
+	return line
+}
+
+func Fatal(t ...interface{}) {
+	fmt.Fprint(&stdout, prefixFatal, " ")
+	fmt.Fprintln(&stdout, t...)
 
 	os.Exit(0)
 }
 
-func ScanQ(text ...string) string {
-	var prefix = color.Yellow("[?]").String()
-	var textString = strings.Join(text, " ")
+func ScanQ(t ...string) string {
+	var raw = strings.Join(t, " ")
 
-	_, err := io.WriteString(&stdout, prefix+" "+textString)
-
-	if err != nil {
-		Fatal(err)
-	}
+	io.WriteString(&stdout, prefixScan+" "+raw)
 
 	scanner := bufio.NewReader(os.Stdin)
-
 	response, err := scanner.ReadString('\n')
 
 	if err != nil {
@@ -117,143 +127,90 @@ func List(text ...string) *l {
 	return &l{text: text}
 }
 
-func (options *l) D() {
-	var prefix = color.White("    —").String()
-	var textString = strings.Join(options.text, " ")
+func (options *l) D() *ln {
+	var raw = strings.Join(options.text, " ")
 
-	_, err := io.WriteString(&stdout, prefix+" "+textString+"\n")
+	io.WriteString(&stdout, prefixListDefault+" "+raw+"\n")
 
-	if err != nil {
-		panic(err)
-	}
+	return line
 }
 
-func (options *l) Done() {
-	var prefix = color.Green("    —").String()
-	var textString = strings.Join(options.text, " ")
+func (options *l) Done() *ln {
+	var raw = strings.Join(options.text, " ")
 
-	_, err := io.WriteString(&stdout, prefix+" "+textString+"\n")
+	io.WriteString(&stdout, prefixListDone+" "+raw+"\n")
 
-	if err != nil {
-		panic(err)
-	}
+	return line
 }
 
-func (options *l) Danger() {
-	var prefix = color.Red("    —").String()
-	var textString = strings.Join(options.text, " ")
+func (options *l) Danger() *ln {
+	var raw = strings.Join(options.text, " ")
 
-	_, err := io.WriteString(&stdout, prefix+" "+textString+"\n")
+	io.WriteString(&stdout, prefixListDanger+" "+raw+"\n")
 
-	if err != nil {
-		panic(err)
-	}
+	return line
 }
 
-func (options *l) Warning() {
-	var prefix = color.Yellow("    —").String()
-	var textString = strings.Join(options.text, " ")
+func (options *l) Warning() *ln {
+	var raw = strings.Join(options.text, " ")
 
-	_, err := io.WriteString(&stdout, prefix+" "+textString+"\n")
+	io.WriteString(&stdout, prefixListWarning+" "+raw+"\n")
 
-	if err != nil {
-		panic(err)
-	}
+	return line
 }
 
-func (options *l) Info() {
-	var prefix = color.Magenta("    —").String()
-	var textString = strings.Join(options.text, " ")
+type topline struct{}
 
-	_, err := io.WriteString(&stdout, prefix+" "+textString+"\n")
+func NewTopLine(t ...string) *topline {
+	var raw = strings.Join(t, " ")
 
-	if err != nil {
-		panic(err)
-	}
+	io.WriteString(&stdout, prefixTopLine+" "+raw)
+
+	return &topline{}
 }
 
-// TopLine :: "What is this struct for ?!" It will serve you some functions to write on the top line ... deleting the print of the NewTopLine function.
-type TopLine struct {
-	count  int
-	Count2 int
+func (options *topline) Done(t ...string) {
+	var raw = strings.Join(t, " ")
+
+	fmt.Fprint(&stdout, "\033[G\033[K")
+	io.WriteString(&stdout, prefixDone+" "+raw+"\n")
 }
 
-// NewTopLine ::
-func NewTopLine(text ...string) *TopLine {
-	var topline TopLine
+func (options *topline) Danger(t ...string) {
+	var raw = strings.Join(t, " ")
 
-	var prefix = color.Yellow("[✲]").String()
-	var textString = strings.Join(text, " ")
-
-	_, err := io.WriteString(&stdout, prefix+" "+textString)
-
-	if err != nil {
-		panic(err)
-	}
-
-	return &topline
+	fmt.Fprint(&stdout, "\033[G\033[K")
+	io.WriteString(&stdout, prefixDanger+" "+raw+"\n")
 }
 
-// DownLine :: An example of using this can be seen in the backup fuzzer file.
-func (topline *TopLine) DownLine() {
-	if topline.count <= 0 {
-		_, err := io.WriteString(&stdout, "\n")
+func (options *topline) Warning(t ...string) {
+	var raw = strings.Join(t, " ")
 
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	topline.count++
+	fmt.Fprint(&stdout, "\033[G\033[K")
+	io.WriteString(&stdout, prefixWarning+" "+raw+"\n")
 }
 
-func (topline *TopLine) Done(text ...string) {
-	var prefix = color.Green("[✔]").String()
-	var textString = strings.Join(text, " ")
+func (options *topline) Info(t ...string) {
+	var raw = strings.Join(t, " ")
 
-	fmt.Print("\033[G\033[K")
-	_, err := io.WriteString(&stdout, prefix+" "+textString+"\n")
-
-	if err != nil {
-		panic(err)
-	}
+	fmt.Fprint(&stdout, "\033[G\033[K")
+	io.WriteString(&stdout, prefixInfo+" "+raw+"\n")
 }
 
-func (topline *TopLine) Danger(text ...string) {
-	var prefix = color.Red("[✗]").String()
-	var textString = strings.Join(text, " ")
+type z struct{}
 
-	fmt.Print("\033[G\033[K")
-	_, err := io.WriteString(&stdout, prefix+" "+textString+"\n")
-
-	if err != nil {
-		panic(err)
-	}
+func (options *z) Fill() {
+	seekCurrent = 0
 }
 
-func (topline *TopLine) Warning(text ...string) {
-	var prefix = color.Yellow("[!]").String()
-	var textString = strings.Join(text, " ")
+func (options *topline) Progress(seek int, t ...string) *z {
+	var prefix = color.Yellow(fmt.Sprintf("[%d/%d]", seekCurrent, seek)).String()
+	var raw = strings.Join(t, " ")
 
-	fmt.Print("\033[G\033[K")
-	_, err := io.WriteString(&stdout, prefix+" "+textString+"\n")
+	fmt.Fprint(&stdout, "\033[G\033[K")
+	io.WriteString(&stdout, prefix+" "+raw)
 
-	if err != nil {
-		panic(err)
-	}
-}
+	seekCurrent++
 
-func (topline *TopLine) Progress(len int, text ...string) {
-
-	var prefix = color.Yellow(fmt.Sprintf("[%d/%d]", topline.Count2, len)).String()
-	var textString = strings.Join(text, " ")
-
-	fmt.Print("\033[G\033[K")
-	_, err := io.WriteString(&stdout, prefix+" "+textString)
-
-	if err != nil {
-		panic(err)
-	}
-
-	topline.Count2++
+	return zfill
 }

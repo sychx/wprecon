@@ -22,8 +22,7 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 
 	if confidence := wordpresscheck(); confidence >= 40.0 {
 		confidenceString := fmt.Sprintf("%.2f%%", confidence)
-		printer.Done("WordPress confirmed with", confidenceString, "confidence!")
-		printer.Println()
+		printer.Done("WordPress confirmed with", confidenceString, "confidence!").L()
 	} else if confidence < 40.0 && confidence > 15.0 && !InfosWprecon.Force {
 		confidenceString := fmt.Sprintf("%.2f%%", confidence)
 
@@ -66,8 +65,8 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 		printer.Println()
 	}
 
-	if scriptsS := InfosWprecon.OtherInformationsString["scripts.name"]; scriptsS != "" {
-		L, _ := scripts.Initialize(scriptsS)
+	if script := InfosWprecon.OtherInformationsString["scripts.name"]; script != "" {
+		L, _ := scripts.Initialize(script)
 
 		scripts.Run(L)
 	}
@@ -82,6 +81,12 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 			printer.Println(robotsResponse.Raw)
 		}
 
+		printer.Println()
+	}
+
+	if wordpressVersion := enumerate.WordpressVersionPassive(); wordpressVersion != "" {
+		printer.Done("WordPress Version:")
+		printer.List("Version:", wordpressVersion).D()
 		printer.Println()
 	}
 
@@ -177,27 +182,28 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 		printer.Println()
 	} else if len(themesEnumerateA) <= 0 && aggressivemode {
 		printer.Println()
-		printer.Danger("Unfortunately I was unable to passively list any theme.")
-		printer.Println()
+		printer.Danger("Unfortunately I was unable to passively list any theme.").L()
 	} else {
 		printer.Println()
-		printer.Danger("Unfortunately I was unable to passively list any theme. Try to use aggressive mode: --aggressive-mode")
-		printer.Println()
+		printer.Danger("Unfortunately I was unable to passively list any theme. Try to use aggressive mode: --aggressive-mode").L()
 	}
 }
 
 func RootOptionsPostRun(cmd *cobra.Command, args []string) {
-	printer.Info("Other interesting information:")
-	printer.Println()
+	printer.Info("Other interesting information:").L()
 
 	if InfosWprecon.OtherInformationsString["target.http.index.server"] != "" || InfosWprecon.OtherInformationsString["target.http.index.php.version"] != "" {
 		printer.Done("Target information(s):")
-		if InfosWprecon.OtherInformationsString["target.http.index.server"] != "" {
-			printer.List("Server:", InfosWprecon.OtherInformationsString["target.http.index.server"]).D()
+		if server := InfosWprecon.OtherInformationsString["target.http.index.server"]; server != "" {
+			printer.List("Server:", server).D()
 		}
-		if InfosWprecon.OtherInformationsString["target.http.index.php.version"] != "" {
-			printer.List("PHP Version:", InfosWprecon.OtherInformationsString["target.http.index.php.version"]).Warning()
+		if version := InfosWprecon.OtherInformationsString["target.http.index.php.version"]; version != "" {
+			printer.List("PHP Version:", version).Warning()
 		}
+		if version := InfosWprecon.OtherInformationsString["target.http.wordpress.version"]; version != "" {
+			printer.List("WordPress Version:", version).D()
+		}
+
 		printer.Println()
 	}
 
@@ -212,22 +218,19 @@ func RootOptionsPostRun(cmd *cobra.Command, args []string) {
 	if status, _ := commons.XMLRPC(); status != "false" {
 		printer.Done("XML-RPC Enabled:")
 		printer.List("Location:", InfosWprecon.Target+"xmlrpc.php").D()
-		printer.List("Checked By:", InfosWprecon.OtherInformationsString["target.http.xmlrpc.php.checkedby"]).D()
-		printer.Println()
+		printer.List("Checked By:", InfosWprecon.OtherInformationsString["target.http.xmlrpc.php.checkedby"]).D().L()
 	}
 
 	if URL := InfosWprecon.OtherInformationsString["target.http.admin-page"]; URL != "" {
 		printer.Done("Admin Page Found:")
 		printer.List("Location:", URL).D()
-		printer.List("Checked by: Access").D()
-		printer.Println()
+		printer.List("Checked by: Access").D().L()
 	}
 
 	if response := commons.Readme(); response.Response.StatusCode == 200 {
 		printer.Done("WordPress Readme:")
 		printer.List("Location:", response.URL.Full).D()
-		printer.List("Checked by: Access").D()
-		printer.Println()
+		printer.List("Checked by: Access").D().L()
 	}
 
 	if raw := InfosWprecon.OtherInformationsString["target.http.wp-content/uploads.indexof.raw"]; raw != "" {
