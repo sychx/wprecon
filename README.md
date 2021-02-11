@@ -39,6 +39,17 @@ But since they are not, it is for the reason that they are still in development.
 - [x] Scripts
 - [x] Vulnerability Version Checking (Plugins) **(Beta)**
 
+<h2 align="center">Build</h2>
+
+For you to compile **wprecon** you will need to have the golang compiler installed.
+And for that you will access the official website of golang and will download and install it. [**Here!**](https://golang.org/dl/)
+
+Once downloaded and installed you will download **wprecon** directly from github with the command:
+
+1. `go get github.com/blackbinn/wprecon`;
+2. `cd $(go env GOPATH)/src/github.com/blackbinn/wprecon`;
+3. `make build`.
+
 <p align="center" >
   <h2 align="center">WPrecon running</h2>
   
