@@ -25,7 +25,7 @@ But I already warn you that this wprecon that you see on github has nothing to d
 I don't have a website yet!
 </p>
  
-<h2 align="center">Features & Tasks List</h2>
+<h2 align="center">Features</h2>
 
 All that are already marked, are already on wprecon.
 But since they are not, it is for the reason that they are still in development.
@@ -41,10 +41,6 @@ But since they are not, it is for the reason that they are still in development.
 - [x] Tor Proxy
 - [x] User(s) Enumerator
 - [x] Vulnerability Version Checking (Plugins) **(Beta)**
-#### —————————————————— Task List ——————————————————
-- [ ] 🔨 — More Scripts Web Exploits
-- [ ] More Vulnerabilities (Plugins)
-- [ ] Vulnerability Version Checking (Theme)
 
 <p align="center" >
   <h2 align="center">WPrecon running</h2>
