@@ -26,9 +26,9 @@ func WAFAggressiveDetection() *gohttp.Response {
 		"wesecur-security"}
 
 	for _, path := range pathWAF {
-		pathFormat := fmt.Sprintf("%s/plugins/%s/", InfosWprecon.WPContent, path)
+		pathFormat := fmt.Sprintf("%s/plugins/%s/", Database.WPContent, path)
 
-		if response := gohttp.SimpleRequest(InfosWprecon.Target, pathFormat); response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
+		if response := gohttp.SimpleRequest(Database.Target, pathFormat); response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
 			return response
 		}
 	}

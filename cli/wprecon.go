@@ -46,6 +46,7 @@ func init() {
 	root.PersistentFlags().BoolP("disable-tls-checks", "", false, "Disables SSL/TLS certificate verification.")
 	root.PersistentFlags().BoolP("verbose", "v", false, "Verbosity mode.")
 	root.PersistentFlags().BoolP("force", "f", false, "Forces wprecon to not check if the target is running WordPress and forces other executions.")
+	root.PersistentFlags().IntP("http-sleep", "", 0, "You can make each request slower, if there is a WAF, it can make it difficult for it to block you. (default: 0)")
 
 	root.Flags().BoolP("aggressive-mode", "A", false, "Activates the aggressive mode of wprecon.")
 	root.Flags().BoolP("detection-waf", "", false, "I will try to detect if the target is using any WAF Wordpress.")
@@ -67,31 +68,32 @@ func init() {
 
 func ibanner() {
 	if target, _ := root.Flags().GetString("url"); !strings.HasSuffix(target, "/") {
-		InfosWprecon.Target = target + "/"
+		Database.Target = target + "/"
 	} else {
-		InfosWprecon.Target = target
+		Database.Target = target
 	}
 
-	InfosWprecon.Force, _ = root.Flags().GetBool("force")
-	InfosWprecon.Verbose, _ = root.Flags().GetBool("verbose")
-	InfosWprecon.WPContent, _ = root.Flags().GetString("wp-content-dir")
-	InfosWprecon.OtherInformationsBool["http.options.tor"], _ = root.Flags().GetBool("tor")
-	InfosWprecon.OtherInformationsBool["http.options.randomuseragent"], _ = root.Flags().GetBool("random-agent")
-	InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"], _ = root.Flags().GetBool("tlscertificateverify")
-	InfosWprecon.OtherInformationsString["scripts.name"], _ = root.Flags().GetString("scripts")
+	Database.Force, _ = root.Flags().GetBool("force")
+	Database.Verbose, _ = root.Flags().GetBool("verbose")
+	Database.WPContent, _ = root.Flags().GetString("wp-content-dir")
+	Database.OtherInformationsBool["http.options.tor"], _ = root.Flags().GetBool("tor")
+	Database.OtherInformationsString["scripts.name"], _ = root.Flags().GetString("scripts")
+	Database.OtherInformationsBool["http.options.randomuseragent"], _ = root.Flags().GetBool("random-agent")
+	Database.OtherInformationsBool["http.options.tlscertificateverify"], _ = root.Flags().GetBool("tlscertificateverify")
+	Database.OtherInformationsInt["http.requests.time.sleep"], _ = root.Flags().GetInt("http-sleep")
 
-	if isURL := gohttp.IsURL(InfosWprecon.Target); isURL {
+	if isURL := gohttp.IsURL(Database.Target); isURL {
 		banner.SBanner()
 	} else {
 		banner.Banner()
 	}
 
 	func() {
-		response := gohttp.SimpleRequest(InfosWprecon.Target)
+		response := gohttp.SimpleRequest(Database.Target)
 
-		InfosWprecon.OtherInformationsString["target.http.index.raw"] = response.Raw
-		InfosWprecon.OtherInformationsString["target.http.index.server"] = response.Response.Header.Get("Server")
-		InfosWprecon.OtherInformationsString["target.http.index.php.version"] = response.Response.Header.Get("x-powered-by")
-		InfosWprecon.OtherInformationsString["target.http.index.cookie"] = response.Response.Header.Get("Set-Cookie")
+		Database.OtherInformationsString["target.http.index.raw"] = response.Raw
+		Database.OtherInformationsString["target.http.index.server"] = response.Response.Header.Get("Server")
+		Database.OtherInformationsString["target.http.index.php.version"] = response.Response.Header.Get("x-powered-by")
+		Database.OtherInformationsString["target.http.index.cookie"] = response.Response.Header.Get("Set-Cookie")
 	}()
 }

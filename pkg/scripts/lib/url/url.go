@@ -1,6 +1,7 @@
 package url
 
 import (
+	"fmt"
 	"net"
 	"net/url"
 
@@ -9,9 +10,9 @@ import (
 )
 
 func Loader(L *lua.LState) int {
-	mod := L.SetFuncs(L.NewTable(), exports)
 
-	L.Push(mod)
+	L.Push(L.SetFuncs(L.NewTable(), exports))
+
 	return 1
 }
 
@@ -23,13 +24,11 @@ func gethost(L *lua.LState) int {
 	uri, err := url.ParseRequestURI(L.ToString(1))
 
 	if err != nil {
-		printer.Fatal(err)
+		printer.Danger(fmt.Sprintf("%s", err))
 	}
 
-	_, err = net.LookupHost(uri.Host)
-
-	if err != nil {
-		printer.Fatal(err)
+	if _, err := net.LookupHost(uri.Host); err != nil {
+		printer.Danger(fmt.Sprintf("%s", err))
 	}
 
 	L.Push(lua.LString(uri.Host))

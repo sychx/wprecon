@@ -53,7 +53,7 @@ func GetFileExtensions(url string, raw string) [][][]byte {
 
 // GetVersionStableTag :: This function searches for the version of the plugin or theme.
 func GetVersionStableTag(raw string) string {
-	rex := regexp.MustCompile("([S|s]table [T|t]ag|[V|v]ersion).*?([0-9.-]+)")
+	rex := regexp.MustCompile("[S|s]table [T|t]ag.*?([0-9.-]+)")
 
 	submatchall := rex.FindSubmatch([]byte(raw))
 
@@ -81,7 +81,7 @@ func GetVersionChangelog(raw string) string {
 	return ""
 }
 
-// GetVersionReleaseLog ::
+// GetVersionReleaseLog :: This function searches for the version of the plugin or theme.
 func GetVersionReleaseLog(raw string) string {
 	rex := regexp.MustCompile("[v|V]ersion.*?([0-9.-]+)")
 
@@ -96,6 +96,7 @@ func GetVersionReleaseLog(raw string) string {
 	return ""
 }
 
+// ReadAllFile :: This function will be responsible for reading the files.
 func ReadAllFile(filename string) (chars []string, count int) {
 	file, err := os.Open(filename)
 

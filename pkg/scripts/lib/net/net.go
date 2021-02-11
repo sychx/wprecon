@@ -23,7 +23,7 @@ func lookupip(L *lua.LState) int {
 	ips, err := net.LookupIP(L.ToString(1))
 
 	if err != nil {
-		printer.Fatal(err)
+		printer.Danger(fmt.Sprintf("%s", err))
 	}
 
 	ip := fmt.Sprintf("%s", ips[0])

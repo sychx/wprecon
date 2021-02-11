@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"strings"
 
 	color "github.com/logrusorgru/aurora"
@@ -38,6 +39,24 @@ var (
 var (
 	seekCurrent = 1
 )
+
+func init() {
+	if runtime.GOOS == "windows" {
+		prefixDanger = "[✗]"
+		prefixFatal = "[!]"
+		prefixDone = "[✔]"
+		prefixWarning = "[!]"
+		prefixScan = "[?]"
+		prefixInfo = "[i]"
+
+		prefixListDanger = "    —"
+		prefixListDone = "    —"
+		prefixListDefault = "    —"
+		prefixListWarning = "    —"
+
+		prefixTopLine = "[✲]"
+	}
+}
 
 type ln struct{}
 
@@ -207,10 +226,10 @@ func (options *topline) Progress(seek int, t ...string) *z {
 	var prefix = color.Yellow(fmt.Sprintf("[%d/%d]", seekCurrent, seek)).String()
 	var raw = strings.Join(t, " ")
 
+	seekCurrent++
+
 	fmt.Fprint(&stdout, "\033[G\033[K")
 	io.WriteString(&stdout, prefix+" "+raw)
-
-	seekCurrent++
 
 	return zfill
 }
