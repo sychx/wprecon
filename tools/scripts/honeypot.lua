@@ -23,7 +23,7 @@ local client = http.client()
 -- This variable must be named "script"
 script = {
     -- Here is the title of your script/vulnerability/poc/cve
-    title = "Honeypot checker",
+    title = "Honeypot Checker",
     -- Here is the name of the author of the script/vulnerability/poc/cve
     author = "blackcrw (WPrecon)",
     -- If your script has a license
@@ -48,14 +48,13 @@ function run(target)
     local response, err = client:do_request(request)
 
     if err then
-        printer.fatal(err)
+        printer.danger(err)
     end
 
     if response.code == 200 then
         printer.done("With a "..convert(response.body).." chance of this host being a Honeypot.")
     end
 
-    print()
 end
 
 function convert(text)

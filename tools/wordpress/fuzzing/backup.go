@@ -14,10 +14,10 @@ func BackupFile() {
 
 	done := false
 
-	for _, directory := range [...]string{"", InfosWprecon.WPContent, "wp-includes/", "wp-uploads/"} {
+	for _, directory := range [...]string{"", Database.WPContent, "wp-includes/", "wp-uploads/"} {
 		for _, file := range wordlist.BackupFiles {
 			go func(file string) {
-				response := gohttp.SimpleRequest(InfosWprecon.Target, directory+file)
+				response := gohttp.SimpleRequest(Database.Target, directory+file)
 
 				if response.Response.StatusCode == 200 {
 					printer.Done("Status Code: 200", "URL:", response.URL.Full)

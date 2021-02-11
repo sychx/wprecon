@@ -1,6 +1,8 @@
 package banner
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	. "github.com/blackbinn/wprecon/cli/config"
@@ -35,28 +37,33 @@ ____/|__/  /_/     /_/ |_| /_____/  \____/  \____/ /_/ |_/
 func SBanner() {
 	Banner()
 
-	printer.Done("Target:     ", InfosWprecon.Target)
+	printer.Done("Target:     ", Database.Target)
 
-	if InfosWprecon.OtherInformationsBool["http.options.tor"] {
+	if Database.OtherInformationsBool["http.options.tor"] {
 		ipTor := gohttp.TorGetIP()
 
 		printer.Done("Proxy:      ", ipTor)
 	}
 
-	InfosWprecon.TimeStart = time.Now().Format(("Monday Jan 02 15:04:05 2006"))
+	Database.TimeStart = time.Now().Format(("Monday Jan 02 15:04:05 2006"))
 
-	printer.Done("Started in: ", InfosWprecon.TimeStart)
+	printer.Done("Started in: ", Database.TimeStart)
 
-	if name := InfosWprecon.OtherInformationsString["scripts.name"]; name != "" {
-		_, infos := scripts.Initialize(name)
+	if names := Database.OtherInformationsString["scripts.name"]; names != "" {
+		var names = strings.Split(names, ",")
 
-		printer.Done("Script Name:", infos.Title)
-		printer.Done("Script Desc:", infos.Description)
+		for _, name := range names {
+			if !scripts.Exists(name) {
+				printer.Fatal("The \"" + name + "\" script does not exist")
+			}
+		}
+
+		printer.Done("Loaded:     ", fmt.Sprintf("%d", len(names)), "Script(s)...")
 	}
 
-	if InfosWprecon.Verbose && InfosWprecon.OtherInformationsBool["http.options.tor"] {
+	if Database.Verbose && Database.OtherInformationsBool["http.options.tor"] {
 		printer.Danger("(Alert) Activating verbose mode together with tor mode can make the wprecon super slow. \n")
-	} else if InfosWprecon.Verbose {
+	} else if Database.Verbose {
 		printer.Danger("(Alert) Enabling verbose mode can slow down wprecon. \n")
 	} else {
 		printer.Println()

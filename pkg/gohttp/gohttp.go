@@ -8,12 +8,15 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	. "github.com/blackbinn/wprecon/cli/config"
 	"github.com/blackbinn/wprecon/pkg/printer"
 )
 
-var firewallPassing = false
+var (
+	firewallPassing bool
+)
 
 // HTTPOptions :: This is Struct Http, it will inherit the struct Options and client.
 type httpOptions struct {
@@ -27,6 +30,7 @@ type httpOptions struct {
 	redirect             func(req *http.Request, via []*http.Request) error
 	contentType          string
 	firewall             bool
+	sleep                time.Duration
 }
 
 // Response :: This struct will store the request data, and will be used for a return.
@@ -55,9 +59,9 @@ func SimpleRequest(params ...string) *Response {
 		http.SetURLDirectory(params[1])
 	}
 
-	http.OnTor(InfosWprecon.OtherInformationsBool["http.options.tor"])
-	http.OnRandomUserAgent(InfosWprecon.OtherInformationsBool["http.options.randomuseragent"])
-	http.OnTLSCertificateVerify(InfosWprecon.OtherInformationsBool["http.options.tlscertificateverify"])
+	http.OnTor(Database.OtherInformationsBool["http.options.tor"])
+	http.OnRandomUserAgent(Database.OtherInformationsBool["http.options.randomuseragent"])
+	http.OnTLSCertificateVerify(Database.OtherInformationsBool["http.options.tlscertificateverify"])
 	http.FirewallDetection(true)
 
 	response, err := http.Run()
@@ -181,6 +185,12 @@ func (options *httpOptions) FirewallDetection(status bool) *httpOptions {
 	return options
 }
 
+func (options *httpOptions) SetSleep(tm int) *httpOptions {
+	options.sleep = time.Duration(tm)
+
+	return options
+}
+
 func (options *httpOptions) f(http *Response) {
 	exists, firewall, output, solve, confidence := NewFirewallDetectionPassive(http).All().Run()
 
@@ -235,7 +245,7 @@ func (options *httpOptions) Run() (*Response, error) {
 		return nil, err
 	}
 
-	InfosWprecon.TotalRequests++
+	Database.TotalRequests++
 
 	structResponse := &Response{
 		Raw:      string(raw),
@@ -245,6 +255,12 @@ func (options *httpOptions) Run() (*Response, error) {
 
 	if options.firewall && !firewallPassing {
 		options.f(structResponse)
+	}
+
+	if options.sleep != 0 {
+		time.Sleep(time.Duration(options.sleep) * time.Second)
+	} else if sleep := Database.OtherInformationsInt["http.requests.time.sleep"]; sleep != 0 {
+		time.Sleep(time.Duration(sleep) * time.Second)
 	}
 
 	return structResponse, nil

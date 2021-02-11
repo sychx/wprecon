@@ -8,7 +8,7 @@ import (
 )
 
 func WordpressVersionPassive() string {
-	raw := InfosWprecon.OtherInformationsString["target.http.index.raw"]
+	raw := Database.OtherInformationsString["target.http.index.raw"]
 
 	rex := regexp.MustCompile("<meta name=\"generator\" content=\"WordPress ([0-9.-]*).*?")
 
@@ -17,10 +17,10 @@ func WordpressVersionPassive() string {
 	for _, slicebytes := range submatchall {
 		version := fmt.Sprintf("%s", slicebytes[1])
 
-		InfosWprecon.OtherInformationsString["target.http.wordpress.version"] = version
+		Database.OtherInformationsString["target.http.wordpress.version"] = version
 	}
 
-	return InfosWprecon.OtherInformationsString["target.http.wordpress.version"]
+	return Database.OtherInformationsString["target.http.wordpress.version"]
 }
 
 func WordpressVersionAggressive() {

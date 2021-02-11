@@ -29,7 +29,7 @@ func Tor() (func(*http.Request) (*url.URL, error), error) {
 func TorGetIP() string {
 	defer handler.HandlerErrorTorProxy()
 
-	http, _ := NewHTTPClient().SetURLFull("https://check.torproject.org/api/ip").OnTor(true)
+	http, _ := NewHTTPClient().SetURLFull("https://check.torproject.org/api/ip").SetSleep(0).OnTor(true)
 
 	response, err := http.Run()
 

@@ -11,7 +11,7 @@ import (
 
 // GetVersionByRequest ::
 func GetVersionByRequest(path string) string {
-	if response := gohttp.SimpleRequest(InfosWprecon.Target, path); response.Response.StatusCode == 200 && response.Raw != "" {
+	if response := gohttp.SimpleRequest(Database.Target, path); response.Response.StatusCode == 200 && response.Raw != "" {
 		if version := text.GetVersionStableTag(response.Raw); version != "" {
 			return version
 		} else if version := text.GetVersionChangelog(response.Raw); version != "" {
@@ -99,10 +99,10 @@ func GetVersionByReleaseLog(path string) string {
 
 // GetVersionByIndexOf ::
 func GetVersionByIndexOf(path string) string {
-	raw := gohttp.SimpleRequest(InfosWprecon.Target, path).Raw
+	raw := gohttp.SimpleRequest(Database.Target, path).Raw
 
 	if file := text.GetOneImportantFile(raw); file != "" {
-		raw := gohttp.SimpleRequest(InfosWprecon.Target, path+file).Raw
+		raw := gohttp.SimpleRequest(Database.Target, path+file).Raw
 
 		if version := text.GetVersionChangelog(raw); version != "" {
 			return version

@@ -1,6 +1,6 @@
 package config
 
-var InfosWprecon informationsWPRecon
+var Database informationsWPRecon
 
 type informationsWPRecon struct {
 	Target        string
@@ -23,12 +23,12 @@ type informationsWPRecon struct {
 }
 
 func init() {
-	InfosWprecon.OtherInformationsSlice = map[string][]string{}
-	InfosWprecon.OtherInformationsString = map[string]string{}
-	InfosWprecon.OtherInformationsInt = map[string]int{}
-	InfosWprecon.OtherInformationsBool = map[string]bool{}
-	InfosWprecon.OtherInformationsMapString = map[string]map[string]string{}
+	Database.OtherInformationsSlice = map[string][]string{}
+	Database.OtherInformationsString = map[string]string{}
+	Database.OtherInformationsInt = map[string]int{}
+	Database.OtherInformationsBool = map[string]bool{}
+	Database.OtherInformationsMapString = map[string]map[string]string{}
 
-	InfosWprecon.OtherInformationsMapString["target.http.plugins.versions"] = map[string]string{}
-	InfosWprecon.OtherInformationsMapString["target.http.themes.versions"] = map[string]string{}
+	Database.OtherInformationsMapString["target.http.plugins.versions"] = map[string]string{}
+	Database.OtherInformationsMapString["target.http.themes.versions"] = map[string]string{}
 }
