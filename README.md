@@ -30,16 +30,13 @@ I don't have a website yet!
 All that are already marked, are already on wprecon.
 But since they are not, it is for the reason that they are still in development.
 
-- [x] Detection WAF
-- [x] Fuzzing Backup Files
-- [x] Fuzzing Passwords (xml-rpc)
-- [x] Fuzzing Passwords (wp-login)
+- [x] Detection WAF (Passive & Aggressive)
 - [x] Random User Agent
-- [x] Plugin(s) Enumerator
-- [x] Theme(s) Enumerator
-- [x] Scripts
 - [x] Tor Proxy
-- [x] User(s) Enumerator
+- [x] Enumerator (Users, Plugins & Themes)
+- [x] Enumerator Version (Plugins, Themes & WordPress)
+- [x] Brute Force (xml-rpc & wp-login)
+- [x] Scripts
 - [x] Vulnerability Version Checking (Plugins) **(Beta)**
 
 <p align="center" >
