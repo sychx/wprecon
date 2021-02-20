@@ -19,7 +19,7 @@ type githubAPIJSON struct {
 func CheckUpdate() string {
 	var githubJSON githubAPIJSON
 
-	http := gohttp.NewHTTPClient().SetURLFull("https://raw.githubusercontent.com/blackbinn/wprecon/dev/internal/config/config.json").SetSleep(0)
+	http := gohttp.NewHTTPClient().SetURLFull("https://raw.githubusercontent.com/blackbinn/wprecon/master/internal/config/config.json").SetSleep(0)
 
 	request, _ := http.Run()
 
