@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/internal/database"
 	"github.com/blackbinn/wprecon/internal/pkg/update"
 	"github.com/blackbinn/wprecon/internal/pkg/version"
 	"github.com/blackbinn/wprecon/pkg/gohttp"
@@ -16,7 +16,7 @@ import (
 // Banner :: A simple banner.
 func Banner() {
 	printer.Println("——————————————————————————————————————————————————————————————————")
-	printer.Println("___       ______________________________________________   __\n__ |     / /__  __ \__  __ \__  ____/_  ____/_  __ \__  | / /\n__ | /| / /__  /_/ /_  /_/ /_  __/  _  /    _  / / /_   |/ / \n__ |/ |/ / _  ____/_  _, _/_  /___  / /___  / /_/ /_  /|  /  \n____/|__/  /_/     /_/ |_| /_____/  \____/  \____/ /_/ |_/   \n")
+	printer.Println("___       ______________________________________________   __\n__ |     / /__  __ \\__  __ \\__  ____/_  ____/_  __ \\__  | / /\n__ | /| / /__  /_/ /_  /_/ /_  __/  _  /    _  / / /_   |/ / \n__ |/ |/ / _  ____/_  _, _/_  /___  / /___  / /_/ /_  /|  /  \n____/|__/  /_/     /_/ |_| /_____/  \\____/  \\____/ /_/ |_/   \n")
 	printer.Println("Github: ", "https://github.com/blackbinn/wprecon")
 
 	if newVersion := update.CheckUpdate(); newVersion != "" {
@@ -32,19 +32,17 @@ func Banner() {
 func SBanner() {
 	Banner()
 
-	printer.Done("Target:     ", Database.Target)
+	printer.Done("Target:     ", database.Memory.GetString("Target"))
 
-	if Database.OtherInformationsBool["http.options.tor"] {
+	if database.Memory.GetBool("Target") {
 		ipTor := gohttp.TorGetIP()
 
 		printer.Done("Proxy:      ", ipTor)
 	}
 
-	Database.TimeStart = time.Now().Format(("Monday Jan 02 15:04:05 2006"))
+	printer.Done("Started in: ", time.Now().Format(("Monday Jan 02 15:04:05 2006")))
 
-	printer.Done("Started in: ", Database.TimeStart)
-
-	if names := Database.OtherInformationsString["scripts.name"]; names != "" {
+	if names := database.Memory.GetString("Scripts List Names"); names != "" {
 		var names = strings.Split(names, ",")
 
 		for _, name := range names {
@@ -56,10 +54,10 @@ func SBanner() {
 		printer.Done("Loaded:     ", fmt.Sprintf("%d", len(names)), "Script(s)...")
 	}
 
-	if Database.Verbose && Database.OtherInformationsBool["http.options.tor"] {
-		printer.Danger("(Alert) Activating verbose mode together with tor mode can make the wprecon super slow. \n")
-	} else if Database.Verbose {
-		printer.Danger("(Alert) Enabling verbose mode can slow down wprecon. \n")
+	if database.Memory.GetBool("Verbose") && database.Memory.GetBool("HTTP Options TOR") {
+		printer.Danger("(Alert) Activating verbose mode together with tor mode can make the wprecon super slow.\n")
+	} else if database.Memory.GetBool("Verbose") {
+		printer.Danger("(Alert) Enabling verbose mode can slow down wprecon.\n")
 	} else {
 		printer.Println()
 	}

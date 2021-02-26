@@ -3,7 +3,7 @@ package security
 import (
 	"fmt"
 
-	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/internal/database"
 	"github.com/blackbinn/wprecon/pkg/gohttp"
 )
 
@@ -26,9 +26,9 @@ func WAFAggressiveDetection() *gohttp.Response {
 		"wesecur-security"}
 
 	for _, path := range pathWAF {
-		pathFormat := fmt.Sprintf("%s/plugins/%s/", Database.WPContent, path)
+		pathFormat := fmt.Sprintf("%s/plugins/%s/", database.Memory.GetString("HTTP wp-content"), path)
 
-		if response := gohttp.SimpleRequest(Database.Target, pathFormat); response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
+		if response := gohttp.SimpleRequest(database.Memory.GetString("Target"), pathFormat); response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
 			return response
 		}
 	}

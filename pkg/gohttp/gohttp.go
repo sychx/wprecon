@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/internal/database"
 	"github.com/blackbinn/wprecon/pkg/printer"
 )
 
@@ -59,9 +59,9 @@ func SimpleRequest(params ...string) *Response {
 		http.SetURLDirectory(params[1])
 	}
 
-	http.OnTor(Database.OtherInformationsBool["http.options.tor"])
-	http.OnRandomUserAgent(Database.OtherInformationsBool["http.options.randomuseragent"])
-	http.OnTLSCertificateVerify(Database.OtherInformationsBool["http.options.tlscertificateverify"])
+	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
+	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
+	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))
 	http.FirewallDetection(true)
 
 	response, err := http.Run()
@@ -195,8 +195,7 @@ func (options *httpOptions) f(http *Response) {
 	exists, firewall, output, solve, confidence := NewFirewallDetectionPassive(http).All().Run()
 
 	if exists {
-		printer.Danger("Firewall Active Detection:")
-		printer.List("Firewall:", firewall).D()
+		printer.Danger("Firewall Active Detection:", firewall)
 		printer.List("Detection By:", output).D()
 		printer.List("Confidence:", fmt.Sprintf("%d%%", confidence)).D()
 		if solve != "" {
@@ -245,7 +244,7 @@ func (options *httpOptions) Run() (*Response, error) {
 		return nil, err
 	}
 
-	Database.TotalRequests++
+	database.Memory.AddInt("HTTP Total")
 
 	structResponse := &Response{
 		Raw:      string(raw),
@@ -259,7 +258,7 @@ func (options *httpOptions) Run() (*Response, error) {
 
 	if options.sleep != 0 {
 		time.Sleep(time.Duration(options.sleep) * time.Second)
-	} else if sleep := Database.OtherInformationsInt["http.requests.time.sleep"]; sleep != 0 {
+	} else if sleep := database.Memory.GetInt("HTTP Time Sleep"); sleep != 0 {
 		time.Sleep(time.Duration(sleep) * time.Second)
 	}
 

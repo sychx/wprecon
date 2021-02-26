@@ -46,7 +46,12 @@ Example:
   wprecon -u "https://xxxxxxxx.com" --detection-waf
   wprecon -u "https://xxxxxxxx.com" --aggressive-mode
   wprecon -u "https://xxxxxxxx.com" -A --scripts script1,script2,script3
-`, green("[flags]"), green("[target]"), printer.Required, green("[dir]"), green("[seconds]"), green("[list]"))
+`, green("[flags]"),
+	green("[target]"),
+	printer.Required,
+	green("[dir]"),
+	green("[seconds]"),
+	green("[list]"))
 
 // HelpFuzzer ::
 var HelpFuzzer = fmt.Sprintf(`wprecon (Wordpress Recon) is a tool for wordpress exploration!
@@ -59,6 +64,8 @@ Flags:
   -U, --usernames %s       Set usernames attack passwords.
   -P, --passwords %s  Set wordlist attack passwords.
   -M, --method-attack %s Forces the use of a non-standard attack method (XML-RPC). Available methods: xml-rpc, wp-login
+      --p-prefix %s        Sets a prefix for all passwords in the wordlist.
+      --p-suffix %s        Sets a suffix for all passwords in the wordlist.
 
 Global Flags:
   -h, --help                   help for wprecon.
@@ -75,4 +82,13 @@ Example:
   wprecon fuzz -u "https://xxxxxxxx.com" -U user -P $HOME/wordlist/rockyou.txt
   wprecon fuzz -u "https://xxxxxxxx.com" -U user1,user2,user3 -P $HOME/wordlist/rockyou.txt
   wprecon fuzz -u "https://xxxxxxxx.com" --backup-file --random-agent
-`, green("[flags]"), green("[list]"), green("[file-path]"), green("[attack]"), green("[target]"), printer.Required, green("[seconds]"), green("[list]"))
+`, green("[flags]"),
+	green("[list]"),
+	green("[file-path]"),
+	green("[attack]"),
+	green("[text]"),
+	green("[text]"),
+	green("[target]"),
+	printer.Required,
+	green("[seconds]"),
+	green("[list]"))

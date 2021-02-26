@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/blackbinn/wprecon/cli/cmd"
-	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/internal/database"
 	"github.com/blackbinn/wprecon/internal/pkg/banner"
 	"github.com/blackbinn/wprecon/pkg/gohttp"
 	"github.com/blackbinn/wprecon/pkg/printer"
@@ -61,6 +61,8 @@ func init() {
 	fuzzer.Flags().StringP("passwords", "P", "", "Set wordlist attack passwords.")
 	fuzzer.Flags().BoolP("backup-file", "B", false, "Performs a fuzzing to try to find the backup file if it exists.")
 	fuzzer.Flags().StringP("attack-method", "M", "xml-rpc", "Avaliable: xml-rpc and wp-login")
+	fuzzer.Flags().StringP("p-prefix", "", "", "Sets a prefix for all passwords in the wordlist.")
+	fuzzer.Flags().StringP("p-suffix", "", "", "Sets a suffix for all passwords in the wordlist.")
 
 	fuzzer.SetHelpTemplate(banner.HelpFuzzer)
 	root.AddCommand(fuzzer)
@@ -68,32 +70,43 @@ func init() {
 
 func ibanner() {
 	if target, _ := root.Flags().GetString("url"); !strings.HasSuffix(target, "/") {
-		Database.Target = target + "/"
+		database.Memory.SetString("Target", target+"/")
 	} else {
-		Database.Target = target
+		database.Memory.SetString("Target", target)
 	}
+	x1, _ := root.Flags().GetBool("force")
+	database.Memory.SetBool("Force", x1)
+	x2, _ := root.Flags().GetBool("tor")
+	database.Memory.SetBool("HTTP Options TOR", x2)
+	x3, _ := root.Flags().GetBool("verbose")
+	database.Memory.SetBool("Verbose", x3)
+	x4, _ := root.Flags().GetString("wp-content-dir")
+	database.Memory.SetString("HTTP wp-content", x4)
+	x5, _ := root.Flags().GetString("scripts")
+	database.Memory.SetString("Scripts List Names", x5)
+	x6, _ := fuzzer.Flags().GetString("p-prefix")
+	database.Memory.SetString("Passwords Prefix", x6)
+	x7, _ := fuzzer.Flags().GetString("p-suffix")
+	database.Memory.SetString("Passwords Suffix", x7)
+	x8, _ := root.Flags().GetBool("random-agent")
+	database.Memory.SetBool("HTTP Options Random Agent", x8)
+	x9, _ := root.Flags().GetBool("tlscertificateverify")
+	database.Memory.SetBool("HTTP Options TLS Certificate Verify", x9)
+	x10, _ := root.Flags().GetInt("http-sleep")
+	database.Memory.SetInt("HTTP Time Sleep", x10)
 
-	Database.Force, _ = root.Flags().GetBool("force")
-	Database.Verbose, _ = root.Flags().GetBool("verbose")
-	Database.WPContent, _ = root.Flags().GetString("wp-content-dir")
-	Database.OtherInformationsBool["http.options.tor"], _ = root.Flags().GetBool("tor")
-	Database.OtherInformationsString["scripts.name"], _ = root.Flags().GetString("scripts")
-	Database.OtherInformationsBool["http.options.randomuseragent"], _ = root.Flags().GetBool("random-agent")
-	Database.OtherInformationsBool["http.options.tlscertificateverify"], _ = root.Flags().GetBool("tlscertificateverify")
-	Database.OtherInformationsInt["http.requests.time.sleep"], _ = root.Flags().GetInt("http-sleep")
-
-	if isURL := gohttp.IsURL(Database.Target); isURL {
+	if isURL := gohttp.IsURL(database.Memory.GetString("Target")); isURL {
 		banner.SBanner()
 	} else {
 		banner.Banner()
 	}
 
 	func() {
-		response := gohttp.SimpleRequest(Database.Target)
+		response := gohttp.SimpleRequest(database.Memory.GetString("Target"))
 
-		Database.OtherInformationsString["target.http.index.raw"] = response.Raw
-		Database.OtherInformationsString["target.http.index.server"] = response.Response.Header.Get("Server")
-		Database.OtherInformationsString["target.http.index.php.version"] = response.Response.Header.Get("x-powered-by")
-		Database.OtherInformationsString["target.http.index.cookie"] = response.Response.Header.Get("Set-Cookie")
+		database.Memory.SetString("HTTP Index Raw", response.Raw)
+		database.Memory.SetString("HTTP PHP Version", response.Response.Header.Get("x-powered-by"))
+		database.Memory.SetString("HTTP Server", response.Response.Header.Get("Server"))
+		database.Memory.SetString("HTTP Index Cookie", response.Response.Header.Get("Set-Cookie"))
 	}()
 }

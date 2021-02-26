@@ -2,10 +2,9 @@ package enumerate
 
 import (
 	"encoding/json"
-	"fmt"
 	"regexp"
 
-	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/internal/database"
 	"github.com/blackbinn/wprecon/pkg/gohttp"
 	"github.com/blackbinn/wprecon/pkg/printer"
 	"github.com/blackbinn/wprecon/pkg/text"
@@ -16,110 +15,95 @@ type uJSON []struct {
 }
 
 // UsersEnumeratePassive :: Enumerate using feed
-func UsersEnumeratePassive() ([]string, *gohttp.Response) {
-	response := gohttp.SimpleRequest(Database.Target, "feed/")
+func UsersEnumeratePassive() (users []string, method string, URL string) {
+	response := gohttp.SimpleRequest(database.Memory.GetString("Target"), "feed/")
 
 	rex := regexp.MustCompile("<dc:creator><!\\[CDATA\\[(.+?)\\]\\]></dc:creator>")
-	submatch := rex.FindAllSubmatch([]byte(response.Raw), -1)
 
-	for _, value := range submatch {
-		valueString := fmt.Sprintf("%s", value[1])
-
-		if _, has := text.ContainsSliceString(Database.OtherInformationsSlice["target.http.users"], valueString); !has {
-			Database.OtherInformationsSlice["target.http.users"] = append(Database.OtherInformationsSlice["target.http.users"], valueString)
+	for _, user := range rex.FindAllStringSubmatch(response.Raw, -1) {
+		if _, has := text.ContainsSliceString(users, user[1]); !has {
+			users = append(users, user[1])
 		}
 	}
 
-	if len(Database.OtherInformationsSlice["target.http.users"]) > 0 {
-		Database.OtherInformationsString["target.http.users.method"] = "Feed"
-	}
+	URL = response.URL.Full
+	method = "Feed"
 
-	return Database.OtherInformationsSlice["target.http.users"], response
+	return
 }
 
 // UsersEnumerateAgressive ::
-func UsersEnumerateAgressive() ([]string, *gohttp.Response) {
-	var responseReturn *gohttp.Response
+func UsersEnumerateAgressive() (users []string, method string, URL string) {
 	var ujson uJSON
-	done := false
-
-	// Enumerate using Yoast SEO
-	func() {
-		if done == false {
-			response := gohttp.SimpleRequest(Database.Target, "author-sitemap.xml")
-
-			rex := regexp.MustCompile("<loc>.*?/author/(.*?)/</loc>")
-
-			submatch := rex.FindAllSubmatch([]byte(response.Raw), -1)
-
-			for _, value := range submatch {
-				valueString := fmt.Sprintf("%s", value[1])
-
-				if _, has := text.ContainsSliceString(Database.OtherInformationsSlice["target.http.users"], valueString); !has {
-					Database.OtherInformationsSlice["target.http.users"] = append(Database.OtherInformationsSlice["target.http.users"], valueString)
-				}
-			}
-
-			if len(Database.OtherInformationsSlice["target.http.users"]) > 0 {
-				Database.OtherInformationsString["target.http.users.method"] = "YoastSEO"
-				done = true
-			}
-
-			responseReturn = response
-		}
-	}()
+	var done bool
 
 	// Enumerate using route
 	func() {
 		if done == false {
-			response := gohttp.SimpleRequest(Database.Target, "?rest_route=/wp/v2/users")
+			response := gohttp.SimpleRequest(database.Memory.GetString("Target"), "?rest_route=/wp/v2/users")
 
 			if response.Response.StatusCode == 200 && response.Raw != "" {
 				json.Unmarshal([]byte(response.Raw), &ujson)
 
 				for _, value := range ujson {
-					if _, has := text.ContainsSliceString(Database.OtherInformationsSlice["target.http.users"], value.Name); !has {
-						Database.OtherInformationsSlice["target.http.users"] = append(Database.OtherInformationsSlice["target.http.users"], value.Name)
+					if _, has := text.ContainsSliceString(users, value.Name); !has {
+						users = append(users, value.Name)
+						done = true
 					}
 				}
 
-				if len(Database.OtherInformationsSlice["target.http.users"]) > 0 {
-					Database.OtherInformationsString["target.http.users.method"] = "Route"
+				method = "Route API"
+				URL = response.URL.Full
+			} else if response.Response.StatusCode == 401 && response.Raw != "" {
+				printer.Danger("Status code 401, I don't think I'm allowed to list users. Target Url:", response.URL.Full, "— Target source code:", response.Raw).L()
+			}
+		}
+	}()
+
+	// Enumerate using Yoast SEO
+	func() {
+		if done == false {
+			response := gohttp.SimpleRequest(database.Memory.GetString("Target"), "author-sitemap.xml")
+
+			rex := regexp.MustCompile("<loc>.*?/author/(.*?)/</loc>")
+
+			for _, value := range rex.FindAllStringSubmatch(response.Raw, -1) {
+				if _, has := text.ContainsSliceString(users, value[1]); !has {
+					users = append(users, value[1])
 					done = true
 				}
-			} else if response.Response.StatusCode == 401 && response.Raw != "" && Database.Verbose {
-				printer.Danger("Status code 401, I don't think I'm allowed to list users. Target Url:", response.URL.Full, "— Target source code:", response.Raw)
 			}
 
-			responseReturn = response
+			URL = response.URL.Full
+			method = "Yoast SEO"
 		}
 	}()
 
 	// Enumerate using json file
 	func() {
 		if done == false {
-			response := gohttp.SimpleRequest(Database.Target, "wp-json/wp/v2/users")
+			response := gohttp.SimpleRequest(database.Memory.GetString("Target"), "wp-json/wp/v2/users")
 
 			if response.Response.StatusCode == 200 && response.Raw != "" {
 				json.Unmarshal([]byte(response.Raw), &ujson)
 
 				for _, value := range ujson {
-					if _, has := text.ContainsSliceString(Database.OtherInformationsSlice["target.http.users"], value.Name); !has {
-						Database.OtherInformationsSlice["target.http.users"] = append(Database.OtherInformationsSlice["target.http.users"], value.Name)
+					if _, has := text.ContainsSliceString(users, value.Name); !has {
+						users = append(users, value.Name)
+						done = true
 					}
 				}
 
-				if len(Database.OtherInformationsSlice["target.http.users"]) > 0 {
-					Database.OtherInformationsString["target.http.users.method"] = "Json"
-					done = true
-				}
-			} else if response.Response.StatusCode == 401 && response.Raw != "" && Database.Verbose {
-				printer.Danger("Status code 401, I don't think I'm allowed to list users. Target Url:", response.URL.Full, "— Target source code:", response.Raw)
+				URL = response.URL.Full
+				method = "Route Json API"
+			} else if response.Response.StatusCode == 401 && response.Raw != "" {
+				printer.Danger("Status code 401, I don't think I'm allowed to list users. Target Url:", response.URL.Full, "— Target source code:", response.Raw).L()
 			}
 
-			responseReturn = response
 		}
 	}()
 
-	return Database.OtherInformationsSlice["target.http.users"], responseReturn
+	users, method, URL = UsersEnumeratePassive()
+
+	return
 }

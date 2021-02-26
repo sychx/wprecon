@@ -1,5 +1,12 @@
 package wordlist
 
+// WPreadme ::
+var WPreadme = [3]string{
+	"readme.txt",
+	"readme.md",
+	"readme",
+}
+
 // WPchangesLogs ::
 var WPchangesLogs = [3]string{
 	"changelog.txt",
@@ -53,11 +60,4 @@ var WPdirectorys = [...]string{
 	"core",
 	"wp-admin",
 	"wp-content",
-}
-
-// WPreadme ::
-var WPreadme = [3]string{
-	"readme.txt",
-	"readme.md",
-	"readme",
 }

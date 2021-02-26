@@ -51,7 +51,7 @@ func (options *webapplicationfirewall) Cerber() *webapplicationfirewall {
 	} else if strings.Contains(options.raw, "Your request looks suspicious or similar to automated requests from spam posting software") {
 		options.exists = true
 		options.output = "Text warning."
-		options.solve = "Set a time for requests with: --time-requests ."
+		options.solve = "Set a time for requests with: --http-sleep ."
 		options.firewall = "Wordpress Cerber"
 		options.confidence = 40
 	}
@@ -65,7 +65,7 @@ func (options *webapplicationfirewall) NinjaFirewall() *webapplicationfirewall {
 	if strings.Contains(options.raw, "For security reasons, it was blocked and logged") {
 		options.exists = true
 		options.output = "Text warning."
-		options.solve = "Use the parameter: --tor and set a time for requests with: --time-requests ."
+		options.solve = "Use the parameter: --tor and set a time for requests with: --http-sleep ."
 		options.firewall = "NinjaFirewall"
 		options.confidence = 40
 	} else if strings.Contains(options.raw, "NinjaFirewall") && strings.Contains(options.raw, "NinjaFirewall: 403 Forbidden") {
@@ -90,7 +90,7 @@ func (options *webapplicationfirewall) Wordfence() *webapplicationfirewall {
 	} else if strings.Contains(options.raw, "A potentially unsafe operation has been detected in your request to this site") || strings.Contains(options.raw, "Your access to this site has been limited") {
 		options.exists = true
 		options.output = "Text warning."
-		options.solve = "Set a time for requests with: --time-requests ."
+		options.solve = "Set a time for requests with: --http-sleep ."
 		options.firewall = "Wordfence"
 		options.confidence = 40
 	}

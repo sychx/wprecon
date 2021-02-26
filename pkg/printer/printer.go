@@ -83,6 +83,18 @@ func Done(t ...string) *ln {
 	return line
 }
 
+func Bars(t string) *ln {
+	var list = strings.Split(t, "\n")
+
+	for num, txt := range list {
+		if num+1 != len(list) {
+			fmt.Fprintln(&stdout, " |", txt)
+		}
+	}
+
+	return line
+}
+
 func Danger(t ...string) *ln {
 	var raw = strings.Join(t, " ")
 
@@ -138,7 +150,8 @@ func ScanQ(t ...string) string {
 }
 
 type l struct {
-	text []string
+	text   []string
+	prefix string
 }
 
 // List ::
@@ -146,10 +159,16 @@ func List(text ...string) *l {
 	return &l{text: text}
 }
 
+func (options *l) Prefix(s ...string) *l {
+	options.prefix = strings.Join(s, " ")
+
+	return options
+}
+
 func (options *l) D() *ln {
 	var raw = strings.Join(options.text, " ")
 
-	io.WriteString(&stdout, prefixListDefault+" "+raw+"\n")
+	io.WriteString(&stdout, options.prefix+prefixListDefault+" "+raw+"\n")
 
 	return line
 }
@@ -157,7 +176,7 @@ func (options *l) D() *ln {
 func (options *l) Done() *ln {
 	var raw = strings.Join(options.text, " ")
 
-	io.WriteString(&stdout, prefixListDone+" "+raw+"\n")
+	io.WriteString(&stdout, options.prefix+prefixListDone+" "+raw+"\n")
 
 	return line
 }
@@ -165,7 +184,7 @@ func (options *l) Done() *ln {
 func (options *l) Danger() *ln {
 	var raw = strings.Join(options.text, " ")
 
-	io.WriteString(&stdout, prefixListDanger+" "+raw+"\n")
+	io.WriteString(&stdout, options.prefix+prefixListDanger+" "+raw+"\n")
 
 	return line
 }
@@ -173,7 +192,7 @@ func (options *l) Danger() *ln {
 func (options *l) Warning() *ln {
 	var raw = strings.Join(options.text, " ")
 
-	io.WriteString(&stdout, prefixListWarning+" "+raw+"\n")
+	io.WriteString(&stdout, options.prefix+prefixListWarning+" "+raw+"\n")
 
 	return line
 }

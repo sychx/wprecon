@@ -3,7 +3,7 @@ package fuzzing
 import (
 	"time"
 
-	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/internal/database"
 	"github.com/blackbinn/wprecon/pkg/gohttp"
 	"github.com/blackbinn/wprecon/pkg/printer"
 	"github.com/blackbinn/wprecon/pkg/wordlist"
@@ -14,10 +14,10 @@ func BackupFile() {
 
 	done := false
 
-	for _, directory := range [...]string{"", Database.WPContent, "wp-includes/", "wp-uploads/"} {
+	for _, directory := range [...]string{"", database.Memory.GetString("HTTP wp-content"), "wp-includes/", "wp-uploads/"} {
 		for _, file := range wordlist.BackupFiles {
 			go func(file string) {
-				response := gohttp.SimpleRequest(Database.Target, directory+file)
+				response := gohttp.SimpleRequest(database.Memory.GetString("Target"), directory+file)
 
 				if response.Response.StatusCode == 200 {
 					printer.Done("Status Code: 200", "URL:", response.URL.Full)

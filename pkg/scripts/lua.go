@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	. "github.com/blackbinn/wprecon/cli/config"
+	"github.com/blackbinn/wprecon/internal/database"
 	"github.com/blackbinn/wprecon/pkg/handler"
 	luaNet "github.com/blackbinn/wprecon/pkg/scripts/lib/net"
 	luaPrinter "github.com/blackbinn/wprecon/pkg/scripts/lib/printer"
@@ -136,7 +136,7 @@ func (s *script) Run() {
 		Fn:      s.lstate.GetGlobal("run"),
 		NRet:    0,
 		Protect: true,
-	}, lua.LString(Database.Target))
+	}, lua.LString(database.Memory.GetString("Target")))
 
 	if err != nil {
 		panic(err)

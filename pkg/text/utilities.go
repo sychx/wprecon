@@ -2,7 +2,6 @@ package text
 
 import (
 	"bufio"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -40,7 +39,7 @@ func GetOneImportantFile(raw string) string {
 		return submatchall[1]
 	}
 
-	return fmt.Sprint(submatchall)
+	return ""
 }
 
 // GetFileExtensions :: This function searches for files by their extension, within an index of.
@@ -52,48 +51,24 @@ func GetFileExtensions(url string, raw string) [][][]byte {
 }
 
 // GetVersionStableTag :: This function searches for the version of the plugin or theme.
-func GetVersionStableTag(raw string) string {
+func GetVersionStableTag(raw string) []string {
 	rex := regexp.MustCompile("[S|s]table [T|t]ag.*?([0-9.-]+)")
 
-	submatchall := rex.FindSubmatch([]byte(raw))
-
-	if len(submatchall) > 0 {
-		version := fmt.Sprintf("%s", submatchall[1])
-
-		return version
-	}
-
-	return ""
+	return rex.FindStringSubmatch(raw)
 }
 
 // GetVersionChangelog :: This function searches for the version of the plugin or theme.
-func GetVersionChangelog(raw string) string {
+func GetVersionChangelog(raw string) []string {
 	rex := regexp.MustCompile("=+\\s+(?:v(?:ersion)?\\s*)?([0-9.-]+)[ \ta-z0-9().\\-/]*=+")
 
-	submatchall := rex.FindSubmatch([]byte(raw))
-
-	if len(submatchall) > 0 {
-		version := fmt.Sprintf("%s", submatchall[1])
-
-		return version
-	}
-
-	return ""
+	return rex.FindStringSubmatch(raw)
 }
 
 // GetVersionReleaseLog :: This function searches for the version of the plugin or theme.
-func GetVersionReleaseLog(raw string) string {
+func GetVersionReleaseLog(raw string) []string {
 	rex := regexp.MustCompile("[v|V]ersion.*?([0-9.-]+)")
 
-	submatchall := rex.FindSubmatch([]byte(raw))
-
-	if len(submatchall) > 0 {
-		version := fmt.Sprintf("%s", submatchall[1])
-
-		return version
-	}
-
-	return ""
+	return rex.FindStringSubmatch(raw)
 }
 
 // ReadAllFile :: This function will be responsible for reading the files.
