@@ -90,6 +90,7 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 	}
 
 	p := enumerate.NewPlugins()
+	t := enumerate.NewThemes()
 
 	switch aggressivemode {
 	case false:
@@ -113,7 +114,7 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 					printer.List("Version:", plugin[1]).D()
 					printer.List(fmt.Sprint(len(matchs)) + " Match(s):").D()
 					for _, match := range matchs {
-						printer.List(match + "'" + strings.Split(match, "?")[1] + "'").Prefix("  ").D()
+						printer.List(match + ", '" + strings.Split(match, "?")[1] + "'").Prefix("  ").D()
 					}
 					pluginvulnenum(plugin[0], plugin[1])
 				} else {
@@ -130,19 +131,28 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 			printer.Danger("Unfortunately I was unable to passively list any plugin. Try to use aggressive mode: --aggressive-mode").L()
 		}
 
-		if themesEnumerateP := enumerate.ThemesEnumeratePassive(); len(themesEnumerateP) > 0 {
-			for theme, version := range themesEnumerateP {
-				if version != "" {
-					printer.Done("Theme:", theme, "(Enumerate Passive Mode)")
-					printer.List("Location:", database.Memory.GetString("Target")+database.Memory.GetString("HTTP wp-content")+"/themes/"+theme+"/").D()
-					printer.List("Version:", version).D()
+		if themesEnumerateP := t.Passive(); len(themesEnumerateP) > 0 {
+			for _, theme := range themesEnumerateP {
+				matchs := strings.Split(theme[2], "ˆ")
 
+				if theme[1] != "" {
+					printer.Done("Theme:", theme[0], "(Enumerate Passive Mode)")
+					printer.List("Location:", database.Memory.GetString("Target")+database.Memory.GetString("HTTP wp-content")+"/themes/"+theme[0]+"/").D()
+					printer.List("Version:", theme[1]).D()
+					printer.List(fmt.Sprint(len(matchs)) + " Match(s):").D()
+					for _, match := range matchs {
+						printer.List(match + ", '" + strings.Split(match, "?")[1] + "'").Prefix("  ").D()
+					}
 					if database.Memory.GetBool("Verbose") {
 						printer.List("Unfortunately wprecon doesn't have vulns for themas *yet*.").Warning()
 					}
 				} else {
-					printer.Done("Theme:", theme, "(Enumerate Passive Mode)")
-					printer.List("Location:", database.Memory.GetString("Target")+database.Memory.GetString("HTTP wp-content")+"/themes/"+theme+"/").D()
+					printer.Done("Theme:", theme[0], "(Enumerate Passive Mode)")
+					printer.List("Location:", database.Memory.GetString("Target")+database.Memory.GetString("HTTP wp-content")+"/themes/"+theme[0]+"/").D()
+					printer.List(fmt.Sprint(len(matchs)) + " Match(s):").D()
+					for _, match := range matchs {
+						printer.List(match).Prefix("  ").D()
+					}
 					printer.List("Version: Unidentified version").D()
 				}
 			}
@@ -197,19 +207,28 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 			printer.Danger("Unfortunately I was unable to passively list any plugin.").L()
 		}
 
-		if themes := enumerate.ThemesEnumerateAgressive(); len(themes) > 0 {
-			for theme, version := range themes {
-				if version != "" {
-					printer.Done("Theme:", theme, "(Enumerate Aggressive Mode)")
-					printer.List("Location:", database.Memory.GetString("Target")+database.Memory.GetString("HTTP wp-content")+"/themes/"+theme+"/").D()
-					printer.List("Version:", version).D()
+		if themes := t.Aggressive(); len(themes) > 0 {
+			for _, theme := range themes {
+				matchs := strings.Split(theme[2], "ˆ")
 
+				if theme[1] != "" {
+					printer.Done("Theme:", theme[0], "(Enumerate Aggressive Mode)")
+					printer.List("Location:", database.Memory.GetString("Target")+database.Memory.GetString("HTTP wp-content")+"/themes/"+theme[0]+"/").D()
+					printer.List("Version:", theme[1]).D()
+					printer.List(fmt.Sprint(len(matchs)) + " Match(s):").D()
+					for _, match := range matchs {
+						printer.List(match).Prefix("  ").D()
+					}
 					if database.Memory.GetBool("Verbose") {
 						printer.List("Unfortunately wprecon doesn't have vulns for themas *yet*.").Warning()
 					}
 				} else {
-					printer.Done("Theme:", theme, "(Enumerate Aggressive Mode)")
-					printer.List("Location:", database.Memory.GetString("Target")+database.Memory.GetString("HTTP wp-content")+"/themes/"+theme+"/").D()
+					printer.Done("Theme:", theme[0], "(Enumerate Aggressive Mode)")
+					printer.List("Location:", database.Memory.GetString("Target")+database.Memory.GetString("HTTP wp-content")+"/themes/"+theme[0]+"/").D()
+					printer.List(fmt.Sprint(len(matchs)) + " Match(s):").D()
+					for _, match := range matchs {
+						printer.List(match).Prefix("  ").D()
+					}
 					printer.List("Version: Unidentified version").D()
 				}
 			}
