@@ -190,7 +190,7 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 					printer.List("Version:", plugin[1]).D()
 					printer.List(fmt.Sprint(len(matchs)) + " Match(s):").D()
 					for _, match := range matchs {
-						printer.List(match).Prefix("  ").D()
+						printer.List(match + ", '" + strings.Split(match, "?")[1] + "'").Prefix("  ").D()
 					}
 					pluginvulnenum(plugin[0], plugin[1])
 				} else {

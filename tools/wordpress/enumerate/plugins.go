@@ -65,7 +65,6 @@ func (p *plugin) Aggressive() [][]string {
 
 				if i, h := text.ContainsSliceSliceString(p.plugins, plugin[1]); !h {
 					form[0] = plugin[1] // name
-					form[2] = plugin[0] // match
 
 					p.plugins = append(p.plugins, form)
 				} else {
@@ -76,23 +75,6 @@ func (p *plugin) Aggressive() [][]string {
 			}
 		}
 	}()
-
-	rex := regexp.MustCompile(database.Memory.GetString("HTTP wp-content") + "/plugins/(.*?)/.*?[css|js]")
-
-	for _, plugin := range rex.FindAllStringSubmatch(p.raw, -1) {
-		form := make([]string, 3)
-
-		if i, h := text.ContainsSliceSliceString(p.plugins, plugin[1]); !h {
-			form[0] = plugin[1] // name
-			form[2] = plugin[0] // match
-
-			p.plugins = append(p.plugins, form)
-		} else {
-			if !strings.Contains(p.plugins[i][2], plugin[0]) {
-				p.plugins[i][2] = p.plugins[i][2] + "ˆ" + plugin[0]
-			}
-		}
-	}
 
 	p.Passive()
 

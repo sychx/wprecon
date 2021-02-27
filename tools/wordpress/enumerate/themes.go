@@ -64,7 +64,6 @@ func (p *theme) Aggressive() [][]string {
 
 				if i, h := text.ContainsSliceSliceString(p.themes, theme[1]); !h {
 					form[0] = theme[1] // name
-					form[2] = theme[0] // match
 
 					p.themes = append(p.themes, form)
 				} else {
@@ -75,23 +74,6 @@ func (p *theme) Aggressive() [][]string {
 			}
 		}
 	}()
-
-	rex := regexp.MustCompile(database.Memory.GetString("HTTP wp-content") + "/themes/(.*?)/.*?[css|js]")
-
-	for _, theme := range rex.FindAllStringSubmatch(p.raw, -1) {
-		form := make([]string, 3)
-
-		if i, h := text.ContainsSliceSliceString(p.themes, theme[1]); !h {
-			form[0] = theme[1] // name
-			form[2] = theme[0] // match
-
-			p.themes = append(p.themes, form)
-		} else {
-			if !strings.Contains(p.themes[i][2], theme[0]) {
-				p.themes[i][2] = p.themes[i][2] + "ˆ" + theme[0]
-			}
-		}
-	}
 
 	p.Passive()
 
