@@ -78,7 +78,7 @@ func (p *theme) Aggressive() [][]string {
 	p.Passive()
 
 	for _, ppp := range p.themes {
-		path := database.Memory.GetString("HTTP wp-content") + "/themes/" + ppp[1] + "/"
+		path := database.Memory.GetString("HTTP wp-content") + "/themes/" + ppp[0] + "/"
 
 		if match, version := extensions.GetVersionByIndexOf(path); version != "" {
 			ppp[1] = version
