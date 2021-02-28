@@ -17,7 +17,7 @@
   <a href="https://github.com/blackbinn">Author</a>
 </p>
 
-<h3><p align="center">Version: 1.6.2 alpha</p></h3>
+<h3><p align="center">Version: 1.6.3 alpha</p></h3>
 <h2 align="center">Warning</h2>
 <p align="center">
 I recently found out that my tool has the same name as a website ... which has the same "subject" as my tool.
