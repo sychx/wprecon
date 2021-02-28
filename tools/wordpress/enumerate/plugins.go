@@ -79,7 +79,7 @@ func (p *plugin) Aggressive() [][]string {
 	p.Passive()
 
 	for _, ppp := range p.plugins {
-		path := database.Memory.GetString("HTTP wp-content") + "/plugins/" + ppp[1] + "/"
+		path := database.Memory.GetString("HTTP wp-content") + "/plugins/" + ppp[0] + "/"
 
 		if match, version := extensions.GetVersionByIndexOf(path); version != "" {
 			ppp[1] = version
