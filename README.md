@@ -1,7 +1,8 @@
 <p align="center" ><img alt="Golpher Ninja by Takuya Ueda" src="https://raw.githubusercontent.com/tenntenn/gopher-stickers/master/png/ninja.png"></p>
 
 <h1 align="center">WPrecon (Wordpress Recon)</h1>
-<p align="center"> 
+<p align="center">
+  <img alt="Build" src="https://github.com/blackbinn/wprecon/workflows/build/badge.svg">
   <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/blackbinn/wprecon">
   <img alt="GitHub go.mod Go version (branch)" src="https://img.shields.io/github/go-mod/go-version/blackbinn/wprecon/master?label=Go&logo=go">
 
