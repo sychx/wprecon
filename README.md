@@ -19,14 +19,14 @@
 </p>
 
 <h3><p align="center">Version: 1.6.3 alpha</p></h3>
-<h2 align="center">Warning</h2>
+<h2 align="center">⚠️ Warning</h2>
 <p align="center">
 I recently found out that my tool has the same name as a website ... which has the same "subject" as my tool.
 But I already warn you that this wprecon that you see on github has nothing to do with this site.
 I don't have a website yet!
 </p>
  
-<h2 align="center">Features</h2>
+<h2 align="center">✨ Features</h2>
 
 All that are already marked, are already on wprecon.
 But since they are not, it is for the reason that they are still in development.
@@ -40,7 +40,7 @@ But since they are not, it is for the reason that they are still in development.
 - [x] Scripts
 - [x] Vulnerability Version Checking (Plugins) **(Beta)**
 
-<h2 align="center">Build</h2>
+<h2 align="center">🔨 Build</h2>
 
 For you to compile **wprecon** you will need to have the golang compiler installed.
 And for that you will access the official website of golang and will download and install it. [**Here!**](https://golang.org/dl/)
@@ -52,7 +52,7 @@ Once downloaded and installed you will download **wprecon** directly from github
 3. `make build`.
 
 <p align="center" >
-  <h2 align="center">WPrecon running</h2>
+  <h2 align="center">🚀 WPrecon running</h2>
   
   <code>$ wprecon --help</code>
   <img alt="wprecon --help" src="https://i.imgur.com/KpuDUy5.png">
