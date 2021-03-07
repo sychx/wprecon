@@ -2,6 +2,7 @@ package text
 
 import (
 	"bufio"
+	"encoding/csv"
 	"io/ioutil"
 	"log"
 	"os"
@@ -86,4 +87,22 @@ func ReadAllFile(filename string) (chars []string, count int) {
 	}
 
 	return chars, len(chars)
+}
+
+func ReadCSVFile(filename string) [][]string {
+	file, err := os.Open(filename)
+
+	if err != nil {
+		printer.Fatal(err)
+	}
+
+	reader := csv.NewReader(file)
+
+	records, err := reader.ReadAll()
+
+	if err != nil {
+		printer.Fatal(err)
+	}
+
+	return records
 }

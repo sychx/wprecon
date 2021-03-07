@@ -7,7 +7,7 @@ import (
 	"github.com/blackbinn/wprecon/tools/wordpress/commons"
 )
 
-// wordpresscheck :: This function should be used to perform wordpress detection.
+// WordpressCheck :: This function should be used to perform wordpress detection.
 // "How does this detection work?", I decided to make a 'percentage system' where I will check if each item in a list exists... and if that item exists it will add +1 to accuracy.
 // With "16.6" hits he says that wordpress is already detected. But it opens up an opportunity for you to choose whether to continue or not, because you are not 100% sure.
 func WordpressCheck() float32 {

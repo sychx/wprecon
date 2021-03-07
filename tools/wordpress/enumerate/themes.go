@@ -11,89 +11,91 @@ import (
 )
 
 type theme struct {
-	raw    string
-	themes [][]string // matriz
+	raw    string     // Index Raw Code
+	themes [][]string // Matriz
 }
 
 func NewThemes() *theme {
-	var p theme
-
-	p.raw = database.Memory.GetString("HTTP Index Raw")
-
-	return &p
+	return &theme{raw: database.Memory.GetString("HTTP Index Raw")}
 }
 
-// Passive :: As the name says, this function will make an enumeration in an passive way.
-// Passive enumeration may not be the best option when searching for vulnerabilities.
-// (I don't recommend) 40% confidence.
-func (p *theme) Passive() [][]string {
-	rex := regexp.MustCompile(database.Memory.GetString("HTTP wp-content") + "/themes/(.*?)/.*?[css|js].*?ver=([0-9\\.]*)")
+// Passive :: "How does passive enumeration work?"
+// We took the source code of the index that was saved in memory and from there we do a search using the regex.
+func (options *theme) Passive() [][]string {
+	regxp := regexp.MustCompile(database.Memory.GetString("HTTP wp-content") + "/themes/(.*?)/.*?[css|js]?ver=(\\d{1,2}\\.\\d{1,2}\\.\\d{1,3})")
 
-	for _, theme := range rex.FindAllStringSubmatch(p.raw, -1) {
-		form := make([]string, 3)
+	for _, theme := range regxp.FindAllStringSubmatch(options.raw, -1) {
+		formOfMatriz := make([]string, 3)
 
-		if i, h := text.ContainsSliceSliceString(p.themes, theme[1]); !h {
-			form[0] = theme[1] // name
-			form[1] = theme[2] // version
-			form[2] = theme[0] // match
+		if count, exists := text.ContainsSliceSliceString(options.themes, theme[1]); !exists {
+			formOfMatriz[0] = theme[1] // name
+			formOfMatriz[1] = theme[2] // version
+			formOfMatriz[2] = theme[0] // match
 
-			p.themes = append(p.themes, form)
+			options.themes = append(options.themes, formOfMatriz)
 		} else {
-			if p.themes[i][1] == "" {
-				p.themes[i][1] = theme[2]
+			if options.themes[count][1] == "" {
+				options.themes[count][1] = theme[2]
 			}
-			if !strings.Contains(p.themes[i][2], theme[0]) {
-				p.themes[i][2] = p.themes[i][2] + "ˆ" + theme[0]
+			if !strings.Contains(options.themes[count][2], theme[0]) {
+				options.themes[count][2] = options.themes[count][2] + "ˆ" + theme[0]
 			}
 		}
 	}
 
-	return p.themes
+	return options.themes
 }
 
-// Aggressive :: As the name says, this function will make an enumeration in an aggressive way.
-// It will try to access the "wp-content/themes" file if it does not have an index of, wprecon will use the ThemesEnumeratePassive function so that it can list the themes.
-// And when finished, it will send a list with the found themes and their version.
-func (p *theme) Aggressive() [][]string {
+// Aggressive :: Aggressive enumeration has 3 steps to complete.
+// In the first she enumerates, in the second step she tries to identify the version using the passive mode and the third she tries to enumerate the version through brute-force in the theme files.
+func (options *theme) Aggressive() [][]string {
 	go func() {
 		if response := commons.DirectoryPlugins(); response.Response.StatusCode != 200 {
-			rex := regexp.MustCompile("<a href=\"(.*?)/\">.*?/</a>")
+			regxp := regexp.MustCompile("<a href=\"(.*?)/\">.*?/</a>")
 
-			for _, theme := range rex.FindAllStringSubmatch(response.Raw, -1) {
-				form := make([]string, 3)
+			for _, theme := range regxp.FindAllStringSubmatch(response.Raw, -1) {
+				formOfMatriz := make([]string, 3)
 
-				if i, h := text.ContainsSliceSliceString(p.themes, theme[1]); !h {
-					form[0] = theme[1] // name
+				if _, h := text.ContainsSliceSliceString(options.themes, theme[1]); !h {
+					formOfMatriz[0] = theme[1] // name
 
-					p.themes = append(p.themes, form)
-				} else {
-					if !strings.Contains(p.themes[i][2], theme[0]) {
-						p.themes[i][2] = p.themes[i][2] + "ˆ" + theme[0]
-					}
+					options.themes = append(options.themes, formOfMatriz)
 				}
 			}
 		}
 	}()
 
-	p.Passive()
+	regxp := regexp.MustCompile(database.Memory.GetString("HTTP wp-content") + "/themes/(.*?)/.*?[css|js]")
 
-	for _, ppp := range p.themes {
-		path := database.Memory.GetString("HTTP wp-content") + "/themes/" + ppp[0] + "/"
+	for _, theme := range regxp.FindAllStringSubmatch(options.raw, -1) {
+		formOfMatriz := make([]string, 3)
 
-		if match, version := extensions.GetVersionByIndexOf(path); version != "" {
-			ppp[1] = version
-			ppp[2] = match
-		} else if match, version := extensions.GetVersionByReadme(path); version != "" {
-			ppp[1] = version
-			ppp[2] = match
-		} else if match, version := extensions.GetVersionByChangeLogs(path); version != "" {
-			ppp[1] = version
-			ppp[2] = match
-		} else if match, version := extensions.GetVersionByReleaseLog(path); version != "" {
-			ppp[1] = version
-			ppp[2] = match
+		if _, h := text.ContainsSliceSliceString(options.themes, theme[1]); !h {
+			formOfMatriz[0] = theme[1] // name
+
+			options.themes = append(options.themes, formOfMatriz)
 		}
 	}
 
-	return p.themes
+	options.Passive()
+
+	for _, themeOfMatriz := range options.themes {
+		path := database.Memory.GetString("HTTP wp-content") + "/themes/" + themeOfMatriz[0] + "/"
+
+		if match, version := extensions.GetVersionByIndexOf(path); version != "" {
+			themeOfMatriz[1] = version
+			themeOfMatriz[2] = match
+		} else if match, version := extensions.GetVersionByReadme(path); version != "" {
+			themeOfMatriz[1] = version
+			themeOfMatriz[2] = match
+		} else if match, version := extensions.GetVersionByChangeLogs(path); version != "" {
+			themeOfMatriz[1] = version
+			themeOfMatriz[2] = match
+		} else if match, version := extensions.GetVersionByReleaseLog(path); version != "" {
+			themeOfMatriz[1] = version
+			themeOfMatriz[2] = match
+		}
+	}
+
+	return options.themes
 }

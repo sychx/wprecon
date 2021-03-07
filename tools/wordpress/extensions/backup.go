@@ -6,7 +6,6 @@ import (
 )
 
 func FindBackupFileOrPath(raw string) (pathSlice []string) {
-
 	rex := regexp.MustCompile("<a href=\"([back[wp|up|.*?]|bkp].*?)\">.*?</a>")
 
 	submatchall := rex.FindAllSubmatch([]byte(raw), -1)

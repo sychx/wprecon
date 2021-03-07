@@ -35,7 +35,7 @@ func GetVersionByChangeLogs(path string) (string, string) {
 			}
 		}()
 
-		time.Sleep(time.Millisecond * 100)
+		time.Sleep(time.Millisecond * 150)
 
 		select {
 		case i := <-channel:
@@ -59,7 +59,7 @@ func GetVersionByReadme(path string) (string, string) {
 			}
 		}()
 
-		time.Sleep(time.Millisecond * 100)
+		time.Sleep(time.Millisecond * 150)
 
 		select {
 		case i := <-channel:
@@ -83,7 +83,7 @@ func GetVersionByReleaseLog(path string) (string, string) {
 			}
 		}()
 
-		time.Sleep(time.Millisecond * 100)
+		time.Sleep(time.Millisecond * 150)
 
 		select {
 		case i := <-channel:

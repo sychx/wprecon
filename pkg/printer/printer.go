@@ -88,7 +88,7 @@ func Bars(t string) *ln {
 
 	for num, txt := range list {
 		if num+1 != len(list) {
-			fmt.Fprintln(&stdout, " |", txt)
+			fmt.Fprintln(&stdout, " |  ", txt)
 		}
 	}
 
