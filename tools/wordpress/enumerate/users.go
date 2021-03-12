@@ -32,7 +32,7 @@ func UsersEnumeratePassive() (users []string, method string, URL string) {
 	return
 }
 
-// UsersEnumerateAgressive ::
+// UsersEnumerateAgressive :: In its aggressive mode, wprecon tries to enumerate users using 4 types of enumeration, which can be considered difficult to access for an ordinary user, and for this reason they are classified as aggressive enumeration.
 func UsersEnumerateAgressive() (users []string, method string, URL string) {
 	var ujson uJSON
 	var done bool
@@ -54,6 +54,8 @@ func UsersEnumerateAgressive() (users []string, method string, URL string) {
 
 				method = "Route API"
 				URL = response.URL.Full
+
+				return
 			} else if response.Response.StatusCode == 401 && response.Raw != "" {
 				printer.Danger("Status code 401, I don't think I'm allowed to list users. Target Url:", response.URL.Full, "— Target source code:", response.Raw).L()
 			}
@@ -65,17 +67,21 @@ func UsersEnumerateAgressive() (users []string, method string, URL string) {
 		if done == false {
 			response := gohttp.SimpleRequest(database.Memory.GetString("Target"), "author-sitemap.xml")
 
-			rex := regexp.MustCompile("<loc>.*?/author/(.*?)/</loc>")
+			if response.Response.StatusCode == 200 && response.Raw != "" {
+				rex := regexp.MustCompile("<loc>.*?/author/(.*?)/</loc>")
 
-			for _, value := range rex.FindAllStringSubmatch(response.Raw, -1) {
-				if _, has := text.ContainsSliceString(users, value[1]); !has {
-					users = append(users, value[1])
-					done = true
+				for _, value := range rex.FindAllStringSubmatch(response.Raw, -1) {
+					if _, has := text.ContainsSliceString(users, value[1]); !has {
+						users = append(users, value[1])
+						done = true
+					}
 				}
-			}
 
-			URL = response.URL.Full
-			method = "Yoast SEO"
+				URL = response.URL.Full
+				method = "Yoast SEO"
+
+				return
+			}
 		}
 	}()
 
@@ -96,6 +102,8 @@ func UsersEnumerateAgressive() (users []string, method string, URL string) {
 
 				URL = response.URL.Full
 				method = "Route Json API"
+
+				return
 			} else if response.Response.StatusCode == 401 && response.Raw != "" {
 				printer.Danger("Status code 401, I don't think I'm allowed to list users. Target Url:", response.URL.Full, "— Target source code:", response.Raw).L()
 			}

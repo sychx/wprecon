@@ -10,11 +10,9 @@ import (
 func WordpressVersionPassive() string {
 	raw := database.Memory.GetString("HTTP Index Raw")
 
-	rex := regexp.MustCompile("<meta name=\"generator\" content=\"WordPress ([0-9.-]*).*?")
+	regxp := regexp.MustCompile("<meta name=\"generator\" content=\"WordPress ([0-9.-]*).*?")
 
-	submatchall := rex.FindAllSubmatch([]byte(raw), -1)
-
-	for _, slicebytes := range submatchall {
+	for _, slicebytes := range regxp.FindAllSubmatch([]byte(raw), -1) {
 		version := fmt.Sprintf("%s", slicebytes[1])
 
 		database.Memory.SetString("HTTP WordPress Version", version)
