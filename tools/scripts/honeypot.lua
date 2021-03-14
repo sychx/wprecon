@@ -38,8 +38,8 @@ script = {
     references = {""},
 }
 
--- It is extremely important that the main function is named run, since it will be executed when script is called.
-function run(target)
+-- It is extremely important that the main function is named main, since it will be executed when script is called.
+function main(target)
     local uri_host = url.host(target)
     local ip = net.lookup_ip(uri_host)
     
@@ -54,7 +54,6 @@ function run(target)
     if response.code == 200 then
         printer.done("With a "..convert(response.body).." chance of this host being a Honeypot.")
     end
-
 end
 
 function convert(text)

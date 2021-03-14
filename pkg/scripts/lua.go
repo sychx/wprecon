@@ -133,7 +133,7 @@ func (s *script) Run() {
 	defer handler.HandlerErrorLuaScripts()
 
 	err := s.lstate.CallByParam(lua.P{
-		Fn:      s.lstate.GetGlobal("run"),
+		Fn:      s.lstate.GetGlobal("main"),
 		NRet:    0,
 		Protect: true,
 	}, lua.LString(database.Memory.GetString("Target")))
