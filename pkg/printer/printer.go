@@ -36,9 +36,7 @@ var (
 	prefixTopLine = color.Yellow("[✲]").String()
 )
 
-var (
-	seekCurrent = 1
-)
+var seekCurrent = 1
 
 func init() {
 	if runtime.GOOS == "windows" {
