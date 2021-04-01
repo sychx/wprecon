@@ -5,10 +5,11 @@ import (
 	"strings"
 
 	"github.com/blackbinn/wprecon/internal/database"
-	"github.com/blackbinn/wprecon/pkg/gohttp"
-	"github.com/blackbinn/wprecon/pkg/printer"
+	"github.com/blackbinn/wprecon/internal/pkg/gohttp"
+	"github.com/blackbinn/wprecon/internal/pkg/printer"
 )
 
+// DirectoryUploads :: Simple requests to check the existence of the page and if it has an index of, if you have some information will be saved in memory.
 func DirectoryUploads() *gohttp.Response {
 	http := gohttp.NewHTTPClient().SetURL(database.Memory.GetString("Target"))
 	http.SetURLDirectory(database.Memory.GetString("HTTP wp-content") + "/uploads/")
@@ -32,8 +33,8 @@ func DirectoryUploads() *gohttp.Response {
 }
 
 // DirectoryPlugins :: Simple requests to see if it exists and if it has index of.
-// If this directory is identified with Index Of, its source code will be saved in this map :: Database.OtherInformationsString["target.http.wp-content/plugin.indexof.raw"]
-// Any directory that is identified with Index Of will be saved on this map :: Database.OtherInformationsSlice["target.http.indexof"]
+// If this directory is identified with Index Of, its source code will be saved in this map :: GetString(HTTP wp-content/plugins Index Of Raw")
+// Any directory that is identified with Index Of will be saved on this map :: GetString("HTTP Index Of's")
 func DirectoryPlugins() *gohttp.Response {
 	http := gohttp.NewHTTPClient()
 	http.SetURL(database.Memory.GetString("Target")).SetURLDirectory(database.Memory.GetString("HTTP wp-content") + "/plugins/")
@@ -57,8 +58,8 @@ func DirectoryPlugins() *gohttp.Response {
 }
 
 // DirectoryThemes :: Simple requests to see if it exists and if it has index of.
-// If this directory is identified with Index Of, its source code will be saved in this map :: Database.OtherInformationsString["target.http.wp-content/plugin.indexof.raw"]
-// Any directory that is identified with Index Of will be saved on this map :: Database.OtherInformationsSlice["target.http.indexof"]
+// If this directory is identified with Index Of, its source code will be saved in this map :: GetString("HTTP wp-content/themes Index Of Raw")
+// Any directory that is identified with Index Of will be saved on this map :: GetSlice("HTTP Index Of's")
 func DirectoryThemes() *gohttp.Response {
 	http := gohttp.NewHTTPClient()
 	http.SetURL(database.Memory.GetString("Target")).SetURLDirectory(database.Memory.GetString("HTTP wp-content") + "/themes/")
@@ -111,8 +112,6 @@ func AdminPage() (string, *gohttp.Response) {
 }
 
 // Robots :: Simple requests to see if there is.
-// The command's message will be saved on this map :: Database.OtherInformationsString["target.http.robots.txt.status"]
-// The source code of the robots file will be saved within this map :: Database.OtherInformationsString["target.http.robots.txt.raw"]
 func Robots() *gohttp.Response {
 	http := gohttp.NewHTTPClient()
 	http.SetURL(database.Memory.GetString("Target")).SetURLDirectory("robots.txt")
@@ -131,7 +130,6 @@ func Robots() *gohttp.Response {
 }
 
 // Sitemap :: Simple requests to see if there is.
-// The command's message will be saved on this map. :: Database.OtherInformationsString["target.http.sitemap.xml.status"]
 func Sitemap() *gohttp.Response {
 	http := gohttp.NewHTTPClient()
 	http.SetURL(database.Memory.GetString("Target")).SetURLDirectory("sitemap.xml")
@@ -149,6 +147,7 @@ func Sitemap() *gohttp.Response {
 	return response
 }
 
+// Readme :: Simple requests to see if there is.
 func Readme() *gohttp.Response {
 	http := gohttp.NewHTTPClient()
 	http.SetURL(database.Memory.GetString("Target")).SetURLDirectory("readme.html")
@@ -167,7 +166,6 @@ func Readme() *gohttp.Response {
 }
 
 // XMLRPC :: Simple requests to see if there is.
-// The command's message will be saved on this map. :: Database.OtherInformationsString["target.http.xmlrpc.php.status"]
 func XMLRPC() (string, string) {
 	if strings.Contains(database.Memory.GetString("HTTP Index Raw"), "xmlrpc.php") {
 		return "", "Link tag"

@@ -1,122 +1,132 @@
 package cmd
 
 import (
-	"fmt"
 	"strings"
 
-	"github.com/blackbinn/wprecon/internal/database"
-	"github.com/blackbinn/wprecon/pkg/printer"
-	"github.com/blackbinn/wprecon/pkg/scripts"
-	"github.com/blackbinn/wprecon/pkg/text"
+	"github.com/blackbinn/wprecon/internal/pkg/gohttp"
+	"github.com/blackbinn/wprecon/internal/pkg/printer"
+	"github.com/blackbinn/wprecon/internal/pkg/text"
+	"github.com/blackbinn/wprecon/internal/pkg/wordlist"
 	"github.com/blackbinn/wprecon/tools/wordpress/fuzzing"
-	"github.com/spf13/cobra"
+	flag "github.com/spf13/cobra"
 )
 
-func FuzzerOptionsRun(cmd *cobra.Command, args []string) {
-	backupfile, _ := cmd.Flags().GetBool("backup-file")
-	attackmethod, _ := cmd.Flags().GetString("attack-method")
+// Fuzzer :: This is the fuzzing flags variable
+var Fuzzer = &flag.Command{
+	Use:     "fuzzer",
+	Aliases: []string{"fuzz"},
+	Short:   "Fuzzing directories or logins.",
+	Long:    "This subcommand is mainly focused on fuzzing directories or logins.",
+	Run:     FuzzerOptionsRun,
+	PostRun: FuzzerOptionsPostRun,
+}
 
-	usernames, _ := cmd.Flags().GetString("usernames")
-	filePasswords, _ := cmd.Flags().GetString("passwords")
+func FuzzerOptionsRun(cmd *flag.Command, args []string) {
+	{
+		var channel = make(chan *gohttp.Response)
+		var math = len(wordlist.BackupFiles) * 3
 
-	if names := database.Memory.GetString("Scripts List Names"); names != "" {
-		for _, name := range strings.Split(names, ",") {
-			printer.Done("Running Script:", name)
+		var ntpl = printer.NewTopLine("Initialize Fuzzer Backup")
 
-			s := scripts.NewScript()
-			s.UseScript(name)
-			s.Run()
+		go fuzzing.BackupFile(channel)
 
-			printer.Println()
+		for i := 0; i <= math; i++ {
+			select {
+			case response := <-channel:
+
+				switch {
+				case response.Response.StatusCode == 200:
+					ntpl.Done(printer.Bold+"URL:"+printer.Reset, response.URL.Full, printer.Bold+"Status Code:"+printer.Reset, response.Response.Status)
+				case response.Response.StatusCode != 404:
+					ntpl.Warning(printer.Bold+"URL:"+printer.Reset, response.URL.Full, printer.Bold+"Status Code:"+printer.Reset, response.Response.Status)
+				case i == math:
+					ntpl.Clean()
+					ntpl.Endl()
+				default:
+					ntpl.Progress(math, printer.Bold+"URL:"+printer.Reset, response.URL.Full, printer.Bold+"Status Code:"+printer.Reset, response.Response.Status)
+				}
+			}
 		}
 	}
 
-	if backupfile {
-		fuzzing.BackupFile()
-		printer.Println()
-	}
+	{
+		var channel = make(chan [3]string)
+		var usernames = [3]string{"staff", "blk", "aaa"}
 
-	if attackmethod == "xml-rpc" && usernames != "" || attackmethod == "xml-rpc" && filePasswords != "" {
-		ntl := printer.NewTopLine(":: Brute-Force to XML-RPC — Loading wordlist... ::")
+		var ntpl = printer.NewTopLine("Brute-Force to wp-login — Loading Wordlist... ")
+		var passwords, count = text.ReadAllFile("/Users/blkz/MEGAsync/Pentest/Wordlists/namess.txt")
 
-		passwords, _ := text.ReadAllFile(filePasswords)
-
-		channel := make(chan [2]int)
-
-		var pprefix = database.Memory.GetString("Passwords Prefix")
-		var psuffix = database.Memory.GetString("Passwords Suffix")
-
-		for _, username := range strings.Split(usernames, ",") {
+	loopXML:
+		for _, username := range usernames {
 			go fuzzing.XMLRPC(channel, username, passwords)
 
-			for alive := true; alive; {
+			for i := 1; i <= count; i++ {
 				select {
 				case response := <-channel:
-					var status = response[0]
-					var password = passwords[response[1]]
-
-					progress := ntl.Progress(len(passwords), "Username:", username, "Password:", pprefix+password+psuffix)
-
-					if status == 1 {
-						ntl.Done("I found the user password:", username)
-						printer.List("Password:", password).Done()
-						printer.List("Attack Method:", "XML-RPC").D().L()
-
-						progress.Fill()
-						alive = false
-					} else if len(passwords) == 1+response[1] {
-						ntl.Danger("No password worked for the user:", username)
+					switch {
+					case strings.Contains(strings.ToLower(response[0]), "admin"):
+						ntpl.Done("Password Found!")
+						printer.NewTopics("Username:", response[1]).Default()
+						printer.NewTopics("Password:", response[2]).Default()
+						printer.NewTopics("Method Used:", "wp-login").Default()
 						printer.Println()
+						printer.ResetSeek()
 
-						progress.Fill()
-						alive = false
+						continue loopXML
+					case i >= count:
+						ntpl.Danger("Password Not Found!")
+						printer.NewTopics("Username:", response[1]).Default()
+						printer.NewTopics("Method Used:", "wp-login").Default()
+						printer.Println()
+						printer.ResetSeek()
+
+					default:
+						ntpl.Progress(count, "Username:", response[1], "Passwords:", response[2])
 					}
 				}
 			}
 		}
 	}
-	if attackmethod == "wp-login" {
-		ntl := printer.NewTopLine(":: Brute-Force to wp-login — Loading Wordlist... ::")
 
-		passwords, _ := text.ReadAllFile(filePasswords)
+	{
+		var channel = make(chan [3]string)
+		var usernames = []string{"staff", "blk", "admin"}
 
-		channel := make(chan [2]int)
+		var ntpl = printer.NewTopLine("Brute-Force to wp-login — Loading Wordlist... ")
+		var passwords, count = text.ReadAllFile("/Users/blkz/MEGAsync/Pentest/Wordlists/names.txt")
 
-		var pprefix = database.Memory.GetString("Passwords Prefix")
-		var psuffix = database.Memory.GetString("Passwords Suffix")
+	loopWP:
+		for _, username := range usernames {
 
-		for _, username := range strings.Split(usernames, ",") {
 			go fuzzing.WPLogin(channel, username, passwords)
 
-			for alive := true; alive; {
+			for i := 1; i <= count; i++ {
 				select {
 				case response := <-channel:
-					var status = response[0]
-					var password = passwords[response[1]]
-
-					progress := ntl.Progress(len(passwords), "Username:", username, "Password:", pprefix+password+psuffix)
-
-					if status == 1 {
-						ntl.Done("I found the user password:", username)
-						printer.List("Password:", password).Done()
-						printer.List("Attack Method:", "WP-Login").D().L()
-
-						progress.Fill()
-						alive = false
-					} else if len(passwords) == 1+response[1] {
-						ntl.Danger("No password worked for the user:", username)
+					switch {
+					case response[0] == "302":
+						ntpl.Done("Password Found!")
+						printer.NewTopics("Username:", response[1]).Default()
+						printer.NewTopics("Password:", response[2]).Default()
+						printer.NewTopics("Method Used:", "wp-login").Default()
 						printer.Println()
+						printer.ResetSeek()
 
-						progress.Fill()
-						alive = false
+						continue loopWP
+
+					case i >= count:
+						ntpl.Danger("Password Not Found!")
+						printer.NewTopics("Username:", response[1]).Default()
+						printer.NewTopics("Method Used:", "wp-login").Default()
+						printer.Println()
+						printer.ResetSeek()
+
+					default:
+						ntpl.Progress(count, "Username:", response[1], "Passwords:", response[2])
 					}
 				}
 			}
 		}
 	}
-
 }
-
-func FuzzerOptionsPostRun(cmd *cobra.Command, args []string) {
-	printer.Done("Total requests:", fmt.Sprint(database.Memory.GetInt("HTTP Total")))
-}
+func FuzzerOptionsPostRun(cmd *flag.Command, args []string) {}

@@ -1,38 +1,18 @@
 package fuzzing
 
 import (
-	"time"
-
 	"github.com/blackbinn/wprecon/internal/database"
-	"github.com/blackbinn/wprecon/pkg/gohttp"
-	"github.com/blackbinn/wprecon/pkg/printer"
-	"github.com/blackbinn/wprecon/pkg/wordlist"
+	"github.com/blackbinn/wprecon/internal/pkg/gohttp"
+	"github.com/blackbinn/wprecon/internal/pkg/wordlist"
 )
 
-func BackupFile() {
-	printer.Warning(":: Backup file/directory fuzzer active! ::")
+func BackupFile(channel chan *gohttp.Response) {
+	var target = database.Memory.GetString("Target")
+	var paths = [4]string{database.Memory.GetString("HTTP wp-content"), "wp-includes/", "wp-uploads/"}
 
-	done := false
-
-	for _, directory := range [...]string{"", database.Memory.GetString("HTTP wp-content"), "wp-includes/", "wp-uploads/"} {
+	for _, directory := range paths {
 		for _, file := range wordlist.BackupFiles {
-			go func(file string) {
-				response := gohttp.SimpleRequest(database.Memory.GetString("Target"), directory+file)
-
-				if response.Response.StatusCode == 200 {
-					printer.Done("Status Code: 200", "URL:", response.URL.Full)
-					done = true
-				} else if response.Response.StatusCode == 403 {
-					printer.Warning("Status Code: 403", "URL:", response.URL.Full)
-					done = true
-				}
-			}(file)
-
-			time.Sleep(time.Millisecond * 100)
+			go gohttp.SimpleRequestGoroutine(channel, target, directory, file)
 		}
-	}
-
-	if !done {
-		printer.Danger(":: No backup files/directories were found. ::")
 	}
 }
