@@ -263,7 +263,6 @@ func (options *httpOptions) Run() (*Response, error) {
 		return nil, err
 	}
 
-	defer request.Body.Close()
 	defer response.Body.Close()
 
 	raw, err := ioutil.ReadAll(response.Body)
