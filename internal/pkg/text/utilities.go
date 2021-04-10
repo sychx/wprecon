@@ -17,6 +17,16 @@ const (
 	MatchVersionReleaseLog = "[v|V]ersion.*?([0-9.-]+)"
 )
 
+func PercentageOfVersions(versions []string) map[string]int {
+	var countMap = make(map[string]int)
+
+	for _, x := range versions {
+		countMap[x] += 10
+	}
+
+	return countMap
+}
+
 // GetOneImportantFile :: This function will do a search for the source code to search for an important file.
 func GetOneImportantFile(raw string) string {
 	re := regexp.MustCompile(MatchImportantFile)
