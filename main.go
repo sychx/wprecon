@@ -8,6 +8,7 @@ import (
 	"github.com/blackbinn/wprecon/internal/database"
 	"github.com/blackbinn/wprecon/internal/pkg/gohttp"
 	"github.com/blackbinn/wprecon/internal/pkg/printer"
+	"github.com/blackbinn/wprecon/internal/pkg/text"
 	"github.com/blackbinn/wprecon/tools/wordpress/enumerate"
 )
 
@@ -24,17 +25,56 @@ func main() {
 
 	var constructorPlugins = enumerate.NewPlugins(database.Memory.GetString("HTTP Index Raw"), database.Memory.GetString("HTTP wp-content"))
 
-	for i, plugin := range constructorPlugins.Passive() {
-		printer.Done("Key:", fmt.Sprint(i), "Plugin:", plugin[1], "—", plugin[2], "—", plugin[0])
+	var ntpl = printer.NewTopLine("Loading Plugins...")
+
+	for _, plugin := range constructorPlugins.Passive() {
+		ntpl.Done("Plugin:", plugin[1], printer.Underline+printer.Yellow+"(Enumerate Passive)"+printer.Reset)
+		printer.NewTopics("Location:", database.Memory.GetString("Target")+database.Memory.GetString("HTTP wp-content")+"/plugins/"+plugin[1]+"/").Done()
+
+		if len(plugin) >= 3 {
+			for version, confidence := range text.PercentageOfVersions(strings.Split(plugin[2], ",")) {
+				printer.NewTopics("Version:", fmt.Sprint(version)).Done()
+				printer.NewTopics("Confidence:", fmt.Sprintf("%d%%", confidence)).Prefix("  ").Warning()
+			}
+		} else {
+			printer.NewTopics("Version:", printer.Underline+printer.Red+"Version Not Identify"+printer.Reset).Danger()
+		}
+
+		printer.NewTopics("Match(s):").Done()
+		for _, match := range strings.Split(plugin[0], ",") {
+			printer.NewTopics(fmt.Sprint(match)).Prefix("  ").Warning()
+		}
+
+		printer.Println()
 	}
 
 	fmt.Println("—————————————————————————————————————\n")
 
-	for i, plugin := range constructorPlugins.Aggressive() {
-		printer.Done("Key:", fmt.Sprint(i), "Plugin:", plugin[1], "—", strings.Join(plugin[2:], ","), "—", plugin[0])
+	for _, plugin := range constructorPlugins.Aggressive() {
+		ntpl.Done("Plugin:", plugin[1], printer.Underline+printer.Yellow+"(Enumerate Aggressive)"+printer.Reset)
+		printer.NewTopics("Location:", database.Memory.GetString("Target")+database.Memory.GetString("HTTP wp-content")+"/plugins/"+plugin[1]+"/").Done()
+
+		if len(plugin) >= 3 {
+			for version, confidence := range text.PercentageOfVersions(strings.Split(plugin[2], ",")) {
+				printer.NewTopics("Version:", fmt.Sprint(version)).Done()
+				printer.NewTopics("Confidence:", fmt.Sprintf("%d%%", confidence)).Prefix("  ").Warning()
+			}
+		} else {
+			printer.NewTopics("Version:", printer.Underline+printer.Red+"Version Not Identify"+printer.Reset).Danger()
+		}
+
+		printer.NewTopics("Match(s):").Done()
+		for _, match := range strings.Split(plugin[0], ",") {
+			printer.NewTopics(fmt.Sprint(match)).Prefix("  ").Warning()
+		}
+
+		printer.Println()
 	}
 
 	printer.Println("Olá " + printer.Cyan + "Mundo" + printer.Reset)
 	printer.Println("Olá " + printer.Green + "Mundo" + printer.Reset)
 	printer.Println("Olá " + printer.Red + "Mundo" + printer.Reset)
+	printer.Println("Olá " + printer.Magenta + "Mundo" + printer.Reset)
+	printer.Println("Olá " + printer.Black + "Mundo" + printer.Reset)
+	printer.Println("Olá " + printer.Blue + "Mundo" + printer.Reset)
 }
