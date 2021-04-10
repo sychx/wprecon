@@ -11,8 +11,8 @@ import (
 
 const (
 	MatchPluginPassive            = "/plugins/(.*?)/.*?[css|js].*?ver=(\\d{1,2}\\.\\d{1,2}\\.\\d{1,3})"
+	MatchPluginPassiveNoVersion   = "/plugins/(.*?)/.*?[.css|.js]"
 	MatchPluginAgressiveDirectory = "<a href=\"(.*?)/\">.*?/</a>"
-	MatchPluginAgressiveNoVersion = "/plugins/(.*?)/.*?[.css|.js]"
 )
 
 type plugin struct {
@@ -44,13 +44,12 @@ func (object *plugin) Aggressive() [][]string {
 
 			for _, submatch := range re.FindAllStringSubmatch(response.Raw, -1) {
 				/*
-				   If the condition is true, it means that the plugin exists. Soon he will not add the list, but the condition will go to the else that will add another match for the plugins.
-				   Note: For you to understand better, I recommend that you see this in operation.
+					If the condition is true, it means that the plugin exists. Soon he will not add the list, but the condition will go to the else that will add another match for the plugins.
+					Note: For you to understand better, I recommend that you see this in operation.
 				*/
 				if _, contains := text.FindStringInSliceSlice(object.plugins, 1, submatch[1]); !contains {
 					object.plugins = append(object.plugins, submatch)
-				} else {
-					var index = text.FindByValueInIndex(object.plugins, submatch[1])
+				} else if index := text.FindByValueInIndex(object.plugins, submatch[1]); index != -1 {
 					object.plugins[index][0] = fmt.Sprintf("%s,%s", object.plugins[index][0], submatch[0])
 				}
 			}
@@ -63,6 +62,9 @@ func (object *plugin) Aggressive() [][]string {
 		for _, submatch := range object.Passive() {
 			if _, has := text.ContainsInSliceSlice(object.plugins, submatch[1]); !has {
 				object.plugins = append(object.plugins, submatch)
+			} else if index := text.FindByValueInIndex(object.plugins, submatch[1]); index != -1 {
+				object.plugins[index][0] = fmt.Sprintf("%s,%s", object.plugins[index][0], submatch[0])
+				object.plugins[index][2] = fmt.Sprintf("%s,%s", object.plugins[index][2], submatch[2])
 			}
 		}
 
