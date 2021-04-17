@@ -36,7 +36,7 @@ func (object *plugin) Passive() [][]string {
 	return submatch
 }
 
-func (object *plugin) Aggressive() [][]string {
+func (object *plugin) Aggressive(channel chan []string) {
 	var wg sync.WaitGroup
 	var mx sync.Mutex
 
@@ -81,6 +81,8 @@ func (object *plugin) Aggressive() [][]string {
 
 	wg.Wait()
 
+	object.CountPluginsAggressive = len(object.plugins)
+
 	for _, plugin := range object.plugins {
 		var path = object.wpContentPath + "/plugins/" + plugin[1] + "/"
 
@@ -97,9 +99,9 @@ func (object *plugin) Aggressive() [][]string {
 			plugin[0] = plugin[0] + "," + match
 			plugin[2] = plugin[2] + "," + version
 		}
+
+		channel <- []string{plugin[0], plugin[1], plugin[2]}
 	}
 
-	object.CountPluginsAggressive = len(object.plugins)
-
-	return object.plugins
+	close(channel)
 }
