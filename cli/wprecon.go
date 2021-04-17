@@ -5,6 +5,7 @@ import (
 
 	. "github.com/blackbinn/wprecon/cli/cmd"
 	"github.com/blackbinn/wprecon/internal/pkg/extensions"
+	"github.com/blackbinn/wprecon/internal/pkg/printer"
 )
 
 // Execute :: This function is the one that will start the cli flags, and if there is an error in the cli it will automatically end the wprecon.
@@ -22,7 +23,7 @@ func init() {
 	// All variables defined with the variable "fuzzer" will be available when using the subcommand "fuzzer or fuzz".
 	var fuzzer = Fuzzer.Flags()
 
-	global.StringP("url", "u", "", "Target URL (Ex: http(s)://example.com/). " /* + printer.Required*/)
+	global.StringP("url", "u", "", "Target URL (Ex: http(s)://example.com/). "+printer.Required)
 	global.StringP("scripts", "", "", "Auxiliary scripts.")
 	global.BoolP("random-agent", "", false, "Use randomly selected HTTP(S) User-Agent header value.")
 	global.BoolP("tor", "", false, "Use Tor anonymity network")
