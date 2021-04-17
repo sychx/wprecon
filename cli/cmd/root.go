@@ -21,6 +21,7 @@ var Root = &flag.Command{
 }
 
 func RootOptionsRun(cmd *flag.Command, args []string) {
+	var channel = make(chan []string)
 	var constructorPlugins = enumerate.NewPlugins(database.Memory.GetString("Target"), database.Memory.GetString("HTTP Index Raw"), database.Memory.GetString("HTTP wp-content"))
 	var ntpl = printer.NewTopLine("Loading Plugins...")
 
@@ -32,38 +33,49 @@ func RootOptionsRun(cmd *flag.Command, args []string) {
 			for version, confidence := range text.PercentageOfVersions(strings.Split(plugin[2], ",")) {
 				printer.NewTopics("Version:", fmt.Sprint(version)).Done()
 				printer.NewTopics("Confidence:", fmt.Sprintf("%d%%", confidence)).Prefix("  ").Warning()
+				for _, match := range strings.Split(plugin[0], ",") {
+					if strings.Contains(match, version) {
+						printer.NewTopics(fmt.Sprint(match)).Prefix("  ").Warning()
+					}
+				}
 			}
 		} else {
 			printer.NewTopics("Version:", printer.Underline+printer.Red+"Version Not Identify"+printer.Reset).Danger()
-		}
-
-		printer.NewTopics("Match(s):").Done()
-		for _, match := range strings.Split(plugin[0], ",") {
-			printer.NewTopics(fmt.Sprint(match)).Prefix("  ").Warning()
 		}
 
 		printer.Println()
 	}
 
-	for _, plugin := range constructorPlugins.Aggressive() {
-		ntpl.Done("Plugin:", plugin[1], printer.Underline+printer.Yellow+"(Enumerate Aggressive)"+printer.Reset)
-		printer.NewTopics("Location:", database.Memory.GetString("Target")+database.Memory.GetString("HTTP wp-content")+"/plugins/"+plugin[1]+"/").Done()
+	go constructorPlugins.Aggressive(channel)
 
-		if len(plugin) >= 3 {
-			for version, confidence := range text.PercentageOfVersions(strings.Split(plugin[2], ",")) {
-				printer.NewTopics("Version:", fmt.Sprint(version)).Done()
-				printer.NewTopics("Confidence:", fmt.Sprintf("%d%%", confidence)).Prefix("  ").Warning()
+	for done := true; done; {
+
+		select {
+		case plugin, ok := <-channel:
+			if ok {
+				ntpl.Done("Plugin:", plugin[1], printer.Underline+printer.Yellow+"(Enumerate Aggressive)"+printer.Reset)
+				printer.NewTopics("Location:", database.Memory.GetString("Target")+database.Memory.GetString("HTTP wp-content")+"/plugins/"+plugin[1]+"/").Done()
+
+				if len(plugin) == 3 {
+					for version, confidence := range text.PercentageOfVersions(strings.Split(plugin[2], ",")) {
+						printer.NewTopics("Version:", fmt.Sprint(version)).Done()
+						printer.NewTopics("Confidence:", fmt.Sprintf("%d%%", confidence)).Prefix("  ").Warning()
+						for _, match := range strings.Split(plugin[0], ",") {
+							if strings.Contains(match, version) {
+								printer.NewTopics(fmt.Sprint(match)).Prefix("  ").Warning()
+							}
+						}
+					}
+				} else {
+					printer.NewTopics("Version:", printer.Underline+printer.Red+"Version Not Identify"+printer.Reset).Danger()
+				}
+
+				printer.Println()
+
+			} else {
+				done = false
 			}
-		} else {
-			printer.NewTopics("Version:", printer.Underline+printer.Red+"Version Not Identify"+printer.Reset).Danger()
 		}
-
-		printer.NewTopics("Match(s):").Done()
-		for _, match := range strings.Split(plugin[0], ",") {
-			printer.NewTopics(fmt.Sprint(match)).Prefix("  ").Warning()
-		}
-
-		printer.Println()
 	}
 
 	if constructorPlugins.CountPluginsAggressive == 0 && constructorPlugins.CountPluginsPassive == 0 {
