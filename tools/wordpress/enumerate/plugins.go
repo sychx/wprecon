@@ -16,9 +16,8 @@ const (
 )
 
 type plugin struct {
-	target, raw, wpContentPath                  string
-	plugins                                     [][]string
-	CountPluginsPassive, CountPluginsAggressive int
+	target, raw, wpContentPath              string
+	LenPluginsPassive, LenPluginsAggressive int
 }
 
 func NewPlugins(target, raw, wpcontent string) *plugin {
@@ -27,18 +26,33 @@ func NewPlugins(target, raw, wpcontent string) *plugin {
 
 // Passive :: "How does passive enumeration work?"
 // We took the source code of the index that was saved in memory and from there we do a search using the regex.
-func (object *plugin) Passive() [][]string {
-	var re = regexp.MustCompile(object.wpContentPath + MatchPluginPassive)
-	var submatch = re.FindAllStringSubmatch(object.raw, -1)
+func (self *plugin) Passive() [][]string {
+	var (
+		re          = regexp.MustCompile(self.wpContentPath + MatchPluginPassive)
+		allsubmatch = re.FindAllStringSubmatch(self.raw, -1)
+		plugins     [][]string
+	)
 
-	object.CountPluginsPassive = len(submatch)
+	self.LenPluginsPassive = len(allsubmatch)
 
-	return submatch
+	for _, submatch := range allsubmatch {
+		if _, has := text.ContainsInSliceSlice(plugins, submatch[1]); !has {
+			plugins = append(plugins, submatch)
+		} else if index := text.FindByValueInIndex(plugins, submatch[1]); index != -1 {
+			plugins[index][0] = plugins[index][0] + "," + submatch[0]
+			plugins[index][2] = plugins[index][2] + "," + submatch[2]
+		}
+	}
+
+	return plugins
 }
 
-func (object *plugin) Aggressive(channel chan []string) {
-	var wg sync.WaitGroup
-	var mx sync.Mutex
+func (self *plugin) Aggressive(channel chan []string) {
+	var (
+		wg      sync.WaitGroup
+		mx      sync.Mutex
+		plugins [][]string
+	)
 
 	wg.Add(2)
 
@@ -52,10 +66,10 @@ func (object *plugin) Aggressive(channel chan []string) {
 					Note: For you to understand better, I recommend that you see this in operation.
 				*/
 				mx.Lock()
-				if _, contains := text.FindStringInSliceSlice(object.plugins, 1, submatch[1]); !contains {
-					object.plugins = append(object.plugins, submatch)
-				} else if index := text.FindByValueInIndex(object.plugins, submatch[1]); index != -1 {
-					object.plugins[index][0] = object.plugins[index][0] + "," + submatch[0]
+				if _, contains := text.FindStringInSliceSlice(plugins, 1, submatch[1]); !contains {
+					plugins = append(plugins, submatch)
+				} else if index := text.FindByValueInIndex(plugins, submatch[1]); index != -1 {
+					plugins[index][0] = plugins[index][0] + "," + submatch[0]
 				}
 				mx.Unlock()
 			}
@@ -65,13 +79,13 @@ func (object *plugin) Aggressive(channel chan []string) {
 	}()
 
 	go func() {
-		for _, submatch := range object.Passive() {
+		for _, submatch := range self.Passive() {
 			mx.Lock()
-			if _, has := text.ContainsInSliceSlice(object.plugins, submatch[1]); !has {
-				object.plugins = append(object.plugins, submatch)
-			} else if index := text.FindByValueInIndex(object.plugins, submatch[1]); index != -1 {
-				object.plugins[index][0] = object.plugins[index][0] + "," + submatch[0]
-				object.plugins[index][2] = object.plugins[index][2] + "," + submatch[2]
+			if _, has := text.ContainsInSliceSlice(plugins, submatch[1]); !has {
+				plugins = append(plugins, submatch)
+			} else if index := text.FindByValueInIndex(plugins, submatch[1]); index != -1 {
+				plugins[index][0] = plugins[index][0] + "," + submatch[0]
+				plugins[index][2] = plugins[index][2] + "," + submatch[2]
 			}
 			mx.Unlock()
 		}
@@ -81,21 +95,21 @@ func (object *plugin) Aggressive(channel chan []string) {
 
 	wg.Wait()
 
-	object.CountPluginsAggressive = len(object.plugins)
+	self.LenPluginsAggressive = len(plugins)
 
-	for _, plugin := range object.plugins {
-		var path = object.wpContentPath + "/plugins/" + plugin[1] + "/"
+	for _, plugin := range plugins {
+		var path = self.wpContentPath + "/plugins/" + plugin[1] + "/"
 
-		if match, version := extensions.GetVersionByIndexOf(object.target, path); version != "" {
+		if match, version := extensions.GetVersionByIndexOf(self.target, path); version != "" {
 			plugin[0] = plugin[0] + "," + match
 			plugin[2] = plugin[2] + "," + version
-		} else if match, version := extensions.GetVersionByReadme(object.target, path); version != "" {
+		} else if match, version := extensions.GetVersionByReadme(self.target, path); version != "" {
 			plugin[0] = plugin[0] + "," + match
 			plugin[2] = plugin[2] + "," + version
-		} else if match, version := extensions.GetVersionByChangeLogs(object.target, path); version != "" {
+		} else if match, version := extensions.GetVersionByChangeLogs(self.target, path); version != "" {
 			plugin[0] = plugin[0] + "," + match
 			plugin[2] = plugin[2] + "," + version
-		} else if match, version := extensions.GetVersionByReleaseLog(object.target, path); version != "" {
+		} else if match, version := extensions.GetVersionByReleaseLog(self.target, path); version != "" {
 			plugin[0] = plugin[0] + "," + match
 			plugin[2] = plugin[2] + "," + version
 		}

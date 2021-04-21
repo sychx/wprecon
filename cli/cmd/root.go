@@ -20,65 +20,67 @@ var Root = &flag.Command{
 	PostRun: RootOptionsPostRun,
 }
 
+var (
+	printer_version = func(confidence int, tag, version string) { var str string; if confidence == 0 { str = tag } else { str = fmt.Sprintf("%s (confidence: %d%%)", version, confidence) }; printer.NewTopics("Version:", str).Done() }
+	printer_match = func(submatch []string, version string) { for _, match := range submatch { if strings.Contains(match, version) { printer.NewTopics(match).Prefix("  ").Warning() } } }
+)
+
 func RootOptionsRun(cmd *flag.Command, args []string) {
-	var channel = make(chan []string)
-	var constructorPlugins = enumerate.NewPlugins(database.Memory.GetString("Target"), database.Memory.GetString("HTTP Index Raw"), database.Memory.GetString("HTTP wp-content"))
-	var ntpl = printer.NewTopLine("Loading Plugins...")
+	var (
+		target    string = database.Memory.GetString("Target")
+		indexraw  string = database.Memory.GetString("HTTP Index Raw")
+		wpcontent string = database.Memory.GetString("HTTP wp-content")
 
-	for _, plugin := range constructorPlugins.Passive() {
-		ntpl.Done("Plugin:", plugin[1], printer.Underline+printer.Yellow+"(Enumerate Passive)"+printer.Reset)
-		printer.NewTopics("Location:", database.Memory.GetString("Target")+database.Memory.GetString("HTTP wp-content")+"/plugins/"+plugin[1]+"/").Done()
+		tagEnumeratePassive    = printer.Underline + printer.Yellow + "(Enumerate Passive)" + printer.Reset
+		tagEnumerateAggressive = printer.Underline + printer.Yellow + "(Enumerate Aggressive)" + printer.Reset
+		tagNoVersion           = printer.Underline + printer.Red + "Version Not Identify" + printer.Reset
 
-		if len(plugin) >= 3 {
-			for version, confidence := range text.PercentageOfVersions(strings.Split(plugin[2], ",")) {
-				printer.NewTopics("Version:", fmt.Sprint(version)).Done()
-				printer.NewTopics("Confidence:", fmt.Sprintf("%d%%", confidence)).Prefix("  ").Warning()
-				for _, match := range strings.Split(plugin[0], ",") {
-					if strings.Contains(match, version) {
-						printer.NewTopics(fmt.Sprint(match)).Prefix("  ").Warning()
-					}
-				}
-			}
-		} else {
-			printer.NewTopics("Version:", printer.Underline+printer.Red+"Version Not Identify"+printer.Reset).Danger()
+		channel = make(chan []string)
+
+		plugins = enumerate.NewPlugins(target, indexraw, wpcontent)
+		ntpl    = printer.NewTopLine("Loading Plugins...")
+	)
+
+	for _, plugin := range plugins.Passive() {
+		var (
+			name     = plugin[1]
+			versions = plugin[2]
+			url      = target + wpcontent + "/plugins/" + name + "/"
+		)
+
+		ntpl.Done("Plugin:", name, tagEnumeratePassive)
+		printer.NewTopics("Location:", url).Done()
+
+		for version, confidence := range text.PercentageOfVersions(strings.Split(versions, ",")) {
+			printer_version(confidence, tagNoVersion, version)
+			printer_match(strings.Split(plugin[0], ","), version)
 		}
 
 		printer.Println()
 	}
 
-	go constructorPlugins.Aggressive(channel)
+	go plugins.Aggressive(channel)
 
 	for done := true; done; {
-
 		select {
 		case plugin, ok := <-channel:
 			if ok {
-				ntpl.Done("Plugin:", plugin[1], printer.Underline+printer.Yellow+"(Enumerate Aggressive)"+printer.Reset)
-				printer.NewTopics("Location:", database.Memory.GetString("Target")+database.Memory.GetString("HTTP wp-content")+"/plugins/"+plugin[1]+"/").Done()
+				ntpl.Done("Plugin:", plugin[1], tagEnumerateAggressive)
+				printer.NewTopics("Location:", target+wpcontent+"/plugins/"+plugin[1]+"/").Done()
 
-				if len(plugin) == 3 {
-					for version, confidence := range text.PercentageOfVersions(strings.Split(plugin[2], ",")) {
-						printer.NewTopics("Version:", fmt.Sprint(version)).Done()
-						printer.NewTopics("Confidence:", fmt.Sprintf("%d%%", confidence)).Prefix("  ").Warning()
-						for _, match := range strings.Split(plugin[0], ",") {
-							if strings.Contains(match, version) {
-								printer.NewTopics(fmt.Sprint(match)).Prefix("  ").Warning()
-							}
-						}
-					}
-				} else {
-					printer.NewTopics("Version:", printer.Underline+printer.Red+"Version Not Identify"+printer.Reset).Danger()
+				for version, confidence := range text.PercentageOfVersions(strings.Split(plugin[2], ",")) {
+					printer_version(confidence, tagNoVersion, version)
+					printer_match(strings.Split(plugin[0], ","), version)
 				}
 
 				printer.Println()
-
 			} else {
 				done = false
 			}
 		}
 	}
 
-	if constructorPlugins.CountPluginsAggressive == 0 && constructorPlugins.CountPluginsPassive == 0 {
+	if plugins.LenPluginsAggressive == 0 && plugins.LenPluginsPassive == 0 {
 		ntpl.Danger("No Plugin Detected")
 	}
 }
