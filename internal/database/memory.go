@@ -4,7 +4,7 @@ import "sync"
 
 /*
 	I am using the mutex to be able to block writing in memory at the same time, this will prevent the wprecon from crashing.
-	In short: "db.mutex.Lock()" blocks writing and "db.mutex.Unlock()" releases writing. Doing so when something is already being written he will wait to finish before he can write other information.
+	In short: "self.mutex.Lock()" blocks writing and "self.mutex.Unlock()" releases writing. Doing so when something is already being written he will wait to finish before he can write other information.
 */
 
 var (
@@ -37,93 +37,93 @@ func NewMemory() *memory {
 	return database
 }
 
-func (db *memory) SetString(key, value string) {
-	db.mutex.Lock()
-	db.stringx[key] = value
-	defer db.mutex.Unlock()
+func (self *memory) SetString(key, value string) {
+	self.mutex.Lock()
+	self.stringx[key] = value
+	defer self.mutex.Unlock()
 }
 
-func (db *memory) SetSlice(key string, value []string) {
-	db.mutex.Lock()
-	db.slice[key] = value
-	defer db.mutex.Unlock()
+func (self *memory) SetSlice(key string, value []string) {
+	self.mutex.Lock()
+	self.slice[key] = value
+	defer self.mutex.Unlock()
 }
 
-func (db *memory) SetInt(key string, value int) {
-	db.mutex.Lock()
-	db.intx[key] = value
-	defer db.mutex.Unlock()
+func (self *memory) SetInt(key string, value int) {
+	self.mutex.Lock()
+	self.intx[key] = value
+	defer self.mutex.Unlock()
 }
 
-func (db *memory) SetBool(key string, value bool) {
-	db.mutex.Lock()
-	db.boolx[key] = value
-	defer db.mutex.Unlock()
+func (self *memory) SetBool(key string, value bool) {
+	self.mutex.Lock()
+	self.boolx[key] = value
+	defer self.mutex.Unlock()
 }
 
-func (db *memory) SetMapString(key string, value map[string]string) {
-	db.mutex.Lock()
-	db.mapstring[key] = value
-	defer db.mutex.Unlock()
+func (self *memory) SetMapString(key string, value map[string]string) {
+	self.mutex.Lock()
+	self.mapstring[key] = value
+	defer self.mutex.Unlock()
 }
 
-func (db *memory) SetMapMapString(key, key2, value string) {
-	db.mutex.Lock()
-	db.mapstring[key][key2] = value
-	defer db.mutex.Unlock()
+func (self *memory) SetMapMapString(key, key2, value string) {
+	self.mutex.Lock()
+	self.mapstring[key][key2] = value
+	defer self.mutex.Unlock()
 }
 
-func (db *memory) AddInString(key, value string) {
-	db.mutex.Lock()
-	db.stringx[key] += value
-	defer db.mutex.Unlock()
+func (self *memory) AddInString(key, value string) {
+	self.mutex.Lock()
+	self.stringx[key] += value
+	defer self.mutex.Unlock()
 }
 
-func (db *memory) AddInSlice(key, value string) {
-	db.mutex.Lock()
-	db.slice[key] = append(db.slice[key], value)
-	defer db.mutex.Unlock()
+func (self *memory) AddInSlice(key, value string) {
+	self.mutex.Lock()
+	self.slice[key] = append(self.slice[key], value)
+	defer self.mutex.Unlock()
 }
 
-func (db *memory) AddCalcInt(key string, value int) {
-	db.mutex.Lock()
-	db.intx[key] = db.intx[key] + value
-	defer db.mutex.Unlock()
+func (self *memory) AddCalcInt(key string, value int) {
+	self.mutex.Lock()
+	self.intx[key] = self.intx[key] + value
+	defer self.mutex.Unlock()
 }
 
-func (db *memory) AddInt(key string) {
-	db.mutex.Lock()
-	db.intx[key]++
-	defer db.mutex.Unlock()
+func (self *memory) AddInt(key string) {
+	self.mutex.Lock()
+	self.intx[key]++
+	defer self.mutex.Unlock()
 }
 
-func (db *memory) GetString(key string) string {
-	defer db.mutex.Unlock()
-	db.mutex.Lock()
-	return db.stringx[key]
+func (self *memory) GetString(key string) string {
+	defer self.mutex.Unlock()
+	self.mutex.Lock()
+	return self.stringx[key]
 }
-func (db *memory) GetSlice(key string) []string {
-	defer db.mutex.Unlock()
-	db.mutex.Lock()
-	return db.slice[key]
+func (self *memory) GetSlice(key string) []string {
+	defer self.mutex.Unlock()
+	self.mutex.Lock()
+	return self.slice[key]
 }
-func (db *memory) GetInt(key string) int {
-	defer db.mutex.Unlock()
-	db.mutex.Lock()
-	return db.intx[key]
+func (self *memory) GetInt(key string) int {
+	defer self.mutex.Unlock()
+	self.mutex.Lock()
+	return self.intx[key]
 }
-func (db *memory) GetBool(key string) bool {
-	defer db.mutex.Unlock()
-	db.mutex.Lock()
-	return db.boolx[key]
+func (self *memory) GetBool(key string) bool {
+	defer self.mutex.Unlock()
+	self.mutex.Lock()
+	return self.boolx[key]
 }
-func (db *memory) GetMapString(key string) map[string]string {
-	defer db.mutex.Unlock()
-	db.mutex.Lock()
-	return db.mapstring[key]
+func (self *memory) GetMapString(key string) map[string]string {
+	defer self.mutex.Unlock()
+	self.mutex.Lock()
+	return self.mapstring[key]
 }
-func (db *memory) GetMapMapString(key, key2 string) string {
-	defer db.mutex.Unlock()
-	db.mutex.Lock()
-	return db.mapstring[key][key2]
+func (self *memory) GetMapMapString(key, key2 string) string {
+	defer self.mutex.Unlock()
+	self.mutex.Lock()
+	return self.mapstring[key][key2]
 }

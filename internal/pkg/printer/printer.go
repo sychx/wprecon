@@ -90,10 +90,10 @@ func Printf(format string, t ...interface{}) {
 type endl struct{}
 
 // endline :: In order to avoid writing at all times "printer.Println" or "fmt.Println", I created this function that will be returned on all normal printer.
-func (options *endl) Endl() *endl {
+func (self *endl) Endl() *endl {
 	Println()
 
-	return options
+	return self
 }
 
 func Done(t ...string) *endl {
@@ -187,26 +187,26 @@ func NewTopics(t ...string) *topics {
 	return &topics{text: raw}
 }
 
-func (options *topics) Prefix(s ...string) *topics {
-	options.prefix = strings.Join(s, " ")
+func (self *topics) Prefix(s ...string) *topics {
+	self.prefix = strings.Join(s, " ")
 
-	return options
+	return self
 }
 
-func (options *topics) Default() {
-	io.WriteString(&stdout, options.prefix+prefixListDefault+" "+options.text+"\n")
+func (self *topics) Default() {
+	io.WriteString(&stdout, self.prefix+prefixListDefault+" "+self.text+"\n")
 }
 
-func (options *topics) Done() {
-	io.WriteString(&stdout, options.prefix+prefixListDone+" "+options.text+"\n")
+func (self *topics) Done() {
+	io.WriteString(&stdout, self.prefix+prefixListDone+" "+self.text+"\n")
 }
 
-func (options *topics) Danger() {
-	io.WriteString(&stdout, options.prefix+prefixListDanger+" "+options.text+"\n")
+func (self *topics) Danger() {
+	io.WriteString(&stdout, self.prefix+prefixListDanger+" "+self.text+"\n")
 }
 
-func (options *topics) Warning() {
-	io.WriteString(&stdout, options.prefix+prefixListWarning+" "+options.text+"\n")
+func (self *topics) Warning() {
+	io.WriteString(&stdout, self.prefix+prefixListWarning+" "+self.text+"\n")
 }
 
 type topline struct {
@@ -221,35 +221,35 @@ func NewTopLine(t ...string) *topline {
 	return &topline{}
 }
 
-func (options *topline) Done(t ...string) {
+func (self *topline) Done(t ...string) {
 	var raw = strings.Join(t, " ")
 
-	options.Clean()
+	self.Clean()
 	Done(raw)
 }
 
-func (options *topline) Danger(t ...string) {
+func (self *topline) Danger(t ...string) {
 	var raw = strings.Join(t, " ")
 
-	options.Clean()
+	self.Clean()
 	Danger(raw)
 }
 
-func (options *topline) Warning(t ...string) {
+func (self *topline) Warning(t ...string) {
 	var raw = strings.Join(t, " ")
 
-	options.Clean()
+	self.Clean()
 	Warning(raw)
 }
 
-func (options *topline) Info(t ...string) {
+func (self *topline) Info(t ...string) {
 	var raw = strings.Join(t, " ")
 
-	options.Clean()
+	self.Clean()
 	Info(raw)
 }
 
-func (options *topline) Clean() {
+func (self *topline) Clean() {
 	fmt.Fprint(&stdout, "\033[G\033[K")
 }
 
@@ -257,13 +257,13 @@ func ResetSeek() {
 	SeekCurrent = 0
 }
 
-func (options *topline) Progress(seek int, t ...string) {
+func (self *topline) Progress(seek int, t ...string) {
 	var prefix = Yellow + fmt.Sprintf("[%d/%d]", SeekCurrent, seek) + Reset
 	var raw = strings.Join(t, " ")
 
 	atomic.AddInt64(&SeekCurrent, 1)
 
-	options.Clean()
+	self.Clean()
 
 	if int(SeekCurrent) <= seek {
 		io.WriteString(&stdout, prefix+" "+raw)

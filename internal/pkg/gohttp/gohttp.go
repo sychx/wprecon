@@ -18,7 +18,7 @@ var (
 	firewallPass bool
 )
 
-// HTTPOptions :: This is Struct Http, it will inherit the struct Options and client.
+// httpOptions :: This is Struct Http, it will inherit the struct self and client.
 type httpOptions struct {
 	url                  *URLOptions
 	method               string
@@ -42,7 +42,7 @@ type Response struct {
 }
 
 // URLOptions :: This struct will be used to inform directories... the complete URL... or just the domain.
-// (Alert) The focus of this struct is to be used together with HTTPOptions!
+// (Alert) The focus of this struct is to be used together with httpOptions!
 type URLOptions struct {
 	Simple    string
 	Full      string
@@ -60,9 +60,9 @@ func SimpleRequest(params ...string) *Response {
 		http.SetURLDirectory(strings.Join(params[1:], ""))
 	}
 
-	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
-	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
-	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))
+	http.OnTor(database.Memory.GetBool("HTTP self TOR"))
+	http.OnRandomUserAgent(database.Memory.GetBool("HTTP self Random Agent"))
+	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP self TLS Certificate Verify"))
 	http.FirewallDetection(true)
 
 	response, err := http.Run()
@@ -83,9 +83,9 @@ func SimpleRequestGoroutine(channel chan *Response, params ...string) {
 		http.SetURLDirectory(strings.Join(params[1:], ""))
 	}
 
-	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
-	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
-	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))
+	http.OnTor(database.Memory.GetBool("HTTP self TOR"))
+	http.OnRandomUserAgent(database.Memory.GetBool("HTTP self Random Agent"))
+	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP self TLS Certificate Verify"))
 	http.FirewallDetection(true)
 
 	response, err := http.Run()
@@ -98,48 +98,48 @@ func SimpleRequestGoroutine(channel chan *Response, params ...string) {
 }
 
 func NewHTTPClient() *httpOptions {
-	options := &httpOptions{
+	self := &httpOptions{
 		method:      "GET",
 		userAgent:   "WPrecon - Wordpress Recon (Vulnerability Scanner)",
 		data:        nil,
 		contentType: "text/html; charset=UTF-8"}
 
-	options.url = &URLOptions{}
+	self.url = &URLOptions{}
 
-	return options
+	return self
 }
 
-func (options *httpOptions) SetURL(url string) *httpOptions {
+func (self *httpOptions) SetURL(url string) *httpOptions {
 	if !strings.HasSuffix(url, "/") {
-		options.url.Simple = url + "/"
-		options.url.Full = url + "/"
+		self.url.Simple = url + "/"
+		self.url.Full = url + "/"
 	} else {
-		options.url.Simple = url
-		options.url.Full = url
+		self.url.Simple = url
+		self.url.Full = url
 	}
 
-	return options
+	return self
 }
 
-func (options *httpOptions) SetURLDirectory(directory string) *httpOptions {
-	if !strings.HasPrefix(directory, "/") && !strings.HasSuffix(options.url.Simple, "/") {
-		options.url.Directory = "/" + directory
-		options.url.Full = options.url.Simple + "/" + directory
+func (self *httpOptions) SetURLDirectory(directory string) *httpOptions {
+	if !strings.HasPrefix(directory, "/") && !strings.HasSuffix(self.url.Simple, "/") {
+		self.url.Directory = "/" + directory
+		self.url.Full = self.url.Simple + "/" + directory
 	} else {
-		options.url.Directory = directory
-		options.url.Full = options.url.Simple + directory
+		self.url.Directory = directory
+		self.url.Full = self.url.Simple + directory
 	}
 
-	return options
+	return self
 }
 
-func (options *httpOptions) SetURLFull(full string) *httpOptions {
-	options.url.Full = full
+func (self *httpOptions) SetURLFull(full string) *httpOptions {
+	self.url.Full = full
 
-	return options
+	return self
 }
 
-func (options *httpOptions) OnTor(status bool) (*httpOptions, error) {
+func (self *httpOptions) OnTor(status bool) (*httpOptions, error) {
 	if status {
 		tor, err := url.Parse("http://127.0.0.1:9080")
 
@@ -147,75 +147,75 @@ func (options *httpOptions) OnTor(status bool) (*httpOptions, error) {
 			return nil, fmt.Errorf("proxy URL is invalid (%w)", err)
 		}
 
-		options.proxy = http.ProxyURL(tor)
+		self.proxy = http.ProxyURL(tor)
 	}
 
-	return options, nil
+	return self, nil
 }
 
-func (options *httpOptions) OnRandomUserAgent(status bool) *httpOptions {
+func (self *httpOptions) OnRandomUserAgent(status bool) *httpOptions {
 	if status {
-		options.userAgent = RandomUserAgent()
+		self.userAgent = RandomUserAgent()
 	}
 
-	return options
+	return self
 }
 
-func (options *httpOptions) OnTLSCertificateVerify(status bool) *httpOptions {
-	options.tlsCertificateVerify = status
+func (self *httpOptions) OnTLSCertificateVerify(status bool) *httpOptions {
+	self.tlsCertificateVerify = status
 
-	return options
+	return self
 }
 
-func (options *httpOptions) SetMethod(method string) *httpOptions {
-	options.method = method
+func (self *httpOptions) SetMethod(method string) *httpOptions {
+	self.method = method
 
-	return options
+	return self
 }
 
-func (options *httpOptions) SetUserAgent(userAgent string) *httpOptions {
-	options.userAgent = userAgent
+func (self *httpOptions) SetUserAgent(userAgent string) *httpOptions {
+	self.userAgent = userAgent
 
-	return options
+	return self
 }
 
-func (options *httpOptions) SetForm(form *url.Values) *httpOptions {
-	options.data = strings.NewReader(form.Encode())
+func (self *httpOptions) SetForm(form *url.Values) *httpOptions {
+	self.data = strings.NewReader(form.Encode())
 
-	return options
+	return self
 }
 
-func (options *httpOptions) SetData(data string) *httpOptions {
-	options.data = strings.NewReader(data)
+func (self *httpOptions) SetData(data string) *httpOptions {
+	self.data = strings.NewReader(data)
 
-	return options
+	return self
 }
 
-func (options *httpOptions) SetRedirectFunc(redirectFunc func(req *http.Request, via []*http.Request) error) *httpOptions {
-	options.redirect = redirectFunc
+func (self *httpOptions) SetRedirectFunc(redirectFunc func(req *http.Request, via []*http.Request) error) *httpOptions {
+	self.redirect = redirectFunc
 
-	return options
+	return self
 }
 
-func (options *httpOptions) SetContentType(contentType string) *httpOptions {
-	options.contentType = contentType
+func (self *httpOptions) SetContentType(contentType string) *httpOptions {
+	self.contentType = contentType
 
-	return options
+	return self
 }
 
-func (options *httpOptions) FirewallDetection(status bool) *httpOptions {
-	options.firewall = status
+func (self *httpOptions) FirewallDetection(status bool) *httpOptions {
+	self.firewall = status
 
-	return options
+	return self
 }
 
-func (options *httpOptions) SetSleep(tm int) *httpOptions {
-	options.sleep = time.Duration(tm)
+func (self *httpOptions) SetSleep(tm int) *httpOptions {
+	self.sleep = time.Duration(tm)
 
-	return options
+	return self
 }
 
-func (options *httpOptions) FirewallActiveDetection(http *Response) {
+func (self *httpOptions) FirewallActiveDetection(http *Response) {
 	exists, firewall, output, solve, confidence := NewFirewallDetectionPassive(http).All().Run()
 
 	if exists {
@@ -235,25 +235,25 @@ func (options *httpOptions) FirewallActiveDetection(http *Response) {
 	}
 }
 
-func (options *httpOptions) Run() (*Response, error) {
+func (self *httpOptions) Run() (*Response, error) {
 	client := &http.Client{
-		CheckRedirect: options.redirect,
+		CheckRedirect: self.redirect,
 		Transport: &http.Transport{
-			Proxy: options.proxy,
+			Proxy: self.proxy,
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: options.tlsCertificateVerify,
+				InsecureSkipVerify: self.tlsCertificateVerify,
 			},
 		},
 	}
 
-	request, err := http.NewRequest(options.method, options.url.Full, options.data)
+	request, err := http.NewRequest(self.method, self.url.Full, self.data)
 
 	if err != nil {
 		return nil, err
 	}
 
-	request.Header.Set("User-Agent", options.userAgent)
-	request.Header.Set("Content-Type", options.contentType)
+	request.Header.Set("User-Agent", self.userAgent)
+	request.Header.Set("Content-Type", self.contentType)
 
 	response, err := client.Do(request)
 
@@ -275,16 +275,16 @@ func (options *httpOptions) Run() (*Response, error) {
 
 	structResponse := &Response{
 		Raw:      string(raw),
-		URL:      options.url,
+		URL:      self.url,
 		Response: response,
 	}
 
-	if options.firewall && !firewallPass {
-		options.FirewallActiveDetection(structResponse)
+	if self.firewall && !firewallPass {
+		self.FirewallActiveDetection(structResponse)
 	}
 
-	if options.sleep != 0 {
-		time.Sleep(time.Duration(options.sleep) * time.Second)
+	if self.sleep != 0 {
+		time.Sleep(time.Duration(self.sleep) * time.Second)
 	} else if sleep := database.Memory.GetInt("HTTP Time Sleep"); sleep != 0 {
 		time.Sleep(time.Duration(sleep) * time.Second)
 	}
