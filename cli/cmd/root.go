@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/blackbinn/wprecon/internal/database"
 	"github.com/blackbinn/wprecon/internal/pkg/printer"
@@ -31,58 +32,81 @@ func RootOptionsRun(cmd *flag.Command, args []string) {
 		indexraw  string = database.Memory.GetString("HTTP Index Raw")
 		wpcontent string = database.Memory.GetString("HTTP wp-content")
 
-		tagEnumeratePassive    = printer.Underline + printer.Yellow + "(Enumerate Passive)" + printer.Reset
-		tagEnumerateAggressive = printer.Underline + printer.Yellow + "(Enumerate Aggressive)" + printer.Reset
-		tagNoVersion           = printer.Underline + printer.Red + "Version Not Identify" + printer.Reset
-
-		channel = make(chan []string)
+		tagNoVersion = printer.Underline + printer.Red + "Version Not Identify" + printer.Reset
 
 		plugins = enumerate.NewPlugins(target, indexraw, wpcontent)
-		ntpl    = printer.NewTopLine("Loading Plugins...")
+		themes  = enumerate.NewThemes(target, indexraw, wpcontent)
+
+		ntpl = printer.NewTopLine("Loading Plugins...")
+
+		aggressive_mode,_ = cmd.Flags().GetBool("aggressive-mode")
 	)
 
-	for _, plugin := range plugins.Passive() {
-		var (
-			name     = plugin[1]
-			versions = plugin[2]
-			url      = target + wpcontent + "/plugins/" + name + "/"
-		)
+	var channel = make(chan [5]string)
 
-		ntpl.Done("Plugin:", name, tagEnumeratePassive)
-		printer.NewTopics("Location:", url).Done()
-
-		for version, confidence := range text.PercentageOfVersions(strings.Split(versions, ",")) {
-			printer_version(confidence, tagNoVersion, version)
-			printer_match(strings.Split(plugin[0], ","), version)
-		}
-
-		printer.Println()
+	if aggressive_mode {
+		go plugins.Aggressive(channel)
+	}else{
+		go plugins.Passive(channel)
 	}
 
-	go plugins.Aggressive(channel)
+	time.Sleep(2*time.Second)
 
-	for done := true; done; {
+	for i := 1; i <= plugins.LenPluginsAggressive+plugins.LenPluginsPassive; i++ {
 		select {
-		case plugin, ok := <-channel:
-			if ok {
-				ntpl.Done("Plugin:", plugin[1], tagEnumerateAggressive)
-				printer.NewTopics("Location:", target+wpcontent+"/plugins/"+plugin[1]+"/").Done()
+		case informations := <-channel:
+			var (
+				name     = informations[1]
+				versions = informations[2]
+				matchs   = informations[0]
+				tag      = printer.Underline + printer.Yellow + "("+informations[3]+")" + printer.Reset
+				url      = target + wpcontent + "/plugins/" + name + "/"
+			)
+	
+			ntpl.Done("Plugin:", name, tag)
+			printer.NewTopics("Location:", url).Done()
 
-				for version, confidence := range text.PercentageOfVersions(strings.Split(plugin[2], ",")) {
-					printer_version(confidence, tagNoVersion, version)
-					printer_match(strings.Split(plugin[0], ","), version)
-				}
-
-				printer.Println()
-			} else {
-				done = false
+			for version, confidence := range text.PercentageOfVersions(strings.Split(versions, ",")) {
+				printer_version(confidence, tagNoVersion, version)
+				printer_match(strings.Split(matchs, ","), version)
 			}
+
+			printer.Println()
 		}
 	}
 
-	if plugins.LenPluginsAggressive == 0 && plugins.LenPluginsPassive == 0 {
-		ntpl.Danger("No Plugin Detected")
+	if aggressive_mode {
+		go themes.Aggressive(channel)
+	}else{
+		go themes.Passive(channel)
 	}
+
+	time.Sleep(2*time.Second)
+
+	for i := 1; i <= themes.LenThemesAggressive+themes.LenThemesPassive; i++ {
+		select {
+		case informations := <-channel:
+			var (
+				name     = informations[1]
+				versions = informations[2]
+				matchs   = informations[0]
+				tag      = printer.Underline + printer.Yellow + "("+informations[3]+")" + printer.Reset
+				url      = target + wpcontent + "/themes/" + name + "/"
+			)
+	
+			ntpl.Done("Theme:", name, tag)
+			printer.NewTopics("Location:", url).Done()
+
+			for version, confidence := range text.PercentageOfVersions(strings.Split(versions, ",")) {
+				printer_version(confidence, tagNoVersion, version)
+				printer_match(strings.Split(matchs, ","), version)
+			}
+
+			printer.Println()
+		}
+	}
+
+
 }
 
 func RootOptionsPostRun(cmd *flag.Command, args []string) {}
