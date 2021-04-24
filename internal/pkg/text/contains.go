@@ -1,27 +1,5 @@
 package text
 
-func FindStringInSliceSlice(slice [][]string, key int, value string) (int, bool) {
-	for i, item := range slice {
-		if value == item[key] {
-			return i, true
-		}
-	}
-
-	return -1, false
-}
-
-func FindByValueInIndex(slice [][]string, sub string) int {
-	for i, item := range slice {
-		for _, item2 := range item {
-			if sub == item2 {
-				return i
-			}
-		}
-	}
-
-	return -1
-}
-
 // ContainsInSlice :: This function will be used to check if a word/text already exists within a slice.
 func ContainsInSlice(slice []string, value string) (int, bool) {
 	for i, item := range slice {
