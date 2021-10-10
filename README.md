@@ -15,7 +15,7 @@
   <a href="#features">Features</a> •
   <a href="https://github.com/blackbinn/wprecon/wiki/Compile-and-Install">Compile & Install</a> •
   <a href="https://github.com/blackbinn/wprecon/blob/master/LICENSE">License</a> • 
-  <a href="https://github.com/blackbinn">Author</a>
+  <a href="https://github.com/blackcrw">Author</a>
 </p>
 
 <h3><p align="center">Version: 1.6.5 alpha</p></h3>
