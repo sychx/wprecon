@@ -1,5 +1,3 @@
-module github.com/blackbinn/wprecon
+module github.com/blackcrw/wprecon
 
-go 1.16
-
-require github.com/spf13/cobra v1.1.3
+go 1.17

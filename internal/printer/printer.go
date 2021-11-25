@@ -39,19 +39,19 @@ var (
 )
 
 var (
-	prefixWarning = Yellow + "[!]" + Reset
-	prefixDanger  = Red + "[✗]" + Reset
-	prefixFatal   = Red + "[!]" + Reset
-	prefixDone    = Green + "[✔]" + Reset
-	prefixScan    = Yellow + "[?]" + Reset
-	prefixInfo    = Magenta + "[i]" + Reset
+	prefix_warning = Yellow + "[!]" + Reset
+	prefix_danger  = Red + "[✗]" + Reset
+	prefix_fatal   = Red + "[!]" + Reset
+	prefix_done    = Green + "[✔]" + Reset
+	prefix_scan    = Yellow + "[?]" + Reset
+	prefix_info    = Magenta + "[i]" + Reset
 
-	prefixListWarning = Yellow + "    —" + Reset
-	prefixListDefault = White + "    —" + Reset
-	prefixListDanger  = Red + "    —" + Reset
-	prefixListDone    = Green + "    —" + Reset
+	prefix_list_warning = Yellow + "    —" + Reset
+	prefix_list_default = White + "    —" + Reset
+	prefix_list_danger  = Red + "    —" + Reset
+	prefix_list_done    = Green + "    —" + Reset
 
-	prefixTopLine = Yellow + "[✲]" + Reset
+	prefix_top_line = Yellow + "[✲]" + Reset
 )
 
 var SeekCurrent int64 = 0
@@ -59,19 +59,19 @@ var SeekCurrent int64 = 0
 func init() {
 	switch runtime.GOOS {
 	case "windows":
-		prefixDanger = "[✗]"
-		prefixFatal = "[!]"
-		prefixDone = "[✔]"
-		prefixWarning = "[!]"
-		prefixScan = "[?]"
-		prefixInfo = "[i]"
+		prefix_danger = "[✗]"
+		prefix_fatal = "[!]"
+		prefix_done = "[✔]"
+		prefix_warning = "[!]"
+		prefix_scan = "[?]"
+		prefix_info = "[i]"
 
-		prefixListDanger = "    —"
-		prefixListDone = "    —"
-		prefixListDefault = "    —"
-		prefixListWarning = "    —"
+		prefix_list_danger = "    —"
+		prefix_list_done = "    —"
+		prefix_list_default = "    —"
+		prefix_list_warning = "    —"
 
-		prefixTopLine = "[✲]"
+		prefix_top_line = "[✲]"
 	}
 }
 
@@ -90,16 +90,16 @@ func Printf(format string, t ...interface{}) {
 type endl struct{}
 
 // endline :: In order to avoid writing at all times "printer.Println" or "fmt.Println", I created this function that will be returned on all normal printer.
-func (self *endl) Endl() *endl {
+func (this *endl) Endl() *endl {
 	Println()
 
-	return self
+	return this
 }
 
 func Done(t ...string) *endl {
 	var raw = strings.Join(t, " ")
 
-	io.WriteString(&stdout, prefixDone+" "+raw+"\n")
+	io.WriteString(&stdout, prefix_done+" "+raw+"\n")
 
 	return &endl{}
 }
@@ -119,7 +119,7 @@ func Bars(t string) *endl {
 func Danger(t ...string) *endl {
 	var raw = strings.Join(t, " ")
 
-	io.WriteString(&stdout, prefixDanger+" "+raw+"\n")
+	io.WriteString(&stdout, prefix_danger+" "+raw+"\n")
 
 	return &endl{}
 }
@@ -127,7 +127,7 @@ func Danger(t ...string) *endl {
 func Warning(t ...string) *endl {
 	var raw = strings.Join(t, " ")
 
-	io.WriteString(&stdout, prefixWarning+" "+raw+"\n")
+	io.WriteString(&stdout, prefix_warning+" "+raw+"\n")
 
 	return &endl{}
 }
@@ -135,13 +135,13 @@ func Warning(t ...string) *endl {
 func Info(t ...string) *endl {
 	var raw = strings.Join(t, " ")
 
-	io.WriteString(&stdout, prefixInfo+" "+raw+"\n")
+	io.WriteString(&stdout, prefix_info+" "+raw+"\n")
 
 	return &endl{}
 }
 
 func Fatal(t interface{}) {
-	fmt.Fprint(&stdout, prefixFatal, " ")
+	fmt.Fprint(&stdout, prefix_fatal, " ")
 
 	switch t.(type) {
 	case error:
@@ -156,7 +156,7 @@ func Fatal(t interface{}) {
 func ScanQ(t ...string) string {
 	var raw = strings.Join(t, " ")
 
-	io.WriteString(&stdout, prefixScan+" "+raw)
+	io.WriteString(&stdout, prefix_scan+" "+raw)
 
 	var scanner = bufio.NewReader(&stdin)
 	var response, err = scanner.ReadString('\n')
@@ -187,26 +187,26 @@ func NewTopics(t ...string) *topics {
 	return &topics{text: raw}
 }
 
-func (self *topics) Prefix(s ...string) *topics {
-	self.prefix = strings.Join(s, " ")
+func (this *topics) Prefix(s ...string) *topics {
+	this.prefix = strings.Join(s, " ")
 
-	return self
+	return this
 }
 
-func (self *topics) Default() {
-	io.WriteString(&stdout, self.prefix+prefixListDefault+" "+self.text+"\n")
+func (this *topics) Default() {
+	io.WriteString(&stdout, this.prefix+prefix_list_default+" "+this.text+"\n")
 }
 
-func (self *topics) Done() {
-	io.WriteString(&stdout, self.prefix+prefixListDone+" "+self.text+"\n")
+func (this *topics) Done() {
+	io.WriteString(&stdout, this.prefix+prefix_list_done+" "+this.text+"\n")
 }
 
-func (self *topics) Danger() {
-	io.WriteString(&stdout, self.prefix+prefixListDanger+" "+self.text+"\n")
+func (this *topics) Danger() {
+	io.WriteString(&stdout, this.prefix+prefix_list_danger+" "+this.text+"\n")
 }
 
-func (self *topics) Warning() {
-	io.WriteString(&stdout, self.prefix+prefixListWarning+" "+self.text+"\n")
+func (this *topics) Warning() {
+	io.WriteString(&stdout, this.prefix+prefix_list_warning+" "+this.text+"\n")
 }
 
 type topline struct {
@@ -216,40 +216,40 @@ type topline struct {
 func NewTopLine(t ...string) *topline {
 	var raw = strings.Join(t, " ")
 
-	io.WriteString(&stdout, prefixTopLine+" "+raw)
+	io.WriteString(&stdout, prefix_top_line+" "+raw)
 
 	return &topline{}
 }
 
-func (self *topline) Done(t ...string) {
+func (this *topline) Done(t ...string) {
 	var raw = strings.Join(t, " ")
 
-	self.Clean()
+	this.Clean()
 	Done(raw)
 }
 
-func (self *topline) Danger(t ...string) {
+func (this *topline) Danger(t ...string) {
 	var raw = strings.Join(t, " ")
 
-	self.Clean()
+	this.Clean()
 	Danger(raw)
 }
 
-func (self *topline) Warning(t ...string) {
+func (this *topline) Warning(t ...string) {
 	var raw = strings.Join(t, " ")
 
-	self.Clean()
+	this.Clean()
 	Warning(raw)
 }
 
-func (self *topline) Info(t ...string) {
+func (this *topline) Info(t ...string) {
 	var raw = strings.Join(t, " ")
 
-	self.Clean()
+	this.Clean()
 	Info(raw)
 }
 
-func (self *topline) Clean() {
+func (this *topline) Clean() {
 	fmt.Fprint(&stdout, "\033[G\033[K")
 }
 
@@ -257,13 +257,13 @@ func ResetSeek() {
 	SeekCurrent = 0
 }
 
-func (self *topline) Progress(seek int, t ...string) {
+func (this *topline) Progress(seek int, t ...string) {
 	var prefix = Yellow + fmt.Sprintf("[%d/%d]", SeekCurrent, seek) + Reset
 	var raw = strings.Join(t, " ")
 
 	atomic.AddInt64(&SeekCurrent, 1)
 
-	self.Clean()
+	this.Clean()
 
 	if int(SeekCurrent) <= seek {
 		io.WriteString(&stdout, prefix+" "+raw)

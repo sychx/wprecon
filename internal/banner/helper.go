@@ -1,11 +1,11 @@
-package extensions
+package banner
 
 import (
 	"fmt"
 
 	"runtime"
 
-	"github.com/blackbinn/wprecon/internal/pkg/printer"
+	"github.com/blackcrw/wprecon/internal/printer"
 )
 
 func green(s string) string {
