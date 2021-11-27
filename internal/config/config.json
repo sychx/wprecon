@@ -1,7 +1,0 @@
-{
-    "Configure": {
-        "description": "Wprecon (Wordpress Recon), is a vulnerability recognition tool in CMS Wordpress, 100% developed in Go.",
-        "version": "2.0.0 alpha",
-        "api_url": ""
-    }
-}
