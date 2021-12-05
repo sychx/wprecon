@@ -1,23 +1,22 @@
 package update
 
 import (
-	"encoding/json"
-
 	"github.com/blackcrw/wprecon/internal/models"
 	"github.com/blackcrw/wprecon/internal/net"
+	"gopkg.in/yaml.v2"
 )
 
 // Check :: This function will be responsible for checking and printing on the screen whether there is an update or not.
-func Check() string {
-	var model models.VersionApiModel
+func GetVersion() string {
+	var model models.ConfigModel
 
-	var response = net.SimpleRequest("https://raw.githubusercontent.com/blackbinn/wprecon/master/internal/config/config.json")
+	var request = net.NewNETClient()
+	request.SetURLFull("https://raw.githubusercontent.com/blackcrw/wprecon/wprecon-v2/internal/config/config.yaml")
+	request.OnRandomUserAgent(true)
 
-	json.Unmarshal([]byte(response.Raw), &model)
+	var response, _ = request.Runner()
 
-	if model.Configure.Version != "1" {
-		return model.Configure.Version
-	}
+	yaml.Unmarshal([]byte(response.Raw), &model)
 
-	return ""
+	return model.App.Version
 }

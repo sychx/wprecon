@@ -36,6 +36,7 @@ var (
 	stdout   = *os.Stdout
 	stderr   = *os.Stderr
 	Required = Red + "(Required)" + Reset
+	Warningx  = Yellow + "(Warning)" + Reset
 )
 
 var (

@@ -22,7 +22,7 @@ The purpose of this tool is just to help developers find possible loopholes in t
 
 <h4>
   <p align="center">
-    <code>v2.0.0</code>
+    <code>v2.1.0</code>
   </p>
 </h4>
 <br>

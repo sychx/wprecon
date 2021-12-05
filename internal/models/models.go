@@ -6,18 +6,35 @@ import (
 	"net/url"
 )
 
-type InformationsModel struct {
-	Url string
-	Status int
-	Raw string
-	Confidence int
-	FoundBy string
+type EnumerateModel struct{
+	Name       string
+	FoundBy    string
+	Others     []EnumerateOthersModel
 }
 
-type VersionApiModel struct {
-	Configure struct {
-		Version string `json:"version"`
-	} `json:"Configure"`
+type EnumerateOthersModel struct {
+	Confidence int
+	Version    string
+	FoundBy    string
+	Match      []string	
+}
+
+type InterestingModel struct {
+	Url        string
+	Status     int
+	Raw        string
+	Confidence int
+	FoundBy    string
+}
+
+type ConfigModel struct {
+	App struct {
+		Name        string `yaml:"name"`
+		Author      string `yaml:"author"`
+		Description string `yaml:"description"`
+		Version     string `yaml:"version"`
+		ApiUrl      string `yaml:"api_url"`
+	} `yaml:"application"`
 }
 
 type UrlOptionsModel struct {
@@ -32,4 +49,10 @@ type ResponseModel struct {
 	Raw      string
 	URL      *UrlOptionsModel
 	Response *http.Response
+}
+
+type GetVersions interface {
+	GetVersionByStableTag(raw string)  []string
+	GetVersionByChangelog(raw string)  []string
+	GetVersionByReleaseLog(raw string) []string
 }
