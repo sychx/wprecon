@@ -1,18 +1,18 @@
 package wordlist
 
-var WPreadme = [3]string{
+var WPReadme = [3]string{
 	"readme.txt",
 	"readme.md",
 	"readme",
 }
 
-var WPchangesLogs = [3]string{
+var WPChangesLogs = [3]string{
 	"changelog.txt",
 	"changelog.md",
 	"changelog",
 }
 
-var WPreleaseLog = [3]string{
+var WPReleaseLog = [3]string{
 	"release_log.txt",
 	"release_log.md",
 	"release_log",
@@ -34,13 +34,13 @@ var WPfpd = [12]string{
 }
 
 // WPlicense ::
-var WPlicense = [3]string{
+var WPLicense = [3]string{
 	"license.txt",
 	"license.md",
 	"license",
 }
 
-var WPdirectorys = [15]string{
+var WPDirectorys = [15]string{
 	"js",
 	"css",
 	"images",

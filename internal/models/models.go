@@ -13,7 +13,7 @@ type EnumerateModel struct{
 }
 
 type EnumerateOthersModel struct {
-	Confidence int
+	Confidence int8
 	Version    string
 	FoundBy    string
 	Match      []string	
@@ -23,8 +23,13 @@ type InterestingModel struct {
 	Url        string
 	Status     int
 	Raw        string
-	Confidence int
+	Confidence int8
 	FoundBy    string
+}
+
+type FindingsVersionModel struct {
+	Version string
+	Match string
 }
 
 type ConfigModel struct {

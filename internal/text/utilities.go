@@ -5,13 +5,13 @@ import (
 )
 
 /*
-	GetFileExtensions
-	  - This function searches for files by their extension, within an index of.
+	FindFilesByExtensions
+	  • This function searches for files by their extension, within an index of.
 
 	This function searches for the version of the plugin or theme.
-	- GetVersionByStableTag
-	- GetVersionByChangelog
-
+	  • GetVersionByStableTag
+	  • GetVersionByChangelog
+	  • GetVersionByReleaseLog
 */
 
 func FindImportantFiles(raw string) [][]string {
