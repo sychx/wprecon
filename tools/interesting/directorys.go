@@ -12,11 +12,10 @@ import (
 
 func DirectoryPlugins() models.InterestingModel {
 	var http = net.NewNETClient()
-	http.SetURL(database.Memory.GetString("Target")).SetURLDirectory(database.Memory.GetString("HTTP wp-content") + "/plugins/")
+	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory(database.Memory.GetString("HTTP wp-content") + "/plugins/")
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
 	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
 	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))
-	http.OnFirewallDetection(true)
 
 	var response, err = http.Runner()
 
@@ -39,12 +38,11 @@ func DirectoryPlugins() models.InterestingModel {
 }
 
 func DirectoryUploads() models.InterestingModel {
-	var http = net.NewNETClient().SetURL(database.Memory.GetString("Target"))
+	var http = net.NewNETClient().SetURL(database.Memory.GetString("Options URL"))
 	http.SetURLDirectory(database.Memory.GetString("HTTP wp-content") + "/uploads/")
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
 	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
 	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))
-	http.OnFirewallDetection(true)
 
 	var response, err = http.Runner()
 
@@ -68,11 +66,10 @@ func DirectoryUploads() models.InterestingModel {
 
 func DirectoryThemes() models.InterestingModel {
 	var http = net.NewNETClient()
-	http.SetURL(database.Memory.GetString("Target")).SetURLDirectory(database.Memory.GetString("HTTP wp-content") + "/themes/")
+	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory(database.Memory.GetString("HTTP wp-content") + "/themes/")
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
 	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
 	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))
-	http.OnFirewallDetection(true)
 
 	var response, err = http.Runner()
 

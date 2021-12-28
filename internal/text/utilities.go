@@ -21,7 +21,7 @@ func FindImportantFiles(raw string) [][]string {
 }
 
 func FindBackupFileOrPath(raw string) [][]string {
-	var rex = regexp.MustCompile("<a href=\"([back[wp|up|.*?]|bkp].*?)\">.*?</a>")
+	var rex = regexp.MustCompile("<a href=\"((?i)(back[up|wp|.*]|bkp).*)\">.*?</a>")
 
 	return rex.FindAllStringSubmatch(raw, -1)
 }

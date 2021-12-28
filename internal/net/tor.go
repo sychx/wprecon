@@ -18,7 +18,7 @@ func Tor() (func(*http.Request) (*url.URL, error)) {
 
 // TorGetIP :: This will perform a check to see if your tor network is online or not.
 func TorGetIP() string {
-	var http = NewNETClient().SetURLFull("https://check.torproject.org/api/ip").SetSleep(0).OnTor(true)
+	var http = NewNETClient().SetURLFull("https://check.torproject.org/api/ip").OnTor(true)
 
 	var response, err = http.Runner()
 

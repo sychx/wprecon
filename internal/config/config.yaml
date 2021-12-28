@@ -1,5 +1,5 @@
 application:
     name:        wprecon
-    version:     "v2.2.0a"
+    version:     v2.3.2a
     author:      blackcrw
-    description: "WPRecon, is a tool for the recognition of vulnerabilities and blackbox information for wordpress."
+    description: WPRecon, is a tool for the recognition of vulnerabilities and blackbox information for wordpress.

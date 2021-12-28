@@ -19,7 +19,7 @@ import (
 func ThemePassive() *[]models.EnumerateModel {
 	var model []models.EnumerateModel
 
-	var regxp = regexp.MustCompile(`wp-content/themes/(.*?)/.*?[css|js].*?ver=(\d{1,2}\.\d{1,2}\.\d{1,3})`)
+	var regxp = regexp.MustCompile(database.Memory.GetString("HTTP wp-content") + `/themes/(.*?)/.*?[css|js].*?ver=(\d{1,2}\.\d{1,2}\.\d{1,3})`)
 	
 	for _, theme_submatch := range regxp.FindAllStringSubmatch(database.Memory.GetString("HTTP Index Raw"), -1) {
 		var matriz models.EnumerateModel
@@ -30,7 +30,7 @@ func ThemePassive() *[]models.EnumerateModel {
 			
 			if !has_version {
 				matriz_others.Version = theme_submatch[2]
-				matriz_others.Confidence += 10
+				matriz_others.Confidence = format_confidence(matriz_others.Confidence, 10)
 				matriz_others.Match = append(matriz_others.Match, theme_submatch[0])
 				
 				model[int_name].Others = append(model[int_name].Others, matriz_others)
@@ -43,7 +43,7 @@ func ThemePassive() *[]models.EnumerateModel {
 				model[int_name].Others[int_match].Confidence += 10
 			}
 		} else {
-			matriz_others.Confidence += 10
+			matriz_others.Confidence = format_confidence(matriz_others.Confidence, 10)
 			matriz.FoundBy = "In the HTML of the index"
 
 			matriz_others.Version = theme_submatch[2]
@@ -52,6 +52,18 @@ func ThemePassive() *[]models.EnumerateModel {
 			matriz.Name = theme_submatch[1]
 			matriz.Others = append(matriz.Others, matriz_others)
 
+			model = append(model, matriz)
+		}
+	}
+
+	regxp = regexp.MustCompile(database.Memory.GetString("HTTP wp-content") + "/themes/(.*?)/.*?[.css|.js]")
+
+	for _, theme_submatch := range regxp.FindAllStringSubmatch(database.Memory.GetString("HTTP Index Raw"), -1) {
+		var matriz models.EnumerateModel
+
+		if has_name,_ := text.ContainsEnumerateName(model, theme_submatch[1]); !has_name {
+			matriz.Name = theme_submatch[1]
+			matriz.FoundBy = "In the HTML of the index - No version"
 			model = append(model, matriz)
 		}
 	}
@@ -71,21 +83,9 @@ func ThemeAggressive() *[]models.EnumerateModel {
 		for _, theme_submatch := range regxp.FindAllStringSubmatch(directory_response.Raw, -1) {
 			if has, _ := text.ContainsEnumerateName(model, theme_submatch[1]); !has {
 				matriz.Name = theme_submatch[1]
-				matriz.FoundBy = "In the HTML of the index - No version"
+				matriz.FoundBy = "In the HTML - No version"
 				model = append(model, matriz)
 			}
-		}
-	}
-
-	var regxp = regexp.MustCompile(database.Memory.GetString("HTTP wp-content") + "/themes/(.*?)/.*?[.css|.js]")
-
-	for _, theme_submatch := range regxp.FindAllStringSubmatch(database.Memory.GetString("HTTP Index Raw"), -1) {
-		var matriz models.EnumerateModel
-
-		if has_name,_ := text.ContainsEnumerateName(model, theme_submatch[1]); !has_name {
-			matriz.Name = theme_submatch[1]
-
-			model = append(model, matriz)
 		}
 	}
 

@@ -1,25 +1,14 @@
 package models
 
-import (
-	"io"
-	"net/http"
-	"net/url"
-)
-
-type EnumerateModel struct{
+type MiddlewareFirewallModel struct {
 	Name       string
+	Solve      string
+	Confidence int
 	FoundBy    string
-	Others     []EnumerateOthersModel
-}
-
-type EnumerateOthersModel struct {
-	Confidence int8
-	Version    string
-	FoundBy    string
-	Match      []string	
 }
 
 type InterestingModel struct {
+	Name       string
 	Url        string
 	Status     int
 	Raw        string
@@ -40,24 +29,4 @@ type ConfigModel struct {
 		Version     string `yaml:"version"`
 		ApiUrl      string `yaml:"api_url"`
 	} `yaml:"application"`
-}
-
-type UrlOptionsModel struct {
-	Simple    string
-	Full      string
-	Directory string
-	URL       *url.URL
-}
-
-type ResponseModel struct {
-	RawIo    io.Reader
-	Raw      string
-	URL      *UrlOptionsModel
-	Response *http.Response
-}
-
-type GetVersions interface {
-	GetVersionByStableTag(raw string)  []string
-	GetVersionByChangelog(raw string)  []string
-	GetVersionByReleaseLog(raw string) []string
 }

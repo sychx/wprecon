@@ -11,7 +11,7 @@ import (
 )
 
 func GoFindingVersionByRequest(channel chan []string, path string) {
-	var response = net.SimpleRequest(database.Memory.GetString("Target"), path)
+	var response = net.SimpleRequest(database.Memory.GetString("Options URL")+path)
 
 	if response.Response.StatusCode == 200 && response.Raw != "" {
 		if slice := text.GetVersionByStableTag(response.Raw); len(slice) != 0 {
@@ -76,11 +76,11 @@ func FindingVersionByChangesLogs(path string) *models.FindingsVersionModel {
 }
 
 func FindingVersionByIndexOf(path string) *models.FindingsVersionModel {
-	var target = database.Memory.GetString("Target")
-	var files = text.FindImportantFiles(net.SimpleRequest(target, path).Raw)
+	var target = database.Memory.GetString("Options URL")
+	var files = text.FindImportantFiles(net.SimpleRequest(target+path).Raw)
 
 	for _, name_file := range files {
-		var response_raw = net.SimpleRequest(target, path+name_file[0]).Raw
+		var response_raw = net.SimpleRequest(target+path+name_file[0]).Raw
 	
 		if slice := text.GetVersionByChangelog(response_raw); len(slice) != 0 {
 			return &models.FindingsVersionModel{Version: slice[1], Match: slice[0]}

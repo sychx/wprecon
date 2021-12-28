@@ -1,5 +1,22 @@
 package wordlist
 
+var WPFirewall = [14]string{
+	"wordfence",
+	"cloudflare",
+	"bulletproof-security",
+	"better-wp-security",
+	"sucuri-scanner",
+	"wp-security-scan",
+	"block-bad-queries",
+	"all-in-one-wp-security-and-firewall",
+	"6scan-protection",
+	"siteguard",
+	"ninjafirewall",
+	"malcare-security",
+	"wp-cerber",
+	"wesecur-security",
+}
+
 var WPReadme = [3]string{
 	"readme.txt",
 	"readme.md",

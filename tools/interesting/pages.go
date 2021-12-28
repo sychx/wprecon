@@ -11,11 +11,10 @@ import (
 
 func AdminPage() models.InterestingModel {
 	var http = net.NewNETClient()
-	http.SetURL(database.Memory.GetString("Target")).SetURLDirectory("wp-admin/")
+	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory("wp-admin/")
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
 	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
 	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))
-	http.OnFirewallDetection(true)
 
 	var response, err = http.Runner()
 
@@ -36,11 +35,10 @@ func AdminPage() models.InterestingModel {
 
 func RobotsPage() models.InterestingModel {
 	var http = net.NewNETClient()
-	http.SetURL(database.Memory.GetString("Target")).SetURLDirectory("robots.txt")
+	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory("robots.txt")
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
 	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
 	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))
-	http.OnFirewallDetection(true)
 
 	var response, err = http.Runner()
 
@@ -61,11 +59,10 @@ func RobotsPage() models.InterestingModel {
 // The command's message will be saved on this map. :: Database.OtherInformationsString["target.http.sitemap.xml.status"]
 func SitemapPage() models.InterestingModel {
 	var http = net.NewNETClient()
-	http.SetURL(database.Memory.GetString("Target")).SetURLDirectory("sitemap.xml")
+	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory("sitemap.xml")
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
 	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
 	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))
-	http.OnFirewallDetection(true)
 
 	var response, err = http.Runner()
 
@@ -84,11 +81,10 @@ func SitemapPage() models.InterestingModel {
 
 func ReadmePage() models.InterestingModel {
 	var http = net.NewNETClient()
-	http.SetURL(database.Memory.GetString("Target")).SetURLDirectory("readme.html")
+	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory("readme.html")
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
 	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
 	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))
-	http.OnFirewallDetection(true)
 
 	var response, err = http.Runner()
 

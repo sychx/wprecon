@@ -15,14 +15,14 @@ The purpose of this tool is just to help developers find possible loopholes in t
 ```
 
 <p align="center">
-  <a href="https://github.com/blackcrw/wprecon/wiki/Compile-and-Install">Compile & Install</a> •
+  <a href="https://github.com/blackcrw/wprecon/wiki/Compile-and-Install">Build & Install</a> •
   <a href="https://github.com/blackcrw/wprecon/blob/master/LICENSE">License</a> • 
   <a href="https://github.com/blackcrw">Author</a>
 </p>
 
 <h4>
   <p align="center">
-    <code>v2.2.0a</code>
+    <code>v2.3.2a</code>
   </p>
 </h4>
 <br>
@@ -51,4 +51,4 @@ wprecon does not have any kind of connection to the site: wprecon.com
 
 <h3 align="center">🚀 <code>Running</code></h3>
 
-<img alt="wprecon -u https://xxxx.com/ --agressive-mode --random-gent" src="https://i.imgur.com/7pJv2uY.png">
+<img align="center" alt="wprecon -u https://xxxx.com/ --agressive-mode --random-gent" src="https://i.imgur.com/zyfINsx.png">

@@ -11,13 +11,13 @@ import (
 
 	"github.com/blackcrw/wprecon/internal/database"
 	"github.com/blackcrw/wprecon/internal/models"
+	"github.com/blackcrw/wprecon/internal/net/middleware"
 	"github.com/blackcrw/wprecon/internal/printer"
 )
 
 // net_options :: This is Struct Http, it will inherit the struct Options and client.
 type net_options struct {
 	tor                    bool
-	firewall               bool
 	tls_certificate_verify bool
 	method                 string
 	user_agent             string
@@ -30,18 +30,12 @@ type net_options struct {
 }
 
 // SimpleRequest :: The first parameter must always be the base url. The second must be the directory.
-func SimpleRequest(params ...string) *models.ResponseModel {
+func SimpleRequest(url string) *models.ResponseModel {
 	var http = NewNETClient()
-	http.SetURL(params[0])
-
-	if len(params) > 1 {
-		http.SetURLDirectory(params[1])
-	}
-
+	http.SetURL(url)
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
 	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
 	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))
-	http.OnFirewallDetection(true)
 
 	var response, err = http.Runner()
 
@@ -152,20 +146,10 @@ func (this *net_options) SetContentType(contentType string) *net_options {
 	return this
 }
 
-func (this *net_options) OnFirewallDetection(status bool) *net_options {
-	this.firewall = status
-
-	return this
-}
-
 func (this *net_options) SetSleep(tm int) *net_options {
 	this.sleep = time.Duration(tm)
 
 	return this
-}
-
-func (this *net_options) waf_detection_passive(response *models.ResponseModel) (string, string, string, int) {
-	return NewWAFDetection(response).All().Runner()
 }
 
 func (this *net_options) Runner() (*models.ResponseModel, error) {
@@ -200,9 +184,9 @@ func (this *net_options) Runner() (*models.ResponseModel, error) {
 		Response: response,
 	}
 
-	if this.sleep != 0 {
-		time.Sleep(time.Duration(this.sleep) * time.Second)
-	} else if sleep := database.Memory.GetInt("HTTP Time Sleep"); sleep != 0 {
+	middleware.ActiveWebApplicationFirewall(struct_response)
+
+	if sleep := database.Memory.GetInt("HTTP Time Sleep"); sleep != 0 {
 		time.Sleep(time.Duration(sleep) * time.Second)
 	}
 

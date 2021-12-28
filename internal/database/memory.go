@@ -31,9 +31,6 @@ func NewMemory() *memory {
 		mapstring: map[string]map[string]string{},
 	}
 
-	database.mapstring["HTTP Plugins Versions"] = map[string]string{}
-	database.mapstring["HTTP Themes Versions"] = map[string]string{}
-
 	return database
 }
 
