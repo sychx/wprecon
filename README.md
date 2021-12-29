@@ -51,4 +51,4 @@ wprecon does not have any kind of connection to the site: wprecon.com
 
 <h3 align="center">🚀 <code>Running</code></h3>
 
-<img align="center" alt="wprecon -u https://xxxx.com/ --agressive-mode --random-gent" src="https://i.imgur.com/zyfINsx.png">
+<p align="center"><img align="center" alt="wprecon -u https://xxxx.com/ --agressive-mode --random-gent" src="https://i.imgur.com/zyfINsx.png"></p>
