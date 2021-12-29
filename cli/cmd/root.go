@@ -2,319 +2,169 @@ package cmd
 
 import (
 	"fmt"
-	"strings"
+	"sync"
 
-	"github.com/blackbinn/wprecon/internal/database"
-	"github.com/blackbinn/wprecon/pkg/gohttp"
-	"github.com/blackbinn/wprecon/pkg/printer"
-	"github.com/blackbinn/wprecon/pkg/scripts"
-	"github.com/blackbinn/wprecon/pkg/text"
-	"github.com/blackbinn/wprecon/tools/wordpress/commons"
-	"github.com/blackbinn/wprecon/tools/wordpress/enumerate"
-	"github.com/blackbinn/wprecon/tools/wordpress/extensions"
-	"github.com/blackbinn/wprecon/tools/wordpress/security"
+	"github.com/blackcrw/wprecon/internal/banner"
+	"github.com/blackcrw/wprecon/internal/database"
+	"github.com/blackcrw/wprecon/internal/models"
+	"github.com/blackcrw/wprecon/internal/net"
+	"github.com/blackcrw/wprecon/internal/printer"
+	"github.com/blackcrw/wprecon/internal/text"
+	"github.com/blackcrw/wprecon/internal/views"
+	"github.com/blackcrw/wprecon/tools/enumerate"
+	"github.com/blackcrw/wprecon/tools/interesting"
 	"github.com/spf13/cobra"
 )
 
+func RootOptionsPreRun(cmd *cobra.Command, args []string) {
+	net.ThisIsHostValid(database.Memory.GetString("Options URL"))
+	var is_url = net.ThisIsURL(database.Memory.GetString("Options URL"))
+
+	if is_url {
+		banner.SBanner()
+	} else {
+		banner.Banner()
+	}
+
+	var response = net.SimpleRequest(database.Memory.GetString("Options URL"))
+	
+	database.Memory.SetString("HTTP Index Raw", response.Raw)
+	database.Memory.SetString("HTTP PHP Version", response.Response.Header.Get("x-powered-by"))
+	database.Memory.SetString("HTTP Server", response.Response.Header.Get("Server"))
+	database.Memory.SetString("HTTP Index Cookie", response.Response.Header.Get("Set-Cookie"))
+}
+
 func RootOptionsRun(cmd *cobra.Command, args []string) {
-	aggressivemode, _ := cmd.Flags().GetBool("aggressive-mode")
-	detectionwaf, _ := cmd.Flags().GetBool("detection-waf")
+	var flag_aggressive_mode, _ = cmd.Flags().GetBool("aggressive-mode")
+	var flag_detection_waf, _ = cmd.Flags().GetBool("detection-waf")
 
-	if confidence := extensions.WordpressCheck(); confidence >= 40.0 {
-		confidenceString := fmt.Sprintf("%.2f%%", confidence)
-		printer.Done("WordPress confirmed with", confidenceString, "confidence!").L()
-	} else if confidence < 40.0 && confidence > 15.0 && !database.Memory.GetBool("Force") {
-		confidenceString := fmt.Sprintf("%.2f%%", confidence)
+	var (
+		wordpress_version = interesting.WordPressVersion()
+		wordpress_confidence = interesting.WordpressCheck()
+		wordpress_confidence_string = fmt.Sprintf("%.2f%%", wordpress_confidence)
+	)
 
-		if q := printer.ScanQ("I'm not absolutely sure that this target is using wordpress!", confidenceString, "chance. do you wish to continue ? [Y]es | [n]o : "); q != "y" && q != "\n" {
+	if wordpress_confidence >= 40.0 {
+		printer.Done("WordPress confirmed with", wordpress_confidence_string, "confidence!\n")
+	} else if wordpress_confidence < 40.0 && wordpress_confidence > 15.0 && !database.Memory.GetBool("Options Force") {
+		if q := printer.ScanQ("I'm not absolutely sure that this target is using wordpress!", wordpress_confidence_string, "chance. do you wish to continue ? [Y]es | [n]o : "); q != "y" && q != "\n" {
 			printer.Fatal("Exiting...")
 		}
 		printer.Println()
-	} else if confidence < 15.0 && !database.Memory.GetBool("Force") {
+	} else if wordpress_confidence < 15.0 && !database.Memory.GetBool("Options Force") {
 		printer.Fatal("This target is not running wordpress!")
 	}
 
-	if detectionwaf || aggressivemode {
-		if waf := security.WAFAggressiveDetection(); waf != nil {
-			name := strings.ReplaceAll(waf.URL.Directory, database.Memory.GetString("HTTP wp-content")+"/plugins/", "")
-			name = strings.ReplaceAll(name, "/", "")
-			name = strings.ReplaceAll(name, "-", " ")
-			name = strings.Title(name)
-
-			printer.Done("Web Application Firewall (WAF):", name, "(Aggressive Detection)")
-			printer.List("Location:", waf.URL.Full).D()
-			printer.List("Status Code:", fmt.Sprint(waf.Response.Status)).D()
-
-			if importantfile := text.GetOneImportantFile(waf.Raw); strings.Contains(importantfile, "<!-- Avoid the directory listing. -->") && importantfile != "" {
-				response := gohttp.SimpleRequest(database.Memory.GetString("Target"), waf.URL.Directory+importantfile)
-				if readme := text.GetVersionStableTag(response.Raw); len(readme) != 0 {
-					printer.List("Version:", readme[1]).D()
-				} else if changelog := text.GetVersionChangelog(response.Raw); len(changelog) != 0 {
-					printer.List("Version:", changelog[1]).D()
-				}
-			} else {
-				if response := gohttp.SimpleRequest(database.Memory.GetString("Target"), waf.URL.Directory+"readme.txt"); response.Response.StatusCode == 200 && response.Raw != "" {
-					if readme := text.GetVersionStableTag(response.Raw); len(readme) != 0 {
-						printer.List("Version:", readme[1]).D()
-					} else if changelog := text.GetVersionChangelog(response.Raw); len(changelog) != 0 {
-						printer.List("Version:", changelog[1]).D()
-					}
-				}
-			}
-
-			if scan := printer.ScanQ("Do you wish to continue ?! [Y]es | [n]o : "); scan != "y" && scan != "\n" {
-				printer.Fatal("Exiting...")
-			}
-		} else {
-			printer.Warning(":: No WAF was detected! But that doesn't mean it doesn't. ::")
-		}
-
-		printer.Println()
-	}
-
-	if names := database.Memory.GetString("Scripts List Names"); names != "" {
-		for _, name := range strings.Split(names, ",") {
-			printer.Done("Running Script:", name)
-
-			s := scripts.NewScript()
-			s.UseScript(name)
-			s.Run()
-
-			printer.Println()
-		}
-	}
-
-	if wordpressVersion := enumerate.WordpressVersionPassive(); wordpressVersion != "" {
+	if wordpress_version != "" {
 		printer.Done("WordPress Version:")
-		printer.List("Version:", wordpressVersion).D().L()
+		printer.NewTopics("Version:", wordpress_version, "\n").Default()
 	}
 
-	newPlugin := enumerate.NewPlugins()
-	newTheme := enumerate.NewThemes()
+	var wordpress_waf = func() *models.InterestingModel { if flag_detection_waf { var waf = interesting.WordpressFirewall(); if waf.Name != "" { return waf }}; return &models.InterestingModel{} }()
 
-	switch aggressivemode {
-	case false:
-		if users, method, URL := enumerate.UsersEnumeratePassive(); len(users) > 0 {
-			printer.Done("WordPress Users:")
-			for _, username := range users {
-				printer.List(username, "("+method+")").D()
-			}
-			printer.List("All users were found at:", URL).D().L()
-		} else {
-			printer.Danger("Unfortunately no user was found. Try to use agressive mode: --agressive-mode").L()
-		}
+	if wordpress_waf.Name != "" {
+		views.RootWAF(wordpress_waf)
+	}
 
-		if plugins := newPlugin.Passive(); len(plugins) > 0 {
-			for _, plugin := range plugins {
-				printer.Done("Plugin:", plugin[0], "(Enumerate Passive Mode)")
-				printer.List("Location:", database.Memory.GetString("Target")+database.Memory.GetString("HTTP wp-content")+"/plugins/"+plugin[0]+"/").D()
-
-				if plugin[1] != "" {
-					var matchs = strings.Split(plugin[2], "ˆ")
-
-					printer.List("Version:", plugin[1]).D()
-					printer.List(fmt.Sprint(len(matchs)) + " Match(s):").D()
-
-					for _, match := range matchs {
-						if len(strings.Split(match, "?ver=")) > 1 {
-							printer.List(match + ", 'Version " + strings.Split(match, "?ver=")[1] + "'").Prefix("  ").D()
-						} else if match != "" {
-							printer.List(match).Prefix("  ").D()
-						}
-					}
-
-					pluginvulnenum(plugin[0], plugin[1])
-				} else {
-					printer.List("Version: Unidentified version").D().L()
-				}
-			}
-		} else {
-			printer.Danger("Unfortunately I was unable to passively list any plugin. Try to use aggressive mode: --aggressive-mode").L()
-		}
-
-		if themes := newTheme.Passive(); len(themes) > 0 {
-			for _, theme := range themes {
-				printer.Done("Theme:", theme[0], "(Enumerate Passive Mode)")
-				printer.List("Location:", database.Memory.GetString("Target")+database.Memory.GetString("HTTP wp-content")+"/themes/"+theme[0]+"/").D()
-
-				if theme[1] != "" {
-					var matchs = strings.Split(theme[2], "ˆ")
-
-					printer.List("Version:", theme[1]).D()
-					printer.List(fmt.Sprint(len(matchs)) + " Match(s):").D()
-
-					for _, match := range matchs {
-						if len(strings.Split(match, "?ver=")) > 1 {
-							printer.List(match + ", 'Version " + strings.Split(match, "?ver=")[1] + "'").Prefix("  ").D()
-						} else if match != "" {
-							printer.List(match).Prefix("  ").D()
-						}
-					}
-
-					printer.List("Unfortunately wprecon doesn't have vulns for themas *yet*.").Warning().L()
-				} else {
-					printer.List("Version: Unidentified version").D().L()
-				}
-			}
-		} else {
-			printer.Danger("Unfortunately I was unable to passively list any theme. Try to use aggressive mode: --aggressive-mode").L()
-		}
-
+	switch flag_aggressive_mode {
 	case true:
-		if response := commons.Sitemap(); response.Response.StatusCode == 200 {
-			printer.Warning("Sitemap.xml found:", response.URL.Full).L()
+		printer.Printf("[+] %sEnumerating %sPLUGIN %s(Aggressive)%s\n\n", printer.Reset, printer.Green, printer.Red, printer.Reset)
+	
+		for _, enum := range *enumerate.PluginAggressive() {
+			views.RootEnumerate(enum)
 		}
-
-		if response := commons.Robots(); response.Response.StatusCode == 200 {
-			printer.Warning("Robots.txt file text:")
-			printer.Bars(response.Raw).L()
-		}
-
-		if users, method, URL := enumerate.UsersEnumerateAgressive(); len(users) > 0 {
-			printer.Done("WordPress Users:")
-			for _, username := range users {
-				printer.List(username, "("+method+")").D()
-			}
-			printer.List("All users were found at:", URL).D().L()
-		} else {
-			printer.Danger("Unfortunately no user was found.").L()
-		}
-
-		if plugins := newPlugin.Aggressive(); len(plugins) > 0 {
-			for _, plugin := range plugins {
-				printer.Done("Plugin:", plugin[0], "(Enumerate Aggressive Mode)")
-				printer.List("Location:", database.Memory.GetString("Target")+database.Memory.GetString("HTTP wp-content")+"/plugins/"+plugin[0]+"/").D()
-
-				if plugin[1] != "" {
-					var matchs = strings.Split(plugin[2], "ˆ")
-
-					printer.List("Version:", plugin[1]).D()
-					printer.List(fmt.Sprint(len(matchs)) + " Match(s):").D()
-
-					for _, match := range matchs {
-						var matchVerSplit = strings.Split(match, "?ver=")
-
-						if len(matchVerSplit) > 1 {
-							printer.List(match + ", 'Version " + matchVerSplit[1] + "'").Prefix("  ").D()
-						} else if match != "" {
-							printer.List(match).Prefix("  ").D()
-						}
-					}
-
-					pluginvulnenum(plugin[0], plugin[1])
-				} else {
-					printer.List("Version: Unidentified version").D().L()
-				}
-			}
-		} else {
-			printer.Danger("Unfortunately I was unable to passively list any plugin.").L()
-		}
-
-		if themes := newTheme.Aggressive(); len(themes) > 0 {
-			for _, theme := range themes {
-				printer.Done("Theme:", theme[0], "(Enumerate Aggressive Mode)")
-				printer.List("Location:", database.Memory.GetString("Target")+database.Memory.GetString("HTTP wp-content")+"/themes/"+theme[0]+"/").D()
-
-				if theme[1] != "" {
-					var matchs = strings.Split(theme[2], "ˆ")
-
-					printer.List("Version:", theme[1]).D()
-					printer.List(fmt.Sprint(len(matchs)) + " Match(s):").D()
-
-					for _, match := range matchs {
-						if len(strings.Split(match, "?ver=")) > 1 {
-							printer.List(match + ", 'Version " + strings.Split(match, "?ver=")[1] + "'").Prefix("  ").D()
-						} else if match != "" {
-							printer.List(match).Prefix("  ").D()
-						}
-					}
-
-					printer.List("Unfortunately wprecon doesn't have vulns for themas *yet*.").Warning().L()
-				} else {
-					printer.List("Version: Unidentified version").D().L()
-				}
-			}
-		} else {
-			printer.Danger("Unfortunately I was unable to passively list any theme.").L()
+	case false:
+		printer.Printf("[+] %sEnumerating %sPLUGIN (Passive)%s\n\n", printer.Reset, printer.Green, printer.Reset)
+	
+		for _, enum := range *enumerate.PluginPassive() {
+			views.RootEnumerate(enum)
 		}
 	}
 }
 
 func RootOptionsPostRun(cmd *cobra.Command, args []string) {
-	printer.Info("Other interesting information:").L()
+	var wg sync.WaitGroup
+
+	wg.Add(5)
+
+	printer.Info("Other interesting information:\n")
 
 	if database.Memory.GetString("HTTP Server") != "" || database.Memory.GetString("HTTP PHP Version") != "" {
 		printer.Done("Target information(s):")
-		if server := database.Memory.GetString("HTTP Server"); server != "" {
-			printer.List("Server:", server).D()
-		}
-		if version := database.Memory.GetString("HTTP PHP Version"); version != "" {
-			printer.List("PHP Version:", version).D()
-		}
-		if version := database.Memory.GetString("HTTP WordPress Version"); version != "" {
-			printer.List("WordPress Version:", version).D()
-		}
+
+		if server := database.Memory.GetString("HTTP Server"); server != "" { printer.NewTopics("Server:", server).Default() }
+		if version := database.Memory.GetString("HTTP PHP Version"); version != "" { printer.NewTopics("PHP Version:", version).Default() }
+		if version := database.Memory.GetString("HTTP WordPress Version"); version != "" { printer.NewTopics("WordPress Version:", version).Default() }
 
 		printer.Println()
 	}
 
-	if len(database.Memory.GetSlice("HTTP Index Of's")) > 0 {
-		printer.Done("Index Of's:")
-		for _, indexofs := range database.Memory.GetSlice("HTTP Index Of's") {
-			printer.List(indexofs).D()
-		}
-		printer.Println()
-	}
-
-	if status, found := commons.XMLRPC(); status != "False" {
-		switch found {
-		case "Link tag":
-			printer.Done("XML-RPC Possibly enabled:")
-		default:
-			printer.Done("XML-RPC Enabled:")
-			printer.List("Status:", status).D()
-		}
-
-		printer.List("Location:", database.Memory.GetString("Target")+"xmlrpc.php").D()
-		printer.List("Found By:", found).D().L()
-	}
-
-	if URL := database.Memory.GetString("HTTP Admin Page"); URL != "" {
-		printer.Done("Admin Page Found:")
-		printer.List("Location:", URL).D()
-		printer.List("Found by: Access").D().L()
-	}
-
-	if response := commons.Readme(); response.Response.StatusCode == 200 {
-		printer.Done("WordPress Readme:")
-		printer.List("Location:", response.URL.Full).D()
-		printer.List("Found by: Access").D().L()
-	}
-
-	if raw := database.Memory.GetString("HTTP wp-content/uploads Index Of Raw"); raw != "" {
-		if list := extensions.FindBackupFileOrPath(raw); len(list) > 0 {
-			printer.Done("File or Path backup:")
-			for _, path := range list {
-				printer.List(database.Memory.GetString("Target") + database.Memory.GetString("HTTP wp-content") + "/uploads/" + path).Done()
+	go func(){
+		if len(database.Memory.GetSlice("HTTP Index Of's")) > 0 {
+			printer.Done("Index Of's:")
+			for _, indexofs := range database.Memory.GetSlice("HTTP Index Of's") {
+				printer.NewTopics(indexofs).Default()
 			}
 			printer.Println()
 		}
-	}
+		
+		defer wg.Done()
+	}()
+
+	go func(){
+		if response := interesting.XMLRPC(); response.Confidence > 0 {
+			if response.Confidence <= 10 {
+				printer.Done("XML-RPC Possibly enabled:")
+			} else {
+				printer.Done("XML-RPC Enabled:")
+				printer.NewTopics("Status:", fmt.Sprint(response.Status)).Default()
+			}
+	
+			printer.NewTopics("Confidence:", fmt.Sprint(response.Confidence)).Default()
+			printer.NewTopics("Found By:", response.FoundBy).Default()
+			printer.NewTopics("Location:", database.Memory.GetString("Options URL")+"xmlrpc.php", "\n").Default()
+		}
+
+		defer wg.Done()
+	}()
+
+	go func(){	
+		if URL := database.Memory.GetString("HTTP Admin Page"); URL != "" {
+			printer.Done("Admin Page Found:")
+			printer.NewTopics("Found by: Access").Default()
+			printer.NewTopics("Location:", URL, "\n").Default()
+		}
+
+		defer wg.Done()
+	}()
+
+	go func(){	
+		if response := interesting.ReadmePage(); response.Status == 200 {
+			printer.Done("WordPress Readme:")
+			printer.NewTopics("Found by:", response.FoundBy).Default()
+			printer.NewTopics("Location:", response.Url, "\n").Default()
+		}
+
+		defer wg.Done()
+	}()
+
+	go func(){
+		if raw := database.Memory.GetString("HTTP wp-content/uploads Index Of Raw"); raw != "" {
+			var list_backup_paths = text.FindBackupFileOrPath(raw)
+			
+			if len(list_backup_paths) > 0 {
+				printer.Done("File or Path backup:")
+				for _, backup_path := range list_backup_paths {
+					printer.NewTopics(database.Memory.GetString("Options URL") + database.Memory.GetString("HTTP wp-content") + "/uploads/" + backup_path[1]).Default()
+				}
+				printer.Println()
+			}
+		}
+
+		defer wg.Done()
+	}()
+
+	wg.Wait()
 
 	printer.Done("Total requests:", fmt.Sprint(database.Memory.GetInt("HTTP Total")))
-}
-
-func pluginvulnenum(name string, version string) {
-	if vuln := extensions.GetVulnerabilityByAPI(name, version); len(vuln.Vulnerabilities) > 0 {
-		printer.List("Vuln:", vuln.Vulnerabilities[0].Title).Warning()
-		printer.List("Report date:", vuln.Vulnerabilities[0].Published).Prefix("  ").D()
-
-		for _, value := range vuln.Vulnerabilities[0].References {
-			printer.List("Reference(s):", value).Prefix("  ").D()
-		}
-	} else {
-		printer.List("I have not found any vulnerability for this version.").Danger()
-	}
-
-	printer.Println()
 }
