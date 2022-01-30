@@ -8,17 +8,15 @@ import (
 	"github.com/blackcrw/wprecon/internal/printer"
 )
 
-func green(s string) string {
-	switch runtime.GOOS {
-	case "windows":
-		return s
-	default:
-		return printer.Green + s + printer.Reset
-	}
+func format_green(s string) string {
+    switch runtime.GOOS {
+	    case "windows": return s
+	    default: return printer.Green + s + printer.Reset
+	  }
 }
 
-// BannerHelpRoot :: Main help banner
-var BannerHelpRoot = fmt.Sprintf(`wprecon (Wordpress Recon) is a tool for wordpress exploration!
+// BannerHelpRoot :: Root help banner
+var BannerHelpRoot = fmt.Sprintf(`WPRecon, is a tool for the recognition of vulnerabilities and blackbox information for wordpress.
 
 Usage:
   wprecon %s
@@ -37,22 +35,20 @@ Flags:
       --wp-content-dir %s In case the wp-content directory is customized. (Default: wp-content)
       --http-sleep %s You can make each request slower, if there is a WAF, it can make it difficult for it to block you. (default: 0)
       --disable-tls-checks   Disables SSL/TLS certificate verification.
-      --scripts %s       Auxiliary scripts.
   -v, --verbose              Verbosity mode.
 
 Example:
   wprecon -u "https://xxxxxxxx.com" --detection-waf
   wprecon -u "https://xxxxxxxx.com" --aggressive-mode
-  wprecon -u "https://xxxxxxxx.com" -A --scripts script1,script2,script3
-`, green("[flags]"),
-	green("[target]"),
+`, format_green("[flags]"),
+	format_green("[target]"),
 	printer.Required,
-	green("[dir]"),
-	green("[seconds]"),
-	green("[list]"))
+	format_green("[dir]"),
+	format_green("[seconds]"),
+	format_green("[list]"))
 
 // BannerHelpFuzzer :: Fuzzer subcommand help banner
-var BannerHelpFuzzer = fmt.Sprintf(`wprecon (Wordpress Recon) is a tool for wordpress exploration!
+var BannerHelpFuzzer = fmt.Sprintf(`WPRecon, is a tool for the recognition of vulnerabilities and blackbox information for wordpress.
 
 Usage:
   wprecon fuzzer %s
@@ -73,20 +69,19 @@ Global Flags:
       --tor                    Use Tor anonymity network.
       --disable-tls-checks     Disables SSL/TLS certificate verification.
       --http-sleep %s   You can make each request slower, if there is a WAF, it can make it difficult for it to block you. (default: 0)
-      --scripts %s         Auxiliary scripts.
   -v, --verbose                Verbosity mode.
 
 Example:
   wprecon fuzz -u "https://xxxxxxxx.com" -U user -P $HOME/wordlist/rockyou.txt
   wprecon fuzz -u "https://xxxxxxxx.com" -U user1,user2,user3 -P $HOME/wordlist/rockyou.txt
   wprecon fuzz -u "https://xxxxxxxx.com" --backup-file --random-agent
-`, green("[flags]"),
-	green("[list]"),
-	green("[file-path]"),
-	green("[attack]"),
-	green("[text]"),
-	green("[text]"),
-	green("[target]"),
+`, format_green("[flags]"),
+	format_green("[list]"),
+	format_green("[file-path]"),
+	format_green("[attack]"),
+	format_green("[text]"),
+	format_green("[text]"),
+	format_green("[target]"),
 	printer.Required,
-	green("[seconds]"),
-	green("[list]"))
+	format_green("[seconds]"),
+	format_green("[list]"))

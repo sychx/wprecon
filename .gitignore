@@ -19,3 +19,5 @@
 wprecon
 .vscode/launch.json
 .vscode/settings.json
+wprecon-linux
+wprecon-macos

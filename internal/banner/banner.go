@@ -29,7 +29,7 @@ func SBanner() {
 		if seconds := database.Memory.GetInt("HTTP Time Sleep"); seconds != 0 { printer.Done("Sleep Requests: "+fmt.Sprint(seconds)+"s") }
 	}
 
-	printer.Done("Started in:\t"+responsive_spaces(), time.Now().Format(("Monday Jan 02 15:04:05 2006"))).Endl()
+	printer.Done("Started in:\t"+responsive_spaces(), time.Now().Format(("Monday Jan 02 15:04:05 2006"))+"\n")
 }
 
 func responsive_spaces() string {

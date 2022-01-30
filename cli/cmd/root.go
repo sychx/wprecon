@@ -68,17 +68,32 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 
 	switch flag_aggressive_mode {
 	case true:
-		printer.Printf("[+] %sEnumerating %sPLUGIN %s(Aggressive)%s\n\n", printer.Reset, printer.Green, printer.Red, printer.Reset)
-	
-		for _, enum := range *enumerate.PluginAggressive() {
-			views.RootEnumerate(enum)
-		}
+
+		printer.Info("Plugin Enumerate:\n")
+		if enum_plug_slice := *enumerate.PluginAggressive(); len(enum_plug_slice) == 0 {
+			printer.Danger("I couldn't find any plugins\n")
+		} else { for _, enum_plug := range enum_plug_slice { views.RootEnumerate(enum_plug) } }
+		
+		printer.Info("Theme Enumerate:\n")
+		if enum_them_slice := *enumerate.ThemeAggressive(); len(enum_them_slice) == 0 {
+			printer.Danger("I couldn't find any themes\n")
+		} else { for _, enum_them := range enum_them_slice { views.RootEnumerate(enum_them) } }
+
+		printer.Info("User Enumerate: ")
+		if enum_user_slice := *enumerate.UserAggressive(); len(enum_user_slice) == 0 {
+			printer.Println(); printer.Danger("Unfortunately no user was found.\n")
+		} else { for _, enum_user := range enum_user_slice { printer.NewTopics(enum_user.Slug, "("+enum_user.Name+")").Warning() }; printer.Println() }
+
 	case false:
-		printer.Printf("[+] %sEnumerating %sPLUGIN (Passive)%s\n\n", printer.Reset, printer.Green, printer.Reset)
-	
-		for _, enum := range *enumerate.PluginPassive() {
-			views.RootEnumerate(enum)
-		}
+		printer.Info("Plugin Enumerate:\n")
+		if enum_plug_slice := *enumerate.PluginPassive(); len(enum_plug_slice) == 0 {
+			printer.Danger("I couldn't find any plugins\n")
+		} else { for _, enum_plug := range enum_plug_slice { views.RootEnumerate(enum_plug) } }
+
+		printer.Info("Theme Enumerate:\n")
+		if enum_them_slice := *enumerate.ThemePassive(); len(enum_them_slice) == 0 {
+			printer.Danger("I couldn't find any themes\n")
+		} else { for _, enum_them := range enum_them_slice { views.RootEnumerate(enum_them) } }
 	}
 }
 

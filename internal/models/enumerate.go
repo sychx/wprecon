@@ -1,7 +1,8 @@
 package models
 
 type EnumerateModel struct {
-	Name       string
+	Name       string `json:"name"`
+	Slug       string `json:"slug"`
 	FoundBy    string
 	Others     []EnumerateOthersModel
 }
