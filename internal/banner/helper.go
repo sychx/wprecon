@@ -40,7 +40,7 @@ Flags:
 Example:
   wprecon -u "https://xxxxxxxx.com" --detection-waf
   wprecon -u "https://xxxxxxxx.com" --aggressive-mode
-`, format_green("[flags]"),
+`,format_green("[flags]"),
 	format_green("[target]"),
 	printer.Required,
 	format_green("[dir]"),
