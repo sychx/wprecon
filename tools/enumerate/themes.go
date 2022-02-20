@@ -1,10 +1,12 @@
 package enumerate
 
 import (
+	"fmt"
 	"regexp"
 
 	"github.com/blackcrw/wprecon/internal/database"
 	"github.com/blackcrw/wprecon/internal/models"
+	"github.com/blackcrw/wprecon/internal/printer"
 	"github.com/blackcrw/wprecon/internal/text"
 	"github.com/blackcrw/wprecon/tools/findings"
 	"github.com/blackcrw/wprecon/tools/interesting"
@@ -76,7 +78,7 @@ func ThemeAggressive() *[]models.EnumerateModel {
 
 	model_enum = *ThemePassive() 
 
-	if directory_response := interesting.DirectoryThemes(); directory_response.Status == 200 {
+	if directory_response, err := interesting.DirectoryThemes(); directory_response.Status == 200 {
 		var regxp = regexp.MustCompile("<a href=\"(.*?)/\">.*?/</a>")
 		var model_matriz models.EnumerateModel
 
@@ -87,7 +89,7 @@ func ThemeAggressive() *[]models.EnumerateModel {
 				model_enum = append(model_enum, model_matriz)
 			}
 		}
-	}
+	} else if err != nil { printer.Danger(fmt.Sprintf("%s", err)) }
 
 	wg.Add(len(model_enum))
 

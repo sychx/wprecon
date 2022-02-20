@@ -14,7 +14,7 @@ import (
 	"github.com/blackcrw/wprecon/internal/wordlist"
 )
 
-func WordpressFirewall() *models.InterestingModel {
+func WordpressFirewall() (*models.InterestingModel, error) {
 	for _, firewall_name := range wordlist.WPFirewall {
 		var net_client = net.NewNETClient()
 		net_client.SetURL(database.Memory.GetString("Options URL"))
@@ -24,7 +24,7 @@ func WordpressFirewall() *models.InterestingModel {
 		var net_response, net_err = net_client.Runner()
 
 		if net_err != nil {
-			printer.Danger(fmt.Sprint(net_err))
+			return &models.InterestingModel{}, net_err
 		}
 
 		if net_response.Response.StatusCode == 200 || net_response.Response.StatusCode == 403 {
@@ -32,15 +32,15 @@ func WordpressFirewall() *models.InterestingModel {
 				var net_response_important = net.SimpleRequest(net_response.URL.Full+important_file[1])
 
 				if version_stable_tag := text.GetVersionByStableTag(net_response_important.Raw); len(version_stable_tag) != 0 {
-					return &models.InterestingModel{Name: firewall_name, Url: net_response.URL.Full, FoundBy: "Important Files - Stable Tag", Status: net_response.Response.StatusCode }
+					return &models.InterestingModel{Name: firewall_name, Url: net_response.URL.Full, FoundBy: "Important Files - Stable Tag", Status: net_response.Response.StatusCode }, nil
 				} else if version_changelog := text.GetVersionByChangelog(net_response_important.Raw); len(version_changelog) != 0 {
-					return &models.InterestingModel{Name: firewall_name, Url: net_response.URL.Full, FoundBy: "Important Files - Changelog", Status: net_response.Response.StatusCode }
+					return &models.InterestingModel{Name: firewall_name, Url: net_response.URL.Full, FoundBy: "Important Files - Changelog", Status: net_response.Response.StatusCode }, nil
 				}
 			}
 		}
 	}
 
-	return &models.InterestingModel{}
+	return &models.InterestingModel{}, nil
 }
 
 func WordPressVersion() string {
@@ -58,7 +58,7 @@ func WordPressVersion() string {
 }
 
 func WordpressCheck() float32 {
-	var wg sync.WaitGroup
+	var wait_group sync.WaitGroup
 	var confidence float32
 
 	var payloads = [4]string{
@@ -68,12 +68,12 @@ func WordpressCheck() float32 {
 		"<link rel=\"https://api.w.org/\"",
 	}
 
-	wg.Add(4)
-		
-	go func(){ if check := AdminPage();        check.Confidence == 100 { confidence++ }; wg.Done() }()
-	go func(){ if check := DirectoryPlugins(); check.Confidence == 100 { confidence++ }; wg.Done() }()
-	go func(){ if check := DirectoryThemes();  check.Confidence == 100 { confidence++ }; wg.Done() }()
-	go func(){ if check := DirectoryUploads(); check.Confidence == 100 { confidence++ }; wg.Done() }()
+	wait_group.Add(4)
+
+	go func(){ if check, err := AdminPage();        check.Confidence == 100 { confidence++ } else if err != nil { printer.Danger(fmt.Sprintf("%s", err)) } ; wait_group.Done() }()
+	go func(){ if check, err := DirectoryPlugins(); check.Confidence == 100 { confidence++ } else if err != nil { printer.Danger(fmt.Sprintf("%s", err)) } ; wait_group.Done() }()
+	go func(){ if check, err := DirectoryThemes();  check.Confidence == 100 { confidence++ } else if err != nil { printer.Danger(fmt.Sprintf("%s", err)) } ; wait_group.Done() }()
+	go func(){ if check, err := DirectoryUploads(); check.Confidence == 100 { confidence++ } else if err != nil { printer.Danger(fmt.Sprintf("%s", err)) } ; wait_group.Done() }()
 	
 	for _, payload := range payloads {
 		if strings.Contains(database.Memory.GetString("HTTP Index Raw"), payload) {
@@ -81,12 +81,12 @@ func WordpressCheck() float32 {
 		}
 	}
 	
-	wg.Wait()
+	wait_group.Wait()
 
 	return confidence / 8 * 100
 }
 
-func WPCron() *models.InterestingModel {
+func WPCron() (*models.InterestingModel, error) {
 	var http = net.NewNETClient()
 	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory(database.Memory.GetString("HTTP wp-content") + "/wp-cron.php")
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
@@ -95,14 +95,12 @@ func WPCron() *models.InterestingModel {
 
 	var response, err = http.Runner()
 
-	if err != nil {
-		printer.Danger(fmt.Sprintf("%s", err))
-	}
+	if err != nil { return &models.InterestingModel{}, err }
 
-	return &models.InterestingModel{Url: response.URL.Full, Status: response.Response.StatusCode, Raw: response.Raw, Confidence: 100, FoundBy: "Direct Access"}
+	return &models.InterestingModel{Url: response.URL.Full, Status: response.Response.StatusCode, Raw: response.Raw, Confidence: 100, FoundBy: "Direct Access"}, nil
 }
 
-func PHPDisabled() *models.InterestingModel {
+func PHPDisabled() (*models.InterestingModel, error) {
 	var http = net.NewNETClient()
 	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory(database.Memory.GetString("HTTP wp-content") + "/wp-includes/version.php")
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
@@ -111,14 +109,12 @@ func PHPDisabled() *models.InterestingModel {
 
 	var response, err = http.Runner()
 	
-	if err != nil {
-		printer.Danger(fmt.Sprintf("%s", err))
-	}
+	if err != nil { return &models.InterestingModel{}, err }
 	
-	return &models.InterestingModel{Url: response.URL.Full, Status: response.Response.StatusCode, Raw: response.Raw, Confidence: 100, FoundBy: "Direct Access"}
+	return &models.InterestingModel{Url: response.URL.Full, Status: response.Response.StatusCode, Raw: response.Raw, Confidence: 100, FoundBy: "Direct Access"}, nil
 }
 
-func XMLRPC() *models.InterestingModel {
+func XMLRPC() (*models.InterestingModel, error) {
 	var http = net.NewNETClient()
 	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory("xmlrpc.php")
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
@@ -127,9 +123,7 @@ func XMLRPC() *models.InterestingModel {
 
 	var response, err = http.Runner()
 
-	if err != nil {
-		printer.Danger(fmt.Sprintf("%s", err))
-	}
+	if err != nil { return &models.InterestingModel{}, err }
 
 	var model = models.InterestingModel{Url: response.URL.Full, Status: response.Response.StatusCode, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
 
@@ -150,5 +144,5 @@ func XMLRPC() *models.InterestingModel {
 		model.Confidence += 10
 	}
 
-	return &model
+	return &model, nil
 }

@@ -1,16 +1,14 @@
 package interesting
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/blackcrw/wprecon/internal/database"
 	"github.com/blackcrw/wprecon/internal/models"
 	"github.com/blackcrw/wprecon/internal/net"
-	"github.com/blackcrw/wprecon/internal/printer"
 )
 
-func DirectoryPlugins() models.InterestingModel {
+func DirectoryPlugins() (models.InterestingModel, error) {
 	var http = net.NewNETClient()
 	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory(database.Memory.GetString("HTTP wp-content") + "/plugins/")
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
@@ -19,9 +17,7 @@ func DirectoryPlugins() models.InterestingModel {
 
 	var response, err = http.Runner()
 
-	if err != nil {
-		printer.Danger(fmt.Sprintf("%s", err))
-	}
+	if err != nil { return models.InterestingModel{}, err }
 
 	if strings.Contains(response.Raw, "Index of") {
 		database.Memory.AddInSlice("HTTP Index Of's", response.URL.Full)
@@ -34,10 +30,10 @@ func DirectoryPlugins() models.InterestingModel {
 		model.Confidence = 100
 	}
 
-	return model
+	return model, nil
 }
 
-func DirectoryUploads() models.InterestingModel {
+func DirectoryUploads() (models.InterestingModel, error) {
 	var http = net.NewNETClient().SetURL(database.Memory.GetString("Options URL"))
 	http.SetURLDirectory(database.Memory.GetString("HTTP wp-content") + "/uploads/")
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
@@ -46,9 +42,7 @@ func DirectoryUploads() models.InterestingModel {
 
 	var response, err = http.Runner()
 
-	if err != nil {
-		printer.Danger(fmt.Sprintf("%s", err))
-	}
+	if err != nil { return models.InterestingModel{}, err }
 
 	if strings.Contains(response.Raw, "Index of") {
 		database.Memory.AddInSlice("HTTP Index Of's", response.URL.Full)
@@ -61,10 +55,10 @@ func DirectoryUploads() models.InterestingModel {
 		model.Confidence = 100
 	}
 
-	return model
+	return model, nil
 }
 
-func DirectoryThemes() models.InterestingModel {
+func DirectoryThemes() (models.InterestingModel, error) {
 	var http = net.NewNETClient()
 	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory(database.Memory.GetString("HTTP wp-content") + "/themes/")
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
@@ -73,9 +67,7 @@ func DirectoryThemes() models.InterestingModel {
 
 	var response, err = http.Runner()
 
-	if err != nil {
-		printer.Danger(fmt.Sprintf("%s", err))
-	}
+	if err != nil { return models.InterestingModel{}, err }
 
 	if strings.Contains(response.Raw, "Index of") {
 		database.Memory.AddInSlice("HTTP Index Of's", response.URL.Full)
@@ -88,5 +80,5 @@ func DirectoryThemes() models.InterestingModel {
 		model.Confidence = 100
 	}
 
-	return model
+	return model, nil
 }

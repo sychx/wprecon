@@ -9,7 +9,7 @@ import (
 	"github.com/blackcrw/wprecon/internal/printer"
 )
 
-func AdminPage() models.InterestingModel {
+func AdminPage() (models.InterestingModel, error) {
 	var http = net.NewNETClient()
 	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory("wp-admin/")
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
@@ -18,9 +18,7 @@ func AdminPage() models.InterestingModel {
 
 	var response, err = http.Runner()
 
-	if err != nil {
-		printer.Danger(fmt.Sprintf("%s", err))
-	}
+	if err != nil { return models.InterestingModel{}, err }
 	
 	var model = models.InterestingModel{Url: response.URL.Full, Status: response.Response.StatusCode, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
 	
@@ -30,10 +28,10 @@ func AdminPage() models.InterestingModel {
 		model.Confidence = 100
 	}
 
-	return model
+	return model, nil
 }
 
-func RobotsPage() models.InterestingModel {
+func RobotsPage() (models.InterestingModel, error) {
 	var http = net.NewNETClient()
 	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory("robots.txt")
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
@@ -42,9 +40,7 @@ func RobotsPage() models.InterestingModel {
 
 	var response, err = http.Runner()
 
-	if err != nil {
-		printer.Danger(fmt.Sprintf("%s", err))
-	}
+	if err != nil { return models.InterestingModel{}, err }
 
 	var model = models.InterestingModel{Url: response.URL.Full, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
 
@@ -52,12 +48,12 @@ func RobotsPage() models.InterestingModel {
 		model.Confidence = 100
 	}
 
-	return model
+	return model, nil
 }
 
 // Sitemap :: Simple requests to see if there is.
 // The command's message will be saved on this map. :: Database.OtherInformationsString["target.http.sitemap.xml.status"]
-func SitemapPage() models.InterestingModel {
+func SitemapPage() (models.InterestingModel, error) {
 	var http = net.NewNETClient()
 	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory("sitemap.xml")
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
@@ -66,9 +62,7 @@ func SitemapPage() models.InterestingModel {
 
 	var response, err = http.Runner()
 
-	if err != nil {
-		printer.Danger(fmt.Sprintf("%s", err))
-	}
+	if err != nil { printer.Danger(fmt.Sprintf("%s", err)) }
 
 	var model = models.InterestingModel{Url: response.URL.Full, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
 
@@ -76,10 +70,10 @@ func SitemapPage() models.InterestingModel {
 		model.Confidence = 100
 	}
 
-	return model
+	return model, nil
 }
 
-func ReadmePage() models.InterestingModel {
+func ReadmePage() (models.InterestingModel, error) {
 	var http = net.NewNETClient()
 	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory("readme.html")
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
@@ -88,9 +82,7 @@ func ReadmePage() models.InterestingModel {
 
 	var response, err = http.Runner()
 
-	if err != nil {
-		printer.Danger(fmt.Sprintf("%s", err))
-	}
+	if err != nil { return models.InterestingModel{}, err }
 
 	var model = models.InterestingModel{Url: response.URL.Full, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
 
@@ -98,5 +90,5 @@ func ReadmePage() models.InterestingModel {
 		model.Confidence = 100
 	}
 
-	return model
+	return model, nil
 }

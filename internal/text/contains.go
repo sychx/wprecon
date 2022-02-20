@@ -1,6 +1,18 @@
 package text
 
-import "github.com/blackcrw/wprecon/internal/models"
+import (
+	"github.com/blackcrw/wprecon/internal/models"
+)
+
+func ContainsEnumerateSlug(enum []models.EnumerateModel, slug string) (bool, int) {
+	for i, item := range enum {
+		if item.Slug == slug {
+			return true, i
+		}
+	}
+
+	return false, 0
+}
 
 func ContainsEnumerateName(enum []models.EnumerateModel, name string) (bool, int) {
 	for i, item := range enum {

@@ -24,9 +24,9 @@ func UserAggressive() *[]models.EnumerateModel {
 	
 	if response.Response.StatusCode == 200 && response.Raw != "" {
 		json.Unmarshal([]byte(response.Raw), &model_json)
-		
+
 		for _, model := range model_json {
-			if has_user, _ := text.ContainsEnumerateName(model_enum, model.Slug); !has_user {
+			if has_user, _ := text.ContainsEnumerateSlug(model_enum, model.Slug); !has_user {
 				model_enum = append_for(model_enum, model_json)
 			}
 		}		

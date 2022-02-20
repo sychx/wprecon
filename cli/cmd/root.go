@@ -60,7 +60,7 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 		printer.NewTopics("Version:", wordpress_version, "\n").Default()
 	}
 
-	var wordpress_waf = func() *models.InterestingModel { if flag_detection_waf { var waf = interesting.WordpressFirewall(); if waf.Name != "" { return waf }}; return &models.InterestingModel{} }()
+	var wordpress_waf = func() *models.InterestingModel { if flag_detection_waf { var waf, err = interesting.WordpressFirewall(); if waf.Name != "" { return waf } else if err != nil { printer.Danger(fmt.Sprintf("%s", err)) } }; return &models.InterestingModel{} }()
 
 	if wordpress_waf.Name != "" {
 		views.RootWAF(wordpress_waf)
@@ -68,6 +68,10 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 
 	switch flag_aggressive_mode {
 	case true:
+		printer.Info("User Enumerate: ")
+		if enum_user_slice := *enumerate.UserAggressive(); len(enum_user_slice) == 0 {
+			printer.Println(); printer.Danger("Unfortunately no user was found.\n")
+		} else { for _, enum_user := range enum_user_slice { printer.NewTopics(enum_user.Slug, "("+enum_user.Name+")").Warning() }; printer.Println() }
 
 		printer.Info("Plugin Enumerate:\n")
 		if enum_plug_slice := *enumerate.PluginAggressive(); len(enum_plug_slice) == 0 {
@@ -78,11 +82,6 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 		if enum_them_slice := *enumerate.ThemeAggressive(); len(enum_them_slice) == 0 {
 			printer.Danger("I couldn't find any themes\n")
 		} else { for _, enum_them := range enum_them_slice { views.RootEnumerate(enum_them) } }
-
-		printer.Info("User Enumerate: ")
-		if enum_user_slice := *enumerate.UserAggressive(); len(enum_user_slice) == 0 {
-			printer.Println(); printer.Danger("Unfortunately no user was found.\n")
-		} else { for _, enum_user := range enum_user_slice { printer.NewTopics(enum_user.Slug, "("+enum_user.Name+")").Warning() }; printer.Println() }
 
 	case false:
 		printer.Info("Plugin Enumerate:\n")
@@ -95,12 +94,13 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 			printer.Danger("I couldn't find any themes\n")
 		} else { for _, enum_them := range enum_them_slice { views.RootEnumerate(enum_them) } }
 	}
+	
 }
 
 func RootOptionsPostRun(cmd *cobra.Command, args []string) {
-	var wg sync.WaitGroup
+	var wait_group sync.WaitGroup
 
-	wg.Add(5)
+	wait_group.Add(5)
 
 	printer.Info("Other interesting information:\n")
 
@@ -123,11 +123,11 @@ func RootOptionsPostRun(cmd *cobra.Command, args []string) {
 			printer.Println()
 		}
 		
-		defer wg.Done()
+		defer wait_group.Done()
 	}()
 
 	go func(){
-		if response := interesting.XMLRPC(); response.Confidence > 0 {
+		if response, err := interesting.XMLRPC(); response.Confidence > 0 {
 			if response.Confidence <= 10 {
 				printer.Done("XML-RPC Possibly enabled:")
 			} else {
@@ -138,29 +138,29 @@ func RootOptionsPostRun(cmd *cobra.Command, args []string) {
 			printer.NewTopics("Confidence:", fmt.Sprint(response.Confidence)).Default()
 			printer.NewTopics("Found By:", response.FoundBy).Default()
 			printer.NewTopics("Location:", database.Memory.GetString("Options URL")+"xmlrpc.php", "\n").Default()
-		}
+		} else if err != nil { printer.Danger(fmt.Sprintf("%s", err)) }
 
-		defer wg.Done()
+		defer wait_group.Done()
 	}()
 
-	go func(){	
+	go func(){
 		if URL := database.Memory.GetString("HTTP Admin Page"); URL != "" {
 			printer.Done("Admin Page Found:")
 			printer.NewTopics("Found by: Access").Default()
 			printer.NewTopics("Location:", URL, "\n").Default()
 		}
 
-		defer wg.Done()
+		defer wait_group.Done()
 	}()
 
 	go func(){	
-		if response := interesting.ReadmePage(); response.Status == 200 {
+		if response, err := interesting.ReadmePage(); response.Status == 200 {
 			printer.Done("WordPress Readme:")
 			printer.NewTopics("Found by:", response.FoundBy).Default()
 			printer.NewTopics("Location:", response.Url, "\n").Default()
-		}
+		} else if err != nil { printer.Danger(fmt.Sprintf("%s", err)) }
 
-		defer wg.Done()
+		defer wait_group.Done()
 	}()
 
 	go func(){
@@ -176,10 +176,10 @@ func RootOptionsPostRun(cmd *cobra.Command, args []string) {
 			}
 		}
 
-		defer wg.Done()
+		defer wait_group.Done()
 	}()
 
-	wg.Wait()
+	wait_group.Wait()
 
 	printer.Done("Total requests:", fmt.Sprint(database.Memory.GetInt("HTTP Total")))
 }
