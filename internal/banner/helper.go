@@ -3,16 +3,11 @@ package banner
 import (
 	"fmt"
 
-	"runtime"
-
 	"github.com/blackcrw/wprecon/internal/printer"
 )
 
-func format_green(s string) string {
-    switch runtime.GOOS {
-	    case "windows": return s
-	    default: return printer.Green + s + printer.Reset
-	  }
+func format_green(in string) string {
+    return printer.GREEN + in + printer.RESET
 }
 
 // BannerHelpRoot :: Root help banner
@@ -42,10 +37,9 @@ Example:
   wprecon -u "https://xxxxxxxx.com" --aggressive-mode
 `,format_green("[flags]"),
 	format_green("[target]"),
-	printer.Required,
+	printer.REQUIRED,
 	format_green("[dir]"),
-	format_green("[seconds]"),
-	format_green("[list]"))
+	format_green("[seconds]"))
 
 // BannerHelpFuzzer :: Fuzzer subcommand help banner
 var BannerHelpFuzzer = fmt.Sprintf(`WPRecon, is a tool for the recognition of vulnerabilities and blackbox information for wordpress.
@@ -82,6 +76,5 @@ Example:
 	format_green("[text]"),
 	format_green("[text]"),
 	format_green("[target]"),
-	printer.Required,
-	format_green("[seconds]"),
-	format_green("[list]"))
+	printer.REQUIRED,
+	format_green("[seconds]"))

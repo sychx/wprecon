@@ -29,14 +29,13 @@ func RootEnumerate(model models.EnumerateModel) {
 				printer.NewTopics("Found By:", model_other.FoundBy).Prefix("  ").Default()
 			}
 			
-			switch {
-			case model_other.Confidence <= 30:
-				printer.NewTopics("Confiance:", fmt.Sprintf("%s%d%%", printer.Red, model_other.Confidence)).Prefix("  ").Danger()
-			case model_other.Confidence < 70:
-				printer.NewTopics("Confiance:", fmt.Sprintf("%s%d%%", printer.Yellow, model_other.Confidence)).Prefix("  ").Warning()
-			case model_other.Confidence >= 70:
-				printer.NewTopics("Confiance:", fmt.Sprintf("%s%d%%", printer.Green, model_other.Confidence)).Prefix("  ").Done()
-			default:
+			if model_other.Confidence <= 30 {
+				printer.NewTopics("Confiance:", fmt.Sprintf("%s%d%%", printer.RED, model_other.Confidence)).Prefix("  ").Danger()
+			} else if model_other.Confidence < 70 {
+				printer.NewTopics("Confiance:", fmt.Sprintf("%s%d%%", printer.YELLOW, model_other.Confidence)).Prefix("  ").Warning()
+			} else if model_other.Confidence >= 70 {
+				printer.NewTopics("Confiance:", fmt.Sprintf("%s%d%%", printer.GREEN, model_other.Confidence)).Prefix("  ").Done()
+			} else {
 				printer.NewTopics("Confiance:", fmt.Sprint(model_other.Confidence)).Prefix("  ").Default()
 			}
 

@@ -12,7 +12,7 @@ import (
 
 func Banner() {
 	printer.Println("——————————————————————————————————————————————————————————————————————")
-	fmt.Print(printer.Black+"___       ______________________________________________   __\n"+printer.Black+"__ |     / /__  __ \\__  __ \\__  ____/_  ____/_  __ \\__  | / /\n"+printer.Blue+"__ | /| / /__  /_/ /_  /_/ /_  __/  _  /    _  / / /_   |/ / \n"+printer.Blue+"__ |/ |/ / _  ____/_  _, _/_  /___  / /___  / /_/ /_  /|  /  \n"+printer.Cyan+"____/|__/  /_/     /_/ |_| /_____/  \\____/  \\____/ /_/ |_/  "+printer.Reset+config.GetConfig().App.Version+"\n\n")
+	fmt.Print(printer.BLACK+"___       ______________________________________________   __\n"+printer.BLACK+"__ |     / /__  __ \\__  __ \\__  ____/_  ____/_  __ \\__  | / /\n"+printer.BLUE+"__ | /| / /__  /_/ /_  /_/ /_  __/  _  /    _  / / /_   |/ / \n"+printer.BLUE+"__ |/ |/ / _  ____/_  _, _/_  /___  / /___  / /_/ /_  /|  /  \n"+printer.CYAN+"____/|__/  /_/     /_/ |_| /_____/  \\____/  \\____/ /_/ |_/  "+printer.RESET+config.GetConfig().App.Version+"\n\n")
 	printer.Warning("Github:\t"+responsive_spaces(),"https://github.com/blackcrw/wprecon")
 	printer.Println("——————————————————————————————————————————————————————————————————————")
 }
