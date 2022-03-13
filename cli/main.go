@@ -58,7 +58,7 @@ var root = &cobra.Command{
 func flags() {
 	cobra.OnInitialize(options)
 
-	root.PersistentFlags().StringP("url", "u", "", "Target URL (Ex: http(s)://example.com/). "+printer.Required)
+	root.PersistentFlags().StringP("url", "u", "", "Target URL (Ex: http(s)://example.com/). "+printer.REQUIRED)
 	root.PersistentFlags().BoolP("verbose", "v", false, "Verbosity mode.")
 	root.PersistentFlags().BoolP("tor", "", false, "Use Tor anonymity network")
 	root.PersistentFlags().BoolP("disable-tls-checks", "", false, "Disables SSL/TLS certificate verification.")
