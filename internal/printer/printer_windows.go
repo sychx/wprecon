@@ -1,8 +1,5 @@
 package printer
 
-
-package printer
-
 import (
 	"bufio"
 	"fmt"
