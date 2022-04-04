@@ -1,12 +1,5 @@
 package models
 
-type MiddlewareFirewallModel struct {
-	Name       string
-	Solve      string
-	Confidence int
-	FoundBy    string
-}
-
 type InterestingModel struct {
 	Name       string
 	Url        string
@@ -14,11 +7,6 @@ type InterestingModel struct {
 	Raw        string
 	Confidence int8
 	FoundBy    string
-}
-
-type FindingsVersionModel struct {
-	Version string
-	Match string
 }
 
 type ConfigModel struct {

@@ -11,7 +11,10 @@ import (
 	"github.com/blackcrw/wprecon/internal/printer"
 	"github.com/blackcrw/wprecon/internal/text"
 	"github.com/blackcrw/wprecon/internal/views"
-	"github.com/blackcrw/wprecon/tools/enumerate"
+	finders_plugins "github.com/blackcrw/wprecon/tools/finders/plugins"
+	finders_themes "github.com/blackcrw/wprecon/tools/finders/themes"
+	finders_users "github.com/blackcrw/wprecon/tools/finders/users"
+
 	"github.com/blackcrw/wprecon/tools/interesting"
 	"github.com/spf13/cobra"
 )
@@ -35,8 +38,11 @@ func RootOptionsPreRun(cmd *cobra.Command, args []string) {
 }
 
 func RootOptionsRun(cmd *cobra.Command, args []string) {
-	var flag_aggressive_mode, _ = cmd.Flags().GetBool("aggressive-mode")
-	var flag_detection_waf, _ = cmd.Flags().GetBool("detection-waf")
+	var (
+		flag_target_url, _ = cmd.Flags().GetString("url")
+		flag_aggressive_mode, _ = cmd.Flags().GetBool("aggressive-mode")
+		flag_detection_waf, _ = cmd.Flags().GetBool("detection-waf")
+	)
 
 	var (
 		wordpress_version = interesting.WordPressVersion()
@@ -60,41 +66,43 @@ func RootOptionsRun(cmd *cobra.Command, args []string) {
 		printer.NewTopics("Version:", wordpress_version, "\n").Default()
 	}
 
-	var wordpress_waf = func() *models.InterestingModel { if flag_detection_waf { var waf, err = interesting.WordpressFirewall(); if waf.Name != "" { return waf } else if err != nil { printer.Danger(fmt.Sprintf("%s", err)) } }; return &models.InterestingModel{} }()
+	var wordpress_waf = func() *models.InterestingModel { if flag_detection_waf { var waf, err = interesting.WordpressFirewall(); if waf.Name != "" { return waf } else if err != nil { printer.Danger(err) } }; return &models.InterestingModel{} }()
 
 	if wordpress_waf.Name != "" {
 		views.RootWAF(wordpress_waf)
 	}
 
+
 	switch flag_aggressive_mode {
 	case true:
-		printer.Info("User Enumerate: ")
-		if enum_user_slice := *enumerate.UserAggressive(); len(enum_user_slice) == 0 {
-			printer.Println(); printer.Danger("Unfortunately no user was found.\n")
-		} else { for _, enum_user := range enum_user_slice { printer.NewTopics(enum_user.Slug, "("+enum_user.Name+")").Warning() }; printer.Println() }
-
+		printer.Info("User Enumerate:\n")
+		if finders_user_slice := *finders_users.Run(flag_target_url); len(finders_user_slice) == 0 {
+			printer.Danger("Unfortunately no user was found.\n")
+		} else {
+			for _, finders_user := range finders_user_slice { views.RootFindersUser(finders_user) }; printer.Println()
+		}
+	
 		printer.Info("Plugin Enumerate:\n")
-		if enum_plug_slice := *enumerate.PluginAggressive(); len(enum_plug_slice) == 0 {
+		if finders_plugins_slice := *finders_plugins.Aggressive(flag_target_url); len(finders_plugins_slice) == 0 {
 			printer.Danger("I couldn't find any plugins\n")
-		} else { for _, enum_plug := range enum_plug_slice { views.RootEnumerate(enum_plug) } }
-		
+		} else { for _, finders_plugin := range finders_plugins_slice { views.RootFindersPluginsAndThemes(finders_plugin) } }
+	
 		printer.Info("Theme Enumerate:\n")
-		if enum_them_slice := *enumerate.ThemeAggressive(); len(enum_them_slice) == 0 {
+		if finders_themes_slice := *finders_themes.Aggressive(flag_target_url); len(finders_themes_slice) == 0 {
 			printer.Danger("I couldn't find any themes\n")
-		} else { for _, enum_them := range enum_them_slice { views.RootEnumerate(enum_them) } }
+		} else { for _, finders_theme := range finders_themes_slice { views.RootFindersPluginsAndThemes(finders_theme) } }
 
 	case false:
 		printer.Info("Plugin Enumerate:\n")
-		if enum_plug_slice := *enumerate.PluginPassive(); len(enum_plug_slice) == 0 {
+		if finders_plugins_slice := *finders_plugins.Passive(flag_target_url); len(finders_plugins_slice) == 0 {
 			printer.Danger("I couldn't find any plugins\n")
-		} else { for _, enum_plug := range enum_plug_slice { views.RootEnumerate(enum_plug) } }
-
-		printer.Info("Theme Enumerate:\n")
-		if enum_them_slice := *enumerate.ThemePassive(); len(enum_them_slice) == 0 {
-			printer.Danger("I couldn't find any themes\n")
-		} else { for _, enum_them := range enum_them_slice { views.RootEnumerate(enum_them) } }
-	}
+		} else { for _, finders_plugin := range finders_plugins_slice { views.RootFindersPluginsAndThemes(finders_plugin) } }
 	
+		printer.Info("Theme Enumerate:\n")
+		if finders_themes_slice := *finders_themes.Passive(flag_target_url); len(finders_themes_slice) == 0 {
+			printer.Danger("I couldn't find any themes\n")
+		} else { for _, finders_theme := range finders_themes_slice { views.RootFindersPluginsAndThemes(finders_theme) } }
+	}
 }
 
 func RootOptionsPostRun(cmd *cobra.Command, args []string) {
@@ -132,13 +140,13 @@ func RootOptionsPostRun(cmd *cobra.Command, args []string) {
 				printer.Done("XML-RPC Possibly enabled:")
 			} else {
 				printer.Done("XML-RPC Enabled:")
-				printer.NewTopics("Status:", fmt.Sprint(response.Status)).Default()
+				printer.NewTopics("Status:", response.Status).Default()
 			}
 	
-			printer.NewTopics("Confidence:", fmt.Sprint(response.Confidence)).Default()
+			printer.NewTopics("Confidence:", fmt.Sprint(response.Confidence)+"%").Default()
 			printer.NewTopics("Found By:", response.FoundBy).Default()
 			printer.NewTopics("Location:", database.Memory.GetString("Options URL")+"xmlrpc.php", "\n").Default()
-		} else if err != nil { printer.Danger(fmt.Sprintf("%s", err)) }
+		} else if err != nil { printer.Danger("%s", err) }
 
 		defer wait_group.Done()
 	}()
@@ -158,7 +166,7 @@ func RootOptionsPostRun(cmd *cobra.Command, args []string) {
 			printer.Done("WordPress Readme:")
 			printer.NewTopics("Found by:", response.FoundBy).Default()
 			printer.NewTopics("Location:", response.Url, "\n").Default()
-		} else if err != nil { printer.Danger(fmt.Sprintf("%s", err)) }
+		} else if err != nil { printer.Danger(err) }
 
 		defer wait_group.Done()
 	}()
@@ -181,5 +189,5 @@ func RootOptionsPostRun(cmd *cobra.Command, args []string) {
 
 	wait_group.Wait()
 
-	printer.Done("Total requests:", fmt.Sprint(database.Memory.GetInt("HTTP Total")))
+	printer.Done("Total requests:", database.Memory.GetInt("HTTP Total"))
 }
