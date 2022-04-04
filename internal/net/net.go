@@ -32,7 +32,7 @@ type net_options struct {
 // SimpleRequest :: The first parameter must always be the base url. The second must be the directory.
 func SimpleRequest(url string) *models.ResponseModel {
 	var http = NewNETClient()
-	http.SetURL(url)
+	http.SetURLFull(url)
 	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
 	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
 	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))

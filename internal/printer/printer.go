@@ -49,7 +49,12 @@ var (
 func doPrintbs(a ...interface{}) (str string){
 	for arg_num, arg := range a {
 		if arg_num > 0 { str += " " }
-		str += arg.(string)
+
+		switch arg.(type) {
+		case string: str += arg.(string)
+		case error: str += arg.(error).Error()
+		case int: str += fmt.Sprint(arg.(int))
+		}
 	}
 
 	return
