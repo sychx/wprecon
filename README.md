@@ -20,11 +20,6 @@ The purpose of this tool is just to help developers find possible loopholes in t
   <a href="https://github.com/blackcrw">Author</a>
 </p>
 
-<h4>
-  <p align="center">
-    <code>v2.4.4</code>
-  </p>
-</h4>
 <br>
  
 <h3 align="center">🔨 <code>Build</code></h3>
