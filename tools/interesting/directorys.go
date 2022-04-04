@@ -24,13 +24,13 @@ func DirectoryPlugins() (models.InterestingModel, error) {
 		database.Memory.SetString("HTTP wp-content/plugins Index Of Raw", response.Raw)
 	}
 
-	var model = models.InterestingModel{Url: response.URL.Full, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
+	var models_interesting = models.InterestingModel{Url: response.URL.Full, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
 
 	if response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
-		model.Confidence = 100
+		models_interesting.Confidence = 100
 	}
 
-	return model, nil
+	return models_interesting, nil
 }
 
 func DirectoryUploads() (models.InterestingModel, error) {
@@ -49,13 +49,13 @@ func DirectoryUploads() (models.InterestingModel, error) {
 		database.Memory.SetString("HTTP wp-content/uploads Index Of Raw", response.Raw)
 	}
 
-	var model = models.InterestingModel{Url: response.URL.Full, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
+	var models_interesting = models.InterestingModel{Url: response.URL.Full, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
 
 	if response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
-		model.Confidence = 100
+		models_interesting.Confidence = 100
 	}
 
-	return model, nil
+	return models_interesting, nil
 }
 
 func DirectoryThemes() (models.InterestingModel, error) {
@@ -74,11 +74,11 @@ func DirectoryThemes() (models.InterestingModel, error) {
 		database.Memory.SetString("HTTP wp-content/themes Index Of Raw", response.Raw)
 	}
 
-	var model = models.InterestingModel{Url: response.URL.Full, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
+	var models_interesting = models.InterestingModel{Url: response.URL.Full, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
 
 	if response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
-		model.Confidence = 100
+		models_interesting.Confidence = 100
 	}
 
-	return model, nil
+	return models_interesting, nil
 }

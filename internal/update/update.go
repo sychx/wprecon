@@ -8,7 +8,7 @@ import (
 
 // Check :: This function will be responsible for checking and printing on the screen whether there is an update or not.
 func GetVersion() string {
-	var model models.ConfigModel
+	var models_config models.ConfigModel
 
 	var request = net.NewNETClient()
 	request.SetURLFull("https://raw.githubusercontent.com/blackcrw/wprecon/wprecon-v2/internal/config/config.yaml")
@@ -16,7 +16,7 @@ func GetVersion() string {
 
 	var response, _ = request.Runner()
 
-	yaml.Unmarshal([]byte(response.Raw), &model)
+	yaml.Unmarshal([]byte(response.Raw), &models_config)
 
-	return model.App.Version
+	return models_config.App.Version
 }

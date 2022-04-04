@@ -4,8 +4,8 @@ import (
 	"github.com/blackcrw/wprecon/internal/models"
 )
 
-func ContainsEnumerateSlug(enum []models.EnumerateModel, slug string) (bool, int) {
-	for i, item := range enum {
+func ContainsFindersSlug(models_finders []models.FindersModel, slug string) (bool, int) {
+	for i, item := range models_finders {
 		if item.Slug == slug {
 			return true, i
 		}
@@ -14,8 +14,8 @@ func ContainsEnumerateSlug(enum []models.EnumerateModel, slug string) (bool, int
 	return false, 0
 }
 
-func ContainsEnumerateName(enum []models.EnumerateModel, name string) (bool, int) {
-	for i, item := range enum {
+func ContainsFindersName(models_finders []models.FindersModel, name string) (bool, int) {
+	for i, item := range models_finders {
 		if item.Name == name {
 			return true, i
 		}
@@ -24,8 +24,8 @@ func ContainsEnumerateName(enum []models.EnumerateModel, name string) (bool, int
 	return false, 0
 }
 
-func ContainsEnumerateMatch(enum []models.EnumerateModel, match string) (bool, int) {
-	for _, item := range enum {	
+func ContainsFindersMatch(models_finders []models.FindersModel, match string) (bool, int) {
+	for _, item := range models_finders {	
 		for i, others := range item.Others {
 			for _, matchs := range others.Match {
 				if matchs == match {
@@ -38,8 +38,8 @@ func ContainsEnumerateMatch(enum []models.EnumerateModel, match string) (bool, i
 	return false, 0
 }
 
-func ContainsEnumerateVersion(enum []models.EnumerateModel, version string) (bool, int) {
-	for _, item := range enum {	
+func ContainsFindersVersion(models_finders []models.FindersModel, version string) (bool, int) {
+	for _, item := range models_finders {	
 		for i, others := range item.Others {
 			if others.Version == version {
 				return true, i 

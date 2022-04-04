@@ -84,11 +84,11 @@ func ReadmePage() (models.InterestingModel, error) {
 
 	if err != nil { return models.InterestingModel{}, err }
 
-	var model = models.InterestingModel{Url: response.URL.Full, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
+	var models_interesting = models.InterestingModel{Url: response.URL.Full, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
 
 	if response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
-		model.Confidence = 100
+		models_interesting.Confidence = 100
 	}
 
-	return model, nil
+	return models_interesting, nil
 }

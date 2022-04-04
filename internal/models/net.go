@@ -19,3 +19,10 @@ type ResponseModel struct {
 	URL      *UrlOptionsModel
 	Response *http.Response
 }
+
+type MiddlewareFirewallModel struct {
+	Name       string
+	Solve      string
+	Confidence int
+	FoundBy    string
+}
