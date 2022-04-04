@@ -9,18 +9,14 @@ import (
 
 /* This function will be used for URL validation */
 func ThisIsURL(URL string) bool {
-	uri, err := url.ParseRequestURI(URL)
+	var uri, err = url.ParseRequestURI(URL)
 
-	if err != nil {
-		printer.Fatal(err)
-	}
+	if err != nil { printer.Fatal(err) }
 
 	switch uri.Scheme {
 	case "http":
 	case "https":
-	default:
-		printer.Fatal("Invalid scheme")
-	}
+	default: printer.Fatal("Invalid scheme") }
 
 	return true
 }
@@ -28,15 +24,19 @@ func ThisIsURL(URL string) bool {
 func ThisIsHostValid(URL string) bool {
 	var uri, err = url.ParseRequestURI(URL)
 
-	if err != nil {
-		printer.Fatal(err)
-	}
+	if err != nil { printer.Fatal(err) }
 
 	_, err = net.LookupHost(uri.Host)
 
-	if err != nil {
-		printer.Fatal(err)
-	}
+	if err != nil { printer.Fatal(err) }
 
 	return true
+}
+
+func GetHost(URL string) string {
+	var uri, err = url.Parse(URL)
+
+	if err != nil { printer.Fatal(err) }
+
+	return uri.Host
 }
