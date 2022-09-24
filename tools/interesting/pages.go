@@ -1,94 +1,103 @@
 package interesting
 
-import (
-	"fmt"
+import "github.com/blackcrw/wprecon/internal/http"
 
-	"github.com/blackcrw/wprecon/internal/database"
-	"github.com/blackcrw/wprecon/internal/models"
-	"github.com/blackcrw/wprecon/internal/net"
-	"github.com/blackcrw/wprecon/internal/printer"
-)
+func AdminPage(URL string) (Interesting, error) {
+	var request = http.NewHTTP(URL + "/wp-admin/")
 
-func AdminPage() (models.InterestingModel, error) {
-	var http = net.NewNETClient()
-	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory("wp-admin/")
-	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
-	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
-	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))
+	request.OnRandomUserAgent(true)
+	request.OnTLSCertificateVerify(false)
 
-	var response, err = http.Runner()
+	var response, err = http.Do(request)
 
-	if err != nil { return models.InterestingModel{}, err }
-	
-	var model = models.InterestingModel{Url: response.URL.Full, Status: response.Response.StatusCode, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
-	
-	defer database.Memory.SetString("HTTP Admin Page Status", response.Response.Status)
-	
-	if response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
-		model.Confidence = 100
+	if err != nil { return Interesting{}, err }
+
+	var entity = Interesting{
+		Url:        response.URL.String(),
+		Raw:        response.Raw,
+		Status:     response.Response.StatusCode,
+		FoundBy:    "Direct Access",
+		Confidence: 0,
 	}
 
-	return model, nil
+	if response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
+		entity.Confidence = 100
+	}
+
+	return entity, nil
 }
 
-func RobotsPage() (models.InterestingModel, error) {
-	var http = net.NewNETClient()
-	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory("robots.txt")
-	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
-	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
-	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))
+func RobotsPage(URL string) (Interesting, error) {
+	var request = http.NewHTTP(URL + "/robots.txt")
 
-	var response, err = http.Runner()
+	request.OnRandomUserAgent(true)
+	request.OnTLSCertificateVerify(false)
 
-	if err != nil { return models.InterestingModel{}, err }
+	var response, err = http.Do(request)
 
-	var model = models.InterestingModel{Url: response.URL.Full, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
+	if err != nil { return Interesting{}, err }
 
-	if response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
-		model.Confidence = 100
+	var entity = Interesting{
+		Url:        response.URL.String(),
+		Raw:        response.Raw,
+		Status:     response.Response.StatusCode,
+		FoundBy:    "Direct Access",
+		Confidence: 0,
 	}
 
-	return model, nil
+	if response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
+		entity.Confidence = 100
+	}
+
+	return entity, nil
 }
 
-// Sitemap :: Simple requests to see if there is.
-// The command's message will be saved on this map. :: Database.OtherInformationsString["target.http.sitemap.xml.status"]
-func SitemapPage() (models.InterestingModel, error) {
-	var http = net.NewNETClient()
-	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory("sitemap.xml")
-	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
-	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
-	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))
+func SiteMapPage(URL string) (Interesting, error) {
+	var request = http.NewHTTP(URL + "/sitemap.xml")
 
-	var response, err = http.Runner()
+	request.OnRandomUserAgent(true)
+	request.OnTLSCertificateVerify(false)
 
-	if err != nil { printer.Danger(fmt.Sprintf("%s", err)) }
+	var response, err = http.Do(request)
 
-	var model = models.InterestingModel{Url: response.URL.Full, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
+	if err != nil { return Interesting{}, err }
 
-	if response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
-		model.Confidence = 100
+	var entity = Interesting{
+		Url:        response.URL.String(),
+		Raw:        response.Raw,
+		Status:     response.Response.StatusCode,
+		FoundBy:    "Direct Access",
+		Confidence: 0,
 	}
 
-	return model, nil
+	if response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
+		entity.Confidence = 100
+	}
+
+	return entity, nil
 }
 
-func ReadmePage() (models.InterestingModel, error) {
-	var http = net.NewNETClient()
-	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory("readme.html")
-	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
-	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
-	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))
+func ReadmePage(URL string) (Interesting, error) {
+	var request = http.NewHTTP(URL + "/readme.html")
 
-	var response, err = http.Runner()
+	request.OnRandomUserAgent(true)
+	request.OnTLSCertificateVerify(false)
 
-	if err != nil { return models.InterestingModel{}, err }
+	var response, err = http.Do(request)
 
-	var models_interesting = models.InterestingModel{Url: response.URL.Full, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
+	if err != nil { return Interesting{}, err }
 
-	if response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
-		models_interesting.Confidence = 100
+	var entity = Interesting{
+		Url:        response.URL.String(),
+		Raw:        response.Raw,
+		Status:     response.Response.StatusCode,
+		FoundBy:    "Direct Access",
+		Confidence: 0,
 	}
 
-	return models_interesting, nil
+	if response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
+		entity.Confidence = 100
+	}
+
+	return entity, nil
 }

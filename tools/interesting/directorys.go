@@ -3,82 +3,93 @@ package interesting
 import (
 	"strings"
 
-	"github.com/blackcrw/wprecon/internal/database"
-	"github.com/blackcrw/wprecon/internal/models"
-	"github.com/blackcrw/wprecon/internal/net"
+	"github.com/blackcrw/wprecon/internal/http"
+	. "github.com/blackcrw/wprecon/internal/memory"
 )
 
-func DirectoryPlugins() (models.InterestingModel, error) {
-	var http = net.NewNETClient()
-	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory(database.Memory.GetString("HTTP wp-content") + "/plugins/")
-	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
-	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
-	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))
+func DirectoryPlugins(URL string) (Interesting, error) {
+	var request = http.NewHTTP(URL + "/plugins/")
 
-	var response, err = http.Runner()
+	request.OnRandomUserAgent(true)
+	request.OnTLSCertificateVerify(false)
 
-	if err != nil { return models.InterestingModel{}, err }
+	var response, err = http.Do(request)
+
+	if err != nil { return Interesting{}, err }
 
 	if strings.Contains(response.Raw, "Index of") {
-		database.Memory.AddInSlice("HTTP Index Of's", response.URL.Full)
-		database.Memory.SetString("HTTP wp-content/plugins Index Of Raw", response.Raw)
+		Memory.AddInSlice("Index Of's", response.URL.String())
 	}
 
-	var models_interesting = models.InterestingModel{Url: response.URL.Full, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
+	var entity = Interesting{
+		Url:        response.URL.String(),
+		Raw:        response.Raw,
+		Status:     response.Response.StatusCode,
+		FoundBy:    "Direct Access",
+		Confidence: 0,
+	}
 
 	if response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
-		models_interesting.Confidence = 100
+		entity.Confidence = 100
 	}
 
-	return models_interesting, nil
+	return entity, nil
 }
 
-func DirectoryUploads() (models.InterestingModel, error) {
-	var http = net.NewNETClient().SetURL(database.Memory.GetString("Options URL"))
-	http.SetURLDirectory(database.Memory.GetString("HTTP wp-content") + "/uploads/")
-	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
-	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
-	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))
+func DirectoryThemes(URL string) (Interesting, error) {
+	var request = http.NewHTTP(URL + "/themes/")
 
-	var response, err = http.Runner()
+	request.OnRandomUserAgent(true)
+	request.OnTLSCertificateVerify(false)
 
-	if err != nil { return models.InterestingModel{}, err }
+	var response, err = http.Do(request)
+
+	if err != nil { return Interesting{}, err }
 
 	if strings.Contains(response.Raw, "Index of") {
-		database.Memory.AddInSlice("HTTP Index Of's", response.URL.Full)
-		database.Memory.SetString("HTTP wp-content/uploads Index Of Raw", response.Raw)
+		Memory.AddInSlice("Index Of's", response.URL.String())
 	}
 
-	var models_interesting = models.InterestingModel{Url: response.URL.Full, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
+	var entity = Interesting{
+		Url:        response.URL.String(),
+		Raw:        response.Raw,
+		Status:     response.Response.StatusCode,
+		FoundBy:    "Direct Access",
+		Confidence: 0,
+	}
 
 	if response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
-		models_interesting.Confidence = 100
+		entity.Confidence = 100
 	}
 
-	return models_interesting, nil
+	return entity, nil
 }
 
-func DirectoryThemes() (models.InterestingModel, error) {
-	var http = net.NewNETClient()
-	http.SetURL(database.Memory.GetString("Options URL")).SetURLDirectory(database.Memory.GetString("HTTP wp-content") + "/themes/")
-	http.OnTor(database.Memory.GetBool("HTTP Options TOR"))
-	http.OnRandomUserAgent(database.Memory.GetBool("HTTP Options Random Agent"))
-	http.OnTLSCertificateVerify(database.Memory.GetBool("HTTP Options TLS Certificate Verify"))
+func DirectoryUploads(URL string) (Interesting, error) {
+	var request = http.NewHTTP(URL + "/uploads/")
 
-	var response, err = http.Runner()
+	request.OnRandomUserAgent(true)
+	request.OnTLSCertificateVerify(false)
 
-	if err != nil { return models.InterestingModel{}, err }
+	var response, err = http.Do(request)
+
+	if err != nil { return Interesting{}, err }
 
 	if strings.Contains(response.Raw, "Index of") {
-		database.Memory.AddInSlice("HTTP Index Of's", response.URL.Full)
-		database.Memory.SetString("HTTP wp-content/themes Index Of Raw", response.Raw)
+		Memory.AddInSlice("Index Of's", response.URL.String())
 	}
 
-	var models_interesting = models.InterestingModel{Url: response.URL.Full, Raw: response.Raw, Confidence: -1, FoundBy: "Direct Access"}
+	var entity = Interesting{
+		Url:        response.URL.String(),
+		Raw:        response.Raw,
+		Status:     response.Response.StatusCode,
+		FoundBy:    "Direct Access",
+		Confidence: 0,
+	}
 
 	if response.Response.StatusCode == 200 || response.Response.StatusCode == 403 {
-		models_interesting.Confidence = 100
+		entity.Confidence = 100
 	}
 
-	return models_interesting, nil
+	return entity, nil
 }

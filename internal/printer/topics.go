@@ -1,32 +1,32 @@
 package printer
 
-type topics struct {
+type _Topics struct {
 	text   string
 	prefix string
 }
 
-func NewTopics(t ...interface{}) *topics {
-	return &topics{text: doPrintbs(t...)}
+func NewTopics(t ...interface{}) *_Topics {
+	return &_Topics{text: doPrintbs(t...)}
 }
 
-func (this *topics) Prefix(s ...interface{}) *topics {
-	this.prefix = doPrintbs(s...)
+func (model *_Topics) Prefix(s ...interface{}) *_Topics {
+	model.prefix = doPrintbs(s...)
 
-	return this
+	return model
 }
 
-func (this *topics) Default() {
-	stdout.WriteString(this.prefix + PREFIX_LIST_DEFAULT+" "+this.text + endl)
+func (model *_Topics) Default() {
+	stdout.WriteString(model.prefix + PREFIX_LIST_DEFAULT+" "+model.text + "\n")
 }
 
-func (this *topics) Done() {
-	stdout.WriteString(this.prefix + PREFIX_LIST_DONE+" "+this.text + endl)
+func (model *_Topics) Done() {
+	stdout.WriteString(model.prefix + PREFIX_LIST_DONE+" "+model.text + "\n")
 }
 
-func (this *topics) Danger() {
-	stdout.WriteString(this.prefix + PREFIX_LIST_DANGER+" "+this.text + endl)
+func (model *_Topics) Danger() {
+	stdout.WriteString(model.prefix + PREFIX_LIST_DANGER+" "+model.text + "\n")
 }
 
-func (this *topics) Warning() {
-	stdout.WriteString(this.prefix + PREFIX_LIST_WARNING+" "+this.text + endl)
+func (model *_Topics) Warning() {
+	stdout.WriteString(model.prefix + PREFIX_LIST_WARNING+" "+model.text + "\n")
 }
