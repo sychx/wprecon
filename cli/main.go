@@ -18,10 +18,10 @@ import (
 	"os/signal"
 	"strings"
 
-	"github.com/blackcrw/wprecon/cli/cmd"
-	"github.com/blackcrw/wprecon/internal/banner"
-	"github.com/blackcrw/wprecon/internal/database"
-	"github.com/blackcrw/wprecon/internal/printer"
+	"github.com/AngraTeam/wprecon/cli/cmd"
+	"github.com/AngraTeam/wprecon/internal/banner"
+	"github.com/AngraTeam/wprecon/internal/database"
+	"github.com/AngraTeam/wprecon/internal/printer"
 	"github.com/spf13/cobra"
 )
 

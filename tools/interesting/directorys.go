@@ -3,8 +3,8 @@ package interesting
 import (
 	"strings"
 
-	"github.com/blackcrw/wprecon/internal/http"
-	. "github.com/blackcrw/wprecon/internal/memory"
+	"github.com/AngraTeam/wprecon/internal/http"
+	. "github.com/AngraTeam/wprecon/internal/memory"
 )
 
 func DirectoryPlugins(URL string) (Interesting, error) {
@@ -15,7 +15,9 @@ func DirectoryPlugins(URL string) (Interesting, error) {
 
 	var response, err = http.Do(request)
 
-	if err != nil { return Interesting{}, err }
+	if err != nil {
+		return Interesting{}, err
+	}
 
 	if strings.Contains(response.Raw, "Index of") {
 		Memory.AddInSlice("Index Of's", response.URL.String())
@@ -44,7 +46,9 @@ func DirectoryThemes(URL string) (Interesting, error) {
 
 	var response, err = http.Do(request)
 
-	if err != nil { return Interesting{}, err }
+	if err != nil {
+		return Interesting{}, err
+	}
 
 	if strings.Contains(response.Raw, "Index of") {
 		Memory.AddInSlice("Index Of's", response.URL.String())
@@ -73,7 +77,9 @@ func DirectoryUploads(URL string) (Interesting, error) {
 
 	var response, err = http.Do(request)
 
-	if err != nil { return Interesting{}, err }
+	if err != nil {
+		return Interesting{}, err
+	}
 
 	if strings.Contains(response.Raw, "Index of") {
 		Memory.AddInSlice("Index Of's", response.URL.String())

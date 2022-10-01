@@ -3,7 +3,7 @@ package banner
 import (
 	"time"
 
-	"github.com/blackcrw/wprecon/internal/printer"
+	"github.com/AngraTeam/wprecon/internal/printer"
 )
 
 func Banner() {
@@ -20,10 +20,10 @@ func XBanner(URL string, randomAgent bool, timeSleep int) {
 	if randomAgent {
 		printer.Done("Random Agent:\t", randomAgent)
 	}
-	
+
 	if timeSleep != 0 {
 		printer.Done("Sleep Requests:\t", timeSleep, "seconds")
 	}
 
-	printer.Done("Started in:\t", time.Now().Format(("Monday Jan 02 15:04:05 2006")), "\n")
+	printer.Done("Started in:\t", time.Now().Format("Monday Jan 02 15:04:05 2006"), "\n")
 }

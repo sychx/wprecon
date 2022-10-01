@@ -7,13 +7,13 @@ package main
 import (
 	"fmt"
 
-	"github.com/blackcrw/wprecon/internal/http"
-	"github.com/blackcrw/wprecon/tools/finders/plugins"
-	"github.com/blackcrw/wprecon/tools/interesting"
+	"github.com/AngraTeam/wprecon/internal/http"
+	"github.com/AngraTeam/wprecon/tools/finders/plugins"
+	"github.com/AngraTeam/wprecon/tools/interesting"
 )
 
 func main() {
-	var URL string = "https://www.poli.usp.br/"
+	var URL = "https://www.poli.usp.br/"
 
 	interesting.WordpressCheck(URL, "")
 	interesting.DirectoryPlugins(URL)

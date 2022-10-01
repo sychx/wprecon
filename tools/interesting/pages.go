@@ -1,6 +1,6 @@
 package interesting
 
-import "github.com/blackcrw/wprecon/internal/http"
+import "github.com/AngraTeam/wprecon/internal/http"
 
 func AdminPage(URL string) (Interesting, error) {
 	var request = http.NewHTTP(URL + "/wp-admin/")
@@ -10,7 +10,9 @@ func AdminPage(URL string) (Interesting, error) {
 
 	var response, err = http.Do(request)
 
-	if err != nil { return Interesting{}, err }
+	if err != nil {
+		return Interesting{}, err
+	}
 
 	var entity = Interesting{
 		Url:        response.URL.String(),
@@ -35,7 +37,9 @@ func RobotsPage(URL string) (Interesting, error) {
 
 	var response, err = http.Do(request)
 
-	if err != nil { return Interesting{}, err }
+	if err != nil {
+		return Interesting{}, err
+	}
 
 	var entity = Interesting{
 		Url:        response.URL.String(),
@@ -60,7 +64,9 @@ func SiteMapPage(URL string) (Interesting, error) {
 
 	var response, err = http.Do(request)
 
-	if err != nil { return Interesting{}, err }
+	if err != nil {
+		return Interesting{}, err
+	}
 
 	var entity = Interesting{
 		Url:        response.URL.String(),
@@ -85,7 +91,9 @@ func ReadmePage(URL string) (Interesting, error) {
 
 	var response, err = http.Do(request)
 
-	if err != nil { return Interesting{}, err }
+	if err != nil {
+		return Interesting{}, err
+	}
 
 	var entity = Interesting{
 		Url:        response.URL.String(),
