@@ -25,7 +25,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func signal_exit() {
+func signalExit() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, os.Interrupt)
 
@@ -36,7 +36,7 @@ func signal_exit() {
 }
 
 func init() {
-	go signal_exit()
+	go signalExit()
 	flags()
 }
 
@@ -80,10 +80,10 @@ func options() {
 	var force, _ = root.Flags().GetBool("force")
 	var target, _ = root.Flags().GetString("url")
 	var verbose, _ = root.Flags().GetBool("verbose")
-	var http_sleep, _ = root.Flags().GetInt("http-sleep")
-	var random_agent, _ = root.Flags().GetBool("random-agent")
-	var wp_content_dir, _ = root.Flags().GetString("wp-content-dir")
-	var disable_tls_checks, _ = root.Flags().GetBool("disable-tls-checks")
+	var httpSleep, _ = root.Flags().GetInt("http-sleep")
+	var randomAgent, _ = root.Flags().GetBool("random-agent")
+	var wpContentDir, _ = root.Flags().GetString("wp-content-dir")
+	var disableTlsChecks, _ = root.Flags().GetBool("disable-tls-checks")
 
 	if !strings.HasSuffix(target, "/") {
 		database.Memory.SetString("Options URL", target+"/")
@@ -91,11 +91,11 @@ func options() {
 		database.Memory.SetString("Options URL", target)
 	}
 
-	database.Memory.SetBool("HTTP Options TOR", tor)
 	database.Memory.SetBool("Options Force", force)
+	database.Memory.SetBool("HTTP Options TOR", tor)
 	database.Memory.SetBool("Options Verbose", verbose)
-	database.Memory.SetInt("HTTP Time Sleep", http_sleep)
-	database.Memory.SetBool("HTTP Options Random Agent", random_agent)
-	database.Memory.SetString("HTTP wp-content", wp_content_dir)
-	database.Memory.SetBool("HTTP Options TLS Certificate Verify", disable_tls_checks)
+	database.Memory.SetBool("HTTP Options Random Agent", randomAgent)
+	database.Memory.SetBool("HTTP Options TLS Certificate Verify", disableTlsChecks)
+	database.Memory.SetInt("HTTP Time Sleep", httpSleep)
+	database.Memory.SetString("HTTP wp-content", wpContentDir)
 }
