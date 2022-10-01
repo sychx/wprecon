@@ -1,8 +1,7 @@
 package error_handling
 
 import (
-	"fmt"
-	"os"
+	"github.com/AngraTeam/wprecon/internal/printer"
 )
 
 // Panic is a function that receives the error and handles it according to the condition by printing a log equivalent
@@ -10,9 +9,9 @@ import (
 func Panic(err error, message ...string) {
 	if err != nil {
 		if message == nil {
-			fmt.Println(err)
+			printer.Println(err)
 		} else {
-			fmt.Println(message)
+			printer.Println(message)
 		}
 		panic(err)
 	}
@@ -23,10 +22,9 @@ func Panic(err error, message ...string) {
 func Fatal(err error, message ...string) {
 	if err != nil {
 		if message == nil {
-			fmt.Println(err)
+			printer.Fatal(err)
 		} else {
-			fmt.Println(message)
+			printer.Fatal(message)
 		}
-		os.Exit(1)
 	}
 }
