@@ -18,9 +18,8 @@ import (
 	"os/signal"
 	"strings"
 
-	"github.com/AngraTeam/wprecon/cli/cmd"
-	"github.com/AngraTeam/wprecon/internal/banner"
-	"github.com/AngraTeam/wprecon/internal/database"
+	"github.com/AngraTeam/wprecon/cli/core/banner"
+	database "github.com/AngraTeam/wprecon/internal/memory"
 	"github.com/AngraTeam/wprecon/internal/printer"
 	"github.com/spf13/cobra"
 )
@@ -50,9 +49,9 @@ var root = &cobra.Command{
 	Use:     "wprecon",
 	Short:   "Wordpress Recon",
 	Long:    `WPRecon, is a tool for the recognition of vulnerabilities and blackbox information for wordpress.`,
-	PreRun:  cmd.RootOptionsPreRun,
-	Run:     cmd.RootOptionsRun,
-	PostRun: cmd.RootOptionsPostRun,
+//	PreRun:  cmd.RootOptionsPreRun,
+//	Run:     cmd.RootOptionsRun,
+//	PostRun: cmd.RootOptionsPostRun,
 }
 
 func flags() {
@@ -72,7 +71,7 @@ func flags() {
 
 	root.MarkPersistentFlagRequired("url")
 
-	root.SetHelpTemplate(banner.BannerHelpRoot)
+	root.SetHelpTemplate(banner.BANNER_HELP_ROOT)
 }
 
 func options() {
