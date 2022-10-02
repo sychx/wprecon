@@ -15,8 +15,8 @@ var (
 )
 
 func doPrintbs(a ...interface{}) (str string){
-	for arg_num, arg := range a {
-		if arg_num > 0 { str += " " }
+	for count, arg := range a {
+		if count > 0 { str += " " }
 
 		switch arg.(type) {
 		case string: str += arg.(string)
