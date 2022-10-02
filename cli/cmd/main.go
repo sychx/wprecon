@@ -13,36 +13,22 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"os/signal"
 	"strings"
 
 	"github.com/AngraTeam/wprecon/cli/core/banner"
+	"github.com/AngraTeam/wprecon/cli/core/signal"
 	database "github.com/AngraTeam/wprecon/internal/memory"
 	"github.com/AngraTeam/wprecon/internal/printer"
 	"github.com/spf13/cobra"
 )
 
-func signalExit() {
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, os.Interrupt)
-
-	<-sc
-
-	fmt.Printf("Your press CTRL+C\r\n")
-	os.Exit(0)
-}
-
 func init() {
-	go signalExit()
+	go signal.Exit()
 	flags()
 }
 
 func main() {
-	if err := root.Execute(); err != nil {
-		printer.Fatal(err)
-	}
+	printer.HandlingFatal(root.Execute())
 }
 
 var root = &cobra.Command{
