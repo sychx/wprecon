@@ -16,12 +16,13 @@ const (
 	UNDERLINE = "\u001b[4m"
 	REVERSED  = "\u001b[7m"
 
-	PREFIX_DONE    = GREEN   + "[✔]" +RESET
-	PREFIX_DANGER  = RED     + "[✗]" +RESET
+	PREFIX_DONE    = GREEN   + "[+]" +RESET
+	PREFIX_DANGER  = RED     + "[-]" +RESET
 	PREFIX_FATAL   = RED     + "[!]" +RESET
 	PREFIX_INFO    = MAGENTA + "[i]" +RESET
 	PREFIX_WARNING = YELLOW  + "[!]" +RESET
 	PREFIX_SCAN    = YELLOW  + "[?]" +RESET
+	PREFIX_VERBOSE = BLACK    + "[v]" +RESET
 
 	PREFIX_LIST_DONE    = GREEN   + "    —" +RESET
 	PREFIX_LIST_DANGER  = RED     + "    —" +RESET

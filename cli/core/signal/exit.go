@@ -9,7 +9,7 @@ import (
 )
 
 func Exit() {
-	sc := make(chan os.Signal, 1)
+	var sc = make(chan os.Signal, 1)
 	signal.Notify(sc, os.Interrupt)
 
 	<-sc

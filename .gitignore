@@ -4,6 +4,8 @@
 *.dll
 *.so
 *.dylib
+wprecon*
+main
 
 # Test binary, built with `go test -c`
 *.test
@@ -16,8 +18,8 @@
 .DS_Store
 *.xml
 *.iml
-wprecon
 .vscode/launch.json
 .vscode/settings.json
-wprecon-linux
-wprecon-macos
+
+# Others
+tasks.md

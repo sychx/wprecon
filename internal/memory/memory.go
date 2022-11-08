@@ -26,61 +26,61 @@ func NewMemory() *_Memory {
 func (model *_Memory) SetString(key, value string) {
 	model.mutex.Lock()
 	model.stringx[key] = value
-	defer model.mutex.Unlock()
+	model.mutex.Unlock()
 }
 
 func (model *_Memory) SetSlice(key string, value []string) {
 	model.mutex.Lock()
 	model.slice[key] = value
-	defer model.mutex.Unlock()
+	model.mutex.Unlock()
 }
 
 func (model *_Memory) SetInt(key string, value int) {
 	model.mutex.Lock()
 	model.intx[key] = value
-	defer model.mutex.Unlock()
+	model.mutex.Unlock()
 }
 
 func (model *_Memory) SetBool(key string, value bool) {
 	model.mutex.Lock()
 	model.boolx[key] = value
-	defer model.mutex.Unlock()
+	model.mutex.Unlock()
 }
 
 func (model *_Memory) SetMapString(key string, value map[string]string) {
 	model.mutex.Lock()
 	model.mapstring[key] = value
-	defer model.mutex.Unlock()
+	model.mutex.Unlock()
 }
 
 func (model *_Memory) SetMapMapString(key, key2, value string) {
 	model.mutex.Lock()
 	model.mapstring[key][key2] = value
-	defer model.mutex.Unlock()
+	model.mutex.Unlock()
 }
 
 func (model *_Memory) AddInString(key, value string) {
 	model.mutex.Lock()
 	model.stringx[key] += value
-	defer model.mutex.Unlock()
+	model.mutex.Unlock()
 }
 
 func (model *_Memory) AddInSlice(key, value string) {
 	model.mutex.Lock()
 	model.slice[key] = append(model.slice[key], value)
-	defer model.mutex.Unlock()
+	model.mutex.Unlock()
 }
 
 func (model *_Memory) AddCalcInt(key string, value int) {
 	model.mutex.Lock()
 	model.intx[key] = model.intx[key] + value
-	defer model.mutex.Unlock()
+	model.mutex.Unlock()
 }
 
 func (model *_Memory) AddInt(key string) {
 	model.mutex.Lock()
 	model.intx[key]++
-	defer model.mutex.Unlock()
+	model.mutex.Unlock()
 }
 
 func (model *_Memory) GetString(key string) string {
