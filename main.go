@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	var URL = "https://www.poli.usp.br/"
+	var URL = ""
 
 	interesting.WordpressCheck(URL, "")
 	interesting.DirectoryPlugins(URL)
