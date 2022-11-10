@@ -9,7 +9,7 @@ import (
 
 // randomUserAgent :: this function "generates" user-agents randomly.
 func randomUserAgent() string {
-	rand.Seed(time.Now().Unix())
+    rand.Seed(time.Now().Unix())
 
-	return wordlist.UserAgents[rand.Intn(len(wordlist.UserAgents))]
+    return wordlist.UserAgents[rand.Intn(len(wordlist.UserAgents))]
 }

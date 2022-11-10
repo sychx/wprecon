@@ -8,18 +8,18 @@ import (
 )
 
 type _EntityOptionsHttp struct {
-	url 				 string
-	data                 io.Reader
-	method               string
-	userAgent            string
-	timeSleep 			 time.Duration
-	contentType 		 string
-	tlsCertificateVerify bool
+    url                  string
+    data                 io.Reader
+    method               string
+    userAgent            string
+    timeSleep            time.Duration
+    contentType          string
+    tlsCertificateVerify bool
 }
 
 type EntityResponse struct {
-	RawIo    io.Reader
-	Raw      string
-	URL      *url.URL
-	Response *http.Response
+    RawIo    io.Reader
+    Raw      string
+    URL      *url.URL
+    Response *http.Response
 }

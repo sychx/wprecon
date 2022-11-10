@@ -5,14 +5,14 @@ package banner
 import "github.com/AngraTeam/wprecon/internal/printer"
 
 const (
-	BAR   = "—————————————————————————————————————————————————————————————————————"
-	ASCII = printer.BLACK + "    ___       ______________________________________________   __\n" + printer.BLACK + "    __ |     / /__  __ \\__  __ \\__  ____/_  ____/_  __ \\__  | / /\n" + printer.BLUE + "    __ | /| / /__  /_/ /_  /_/ /_  __/  _  /    _  / / /_   |/ / \n" + printer.BLUE + "    __ |/ |/ / _  ____/_  _, _/_  /___  / /___  / /_/ /_  /|  /  \n" + printer.CYAN + "    ____/|__/  /_/     /_/ |_| /_____/  \\____/  \\____/ /_/ |_/ \n"
+    BAR   = "—————————————————————————————————————————————————————————————————————"
+    ASCII = printer.BLACK + "    ___       ______________________________________________   __\n" + printer.BLACK + "    __ |     / /__  __ \\__  __ \\__  ____/_  ____/_  __ \\__  | / /\n" + printer.BLUE + "    __ | /| / /__  /_/ /_  /_/ /_  __/  _  /    _  / / /_   |/ / \n" + printer.BLUE + "    __ |/ |/ / _  ____/_  _, _/_  /___  / /___  / /_/ /_  /|  /  \n" + printer.CYAN + "    ____/|__/  /_/     /_/ |_| /_____/  \\____/  \\____/ /_/ |_/ \n"
 
-	HELP_ROOT = `WPRecon, is a tool for the recognition of vulnerabilities and blackbox information for wordpress.
+    HELP_ROOT = `WPRecon, is a tool for the recognition of vulnerabilities and blackbox information for wordpress.
 
 Usage:
     wprecon [flags]
-	
+    
 Flags:
     -h, --help                 Help for wprecon.
     -u, --url [target]         Target URL (Ex: http(s)://example.com/). `+ printer.REQUIRED +`

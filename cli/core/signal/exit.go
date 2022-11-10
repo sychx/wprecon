@@ -9,11 +9,11 @@ import (
 )
 
 func Exit() {
-	var sc = make(chan os.Signal, 1)
-	signal.Notify(sc, os.Interrupt)
+    var sc = make(chan os.Signal, 1)
+    signal.Notify(sc, os.Interrupt)
 
-	<-sc
+    <-sc
 
-	printer.Printf("Your press CTRL+C\r\n")
-	syscall.Exit(0)
+    printer.Printf("Your press CTRL+C\r\n")
+    syscall.Exit(0)
 }

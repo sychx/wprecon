@@ -9,7 +9,7 @@ import (
 
 func NewHTTP(URL string) (httpOptions *_EntityOptionsHttp) {
     httpOptions = &_EntityOptionsHttp{
-        url:		 URL,
+        url:         URL,
         method:      "GET",
         userAgent:   "WPrecon - Wordpress Recon (Vulnerability Recon)",
         data:        nil,
