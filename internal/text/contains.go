@@ -4,6 +4,7 @@ import (
 	"reflect"
 )
 
+// This method only accepts maps
 func ContainsAny(entity interface{}, field, value string) bool {
     var boolean, _ = any(entity, field, value)
 

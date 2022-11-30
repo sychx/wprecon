@@ -25,5 +25,5 @@ func XBanner(URL string, randomAgent bool, timeSleep int) {
         printer.Done("Sleep Requests:\t", timeSleep, "second(s)")
     }
 
-    printer.Done("Started in:\t", time.Now().Format("Monday Jan 02 15:04:05 2006"), "\n")
+    printer.Done("Started in:\t", time.Now().Format("02 Jan 15:04:05"), "\n")
 }
